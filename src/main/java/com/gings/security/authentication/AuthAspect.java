@@ -13,40 +13,53 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
+import com.gings.security.TokenInfo;
 import com.gings.security.UserAuthTokenInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * 
+ * @author seunghyun
+ *
+ */
 @Slf4j
 @Component
 @Aspect
 public class AuthAspect {
+ 
+    public static final String PRINCIPAL = "Princial";
+    
+    private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
+    private static final String SERVER_ERROR_MSG = "response.exception.SystemException";
 
     private static final String AUTHORIZATION = "Authorization";
-    private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
-
-    private static final String BEARER_SCHME = "Bearer ";
+    private static final String BEARER_SCHEME = "Bearer ";
+    
+    private static final Class<? extends UserAuthTokenInfo> USING_TOKEN_INFO  = UserAuthTokenInfo.class;
     
     /**
-     * 실패 시 기본 반환 Response
+     * 인증 실패 시 기본 반환 Response
      */
-    private static ResponseEntity<ApiError> FAILURE_RES;
+    private static ResponseEntity<ApiError> AUTH_FAILURE_RES;
+    private static ResponseEntity<ApiError> SERVER_ERROR_RES;
 
     private final HttpServletRequest httpServletRequest;
     private final JWTServiceManager jwtServiceManager;
     private final MessageSource msgSource;
 
-    /**
-     * Repository 의존성 주입
-     */
     public AuthAspect(HttpServletRequest httpServletRequest, JWTServiceManager jwtServiceManager,
                       MessageSource msgSource) {
+        
         this.httpServletRequest = httpServletRequest;
         this.jwtServiceManager = jwtServiceManager;
         this.msgSource = msgSource;
+        
     }
     
     public HttpServletRequest getHttpServletRequest() {
@@ -55,31 +68,49 @@ public class AuthAspect {
     
     @PostConstruct
     public void init() {
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED.value()
-                                       , msgSource.getMessage(UNAUTHORIZED_MSG, null, Locale.getDefault()));
+        ApiError authFailRES = new ApiError(HttpStatus.UNAUTHORIZED.value(),
+                                               msgSource.getMessage(UNAUTHORIZED_MSG, null, 
+                                                                    Locale.getDefault()));
         
-        FAILURE_RES = new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
+        ApiError errorRES = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                               msgSource.getMessage(SERVER_ERROR_MSG, null, 
+                                                                    Locale.getDefault()));
+        
+        
+        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.UNAUTHORIZED);
+        SERVER_ERROR_RES = new ResponseEntity<>(errorRES, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
-    /*
-    @Around("@annotation(org.sopt.seminar7.utils.auth.Auth)")
+    
+    @Around("@annotation(com.gings.security.authentication.Authentication)")
     public Object around(final ProceedingJoinPoint pjp) throws Throwable {
-        final String jwt = httpServletRequest.getHeader(AUTHORIZATION);
         
-        if (jwt == null) return FAILURE_RES;
+        log.info("Starting to authenticate user info.");
         
-        JWTService jwtService = jwtServiceManager.resolve(UserAuthTokenInfo.class);
+        String jwt = httpServletRequest.getHeader(AUTHORIZATION);
         
-        jwtService.decode(new UserAuthTokenInfo(jwt));
-        
-        if (token == null) {
-            return RES_RESPONSE_ENTITY;
-        } else {
-            final User user = userMapper.findByUserIdx(token.getUser_idx());
-            //유효 사용자 검사
-            if (user == null) return RES_RESPONSE_ENTITY;
-            return pjp.proceed(pjp.getArgs());
+        if (jwt == null) {
+            log.info("JWT token from request header does not exist.");
+            
+            return AUTH_FAILURE_RES;
         }
-    }*/
+        
+        jwt = jwt.replace(BEARER_SCHEME, "");
+        JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
+            
+         try {
+
+            TokenInfo token = jwtService.decode(new UserAuthTokenInfo(jwt));
+            
+            httpServletRequest.setAttribute(PRINCIPAL, token);
+            
+            return pjp.proceed(pjp.getArgs());
+
+        }catch(JWTCreationException e) {
+            log.error("Exception occurred while trying to authenticate user request.", e);
+            
+            return AUTH_FAILURE_RES;
+        }
+    }
 }
 

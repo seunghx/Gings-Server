@@ -3,7 +3,9 @@ package com.gings.security;
 
 import com.gings.utils.code.UserRole;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -13,9 +15,17 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserAuthTokenInfo extends TokenInfo {
     
     private int uid;
     private UserRole userRole;
+    
+    
+    public UserAuthTokenInfo(String token) {
+        super(token);
+    }
+    
     
 }
