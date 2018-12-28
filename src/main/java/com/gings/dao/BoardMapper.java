@@ -10,7 +10,6 @@ import java.util.List;
 public interface BoardMapper {
 
     // 보드 전체 조회 (findAllBoard)
-
     @Select("SELECT * FROM board ORDER BY write_time DESC")
     @Results(value= {
             @Result(property="boardId", column="board_id"),

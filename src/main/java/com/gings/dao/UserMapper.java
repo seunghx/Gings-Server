@@ -7,15 +7,20 @@ import java.util.List;
 
 import org.apache.ibatis.mapping.FetchType;
 
+import com.gings.controller.LoginController.LoginUser;
 import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 
+
 @Mapper
 public interface UserMapper {
 
-    //회원 전체 조회
+    
+    /**
+     * {@link User} 조회 
+     */
     @Select("SELECT * FROM user WHERE user_id = #{userId}")
     @Results(value = {
             @Result(property = "id", column = "user_id"), @Result(property = "email", column = "email"),
@@ -35,7 +40,12 @@ public interface UserMapper {
     public User findByUserId(int userId);
 
 
-    //자기소개 조회
+    @Select("SELECT user_id, pwd, role FROM user WHERE email = #{email}")
+    public LoginUser findByEmail(@Param("email") String email);
+    
+    /**
+     * {@link Introduce} 조회
+     */
     @Select("SELECT * from introduce WHERE user_id = #{userId}")
     @Results({
             @Result(property = "id", column = "introduce_id"),
@@ -44,14 +54,23 @@ public interface UserMapper {
                     many = @Many(select = "findImagesByIntroduceId"))
     })
     public List<Introduce> findIntroduceByUserId(int userId);
-
+    
+    /**
+     * {@link UserKeyword} 조회
+     */
     @Select("SELECT user_id as userId, content from user_keyword WHERE user_id = #{userId}")
     public List<UserKeyword> findKeywordsByUserId(int userId);
 
+    /**
+     * {@link Signature} 조회 
+     */
     @Select("SELECT writer_id as writerId, content, write_time as writeTime from signature "
             + "WHERE user_id = #{userId} ORDER BY write_time DESC")
     public List<Signature> findSignaturesByUserId(int userId);
 
+    /**
+     * 소개글 이미지 조회
+     */
     @Select("SELECT url from introduce_img WHERE introduce_id = #{introduceId}")
     public List<String> findImagesByIntroduceId(int introduceId);
 
