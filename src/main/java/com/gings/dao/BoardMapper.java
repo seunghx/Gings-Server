@@ -2,7 +2,6 @@ package com.gings.dao;
 
 import com.gings.domain.*;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 
 import java.util.List;
 
@@ -42,8 +41,6 @@ public interface BoardMapper {
 
     @Select("SELECT COUNT(recommender_id) FROM board_recommend WHERE board_id = #{boardId}")
     public int countRecommendByBoardId(int boardId);
-
-
 
 
     // 보드 고유 번호로 보드 조회

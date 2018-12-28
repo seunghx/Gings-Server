@@ -1,10 +1,8 @@
 package com.gings.controller;
 
 import com.gings.dao.UserMapper;
-import com.gings.model.ApiError;
 import com.gings.model.DefaultRes;
 import com.gings.model.LoginReq;
-import com.gings.security.DefaultJWTService;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 import com.gings.security.TokenInfo;
@@ -16,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,23 +32,21 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
     
     private static final Class<? extends TokenInfo> USING_TOKEN_INFO = UserAuthTokenInfo.class;
+    
     private static final DefaultRes loginSuccessRes = 
                             new DefaultRes(HttpStatus.CREATED.value(), LOGIN_SUCCESS);
     private static final DefaultRes loginFailedRes = 
                         new DefaultRes(HttpStatus.UNAUTHORIZED.value(), LOGIN_FAIL);
 
-    
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JWTServiceManager jwtServiceManager;
-    private final MessageSource msgSource;
     
     public LoginController(UserMapper userMapper, PasswordEncoder passwordEncoder, 
-                           JWTServiceManager jwtServiceManager, MessageSource msgSource) {
+                           JWTServiceManager jwtServiceManager) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtServiceManager = jwtServiceManager;
-        this.msgSource = msgSource;
     }
     
     
@@ -81,7 +76,7 @@ public class LoginController {
         }else {
             if(log.isInfoEnabled()) {
                 log.info("Login failed because of invalid password for user email : {}"
-                                                                                , loginReq.getEmail());
+                                                                               , loginReq.getEmail());
             }
             
             return new ResponseEntity<>(loginFailedRes, HttpStatus.UNAUTHORIZED);
