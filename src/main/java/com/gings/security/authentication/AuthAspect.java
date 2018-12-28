@@ -40,8 +40,8 @@ public class AuthAspect {
     
     private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
 
-    private static final String AUTHORIZATION = "Authorization";
-    private static final String BEARER_SCHEME = "Bearer ";
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER_SCHEME = "Bearer ";
     
     private static final Class<? extends UserAuthTokenInfo> USING_TOKEN_INFO  = UserAuthTokenInfo.class;
     

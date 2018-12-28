@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.One;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,10 +12,12 @@ import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.mapping.FetchType;
 
+import com.gings.controller.LoginController.LoginUser;
 import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
+
 
 @Mapper
 public interface UserMapper {
@@ -40,6 +43,9 @@ public interface UserMapper {
     })
     public User findByUserId(int userId);
 
+    @Select("SELECT user_id, pwd, role FROM user WHERE email = #{email}")
+    public LoginUser findByEmail(@Param("email") String email);
+    
     /**
      * {@link Introduce} 조회
      */
