@@ -31,7 +31,6 @@ import static com.gings.utils.ResponseMessage.LOGIN_FAIL;
 
 import java.util.Locale;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -64,8 +63,9 @@ public class LoginController {
     public ResponseEntity<DefaultRes<Void>> login(@RequestBody final LoginReq loginReq, 
                                                   HttpServletRequest request, 
                                                   HttpServletResponse response) {
-        
+                
         LoginUser loginUser = userMapper.findByEmail(loginReq.getEmail());
+                                      
         
         if(loginUser == null) {
             if(log.isInfoEnabled()) {
@@ -87,10 +87,9 @@ public class LoginController {
                 log.info("Login failed because of invalid password for user email : {}"
                                                                                 , loginReq.getEmail());
             }
+            
             return new ResponseEntity<>(loginFailedRes, HttpStatus.UNAUTHORIZED);
         }
-        
-        
     }
     
     @Setter
