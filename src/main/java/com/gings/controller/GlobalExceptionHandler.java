@@ -5,14 +5,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-
     @Autowired
     private MessageSource msgSource;
 
@@ -51,16 +48,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
             HttpHeaders headers, HttpStatus status, WebRequest request) {
+        
         log.error("An exception occurred associated with controller method parameter.", ex);
 
         ApiError apiError = new ApiError(status.value(),
                 msgSource.getMessage("response.exception.MethodArgumentNotValidException", null, request.getLocale()));
 
-        ex.getBindingResult().getFieldErrors().stream()
-                .forEach(e -> apiError.addDetail(e.getField(), msgSource.getMessage(e, request.getLocale())));
+        ex.getBindingResult().getFieldErrors()
+                             .stream()
+                             .forEach(e -> apiError.addDetail(e.getField(), 
+                                                              msgSource.getMessage(e, request.getLocale())));
 
-        ex.getBindingResult().getGlobalErrors().stream()
-                .forEach(e -> apiError.addDetail(e.getObjectName(), msgSource.getMessage(e, request.getLocale())));
+        ex.getBindingResult().getGlobalErrors()
+                             .stream()
+                             .forEach(e -> apiError.addDetail(e.getObjectName(), 
+                                                              msgSource.getMessage(e, request.getLocale())));
 
         return handleExceptionInternal(ex, apiError, headers, status, request);
     }
@@ -80,8 +82,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(status.value(),
                 msgSource.getMessage("response.exception.BindException", null, request.getLocale()));
 
-        ex.getBindingResult().getFieldErrors().stream()
-                .forEach(e -> apiError.addDetail(e.getField(), msgSource.getMessage(e, request.getLocale())));
+        ex.getBindingResult().getFieldErrors()
+                             .stream()
+                             .forEach(e -> apiError.addDetail(e.getField(), 
+                                                              msgSource.getMessage(e, request.getLocale())));
 
         ex.getBindingResult().getGlobalErrors().stream()
                 .forEach(e -> apiError.addDetail(e.getObjectName(), msgSource.getMessage(e, request.getLocale())));
@@ -107,7 +111,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         new String[] { ex.getParameterName() }, request.getLocale()));
 
         return handleExceptionInternal(ex, apiError, headers, status, request);
-
     }
 
     /**
@@ -129,28 +132,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(ex, apiError, headers, status, request);
     }
-
-    /**
-     * 
-     * 컨트롤러의 {@link @RequestMapping} 메서드의 인자로 전달 될 경로 변수가 URL에서 추출 된 URI 변수에 존재하지 않을
-     * 때 발생하는 예외를 처리한다. 이 예외는 일반적으로 URI 템플릿이 method 인자에 명시된 경로 변수 이름과 매치되지 않음을 의미한다.
-     * 
-     * @param status
-     *            - 500 - Internal Server Error를 의미. URI 템플릿에서 지정한 경로 변수 명이나 메서드
-     *            인자명을 바꾸거나 해야 한다.
-     * 
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
-            HttpStatus status, WebRequest request) {
-        log.error("An exception occurred accoicated with path variable setting.", ex);
-
-        ApiError apiError = new ApiError(status.value(),
-                msgSource.getMessage("response.exception.MissingPathVariableException", null, request.getLocale()));
-
-        return handleExceptionInternal(ex, apiError, headers, status, request);
-    }
-
+    
     /**
      * 
      * 페이지를 찾지 못할 때 발생하는 예외에 대한 처리를 수행하는 메서드.
