@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.gings.controller.Principal;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
@@ -94,9 +95,8 @@ public class AuthAspect {
             
          try {
 
-            TokenInfo token = jwtService.decode(new UserAuthTokenInfo(jwt));
-            
-            httpServletRequest.setAttribute(PRINCIPAL, token);
+            UserAuthTokenInfo token = (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
+            httpServletRequest.setAttribute(PRINCIPAL, new Principal(token.getUid(), token.getUserRole()));
             
         }catch(JWTCreationException e) {
             log.error("Exception occurred while trying to authenticate user request.", e);
