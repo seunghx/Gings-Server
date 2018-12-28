@@ -30,9 +30,7 @@ import static com.gings.utils.ResponseMessage.LOGIN_SUCCESS;
 import static com.gings.utils.ResponseMessage.LOGIN_FAIL;
 
 import java.util.Locale;
-import java.util.Optional;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -68,6 +66,7 @@ public class LoginController {
                 
         LoginUser loginUser = userMapper.findByEmail(loginReq.getEmail());
                                       
+        
         if(loginUser == null) {
             if(log.isInfoEnabled()) {
                 log.info("Login failed for user email : {}", loginReq.getEmail());
