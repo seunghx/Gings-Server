@@ -1,5 +1,6 @@
 package com.gings.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,8 @@ public class DefaultRes<T> {
     private int status;
 
     private String message;
-
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     public DefaultRes(final int status, final String message) {

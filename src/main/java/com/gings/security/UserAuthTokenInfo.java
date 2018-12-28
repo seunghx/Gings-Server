@@ -22,10 +22,8 @@ public class UserAuthTokenInfo extends TokenInfo {
     private int uid;
     private UserRole userRole;
     
-    
     public UserAuthTokenInfo(String token) {
         super(token);
     }
-    
     
 }
