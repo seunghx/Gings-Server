@@ -9,6 +9,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.MessageSource;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,13 +31,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@Order(1)
 @Aspect
 public class AuthAspect {
  
     public static final String PRINCIPAL = "Princial";
     
     private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
-    private static final String SERVER_ERROR_MSG = "response.exception.SystemException";
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER_SCHEME = "Bearer ";
@@ -47,7 +48,6 @@ public class AuthAspect {
      * 인증 실패 시 기본 반환 Response
      */
     private static ResponseEntity<ApiError> AUTH_FAILURE_RES;
-    private static ResponseEntity<ApiError> SERVER_ERROR_RES;
 
     private final HttpServletRequest httpServletRequest;
     private final JWTServiceManager jwtServiceManager;
@@ -72,13 +72,7 @@ public class AuthAspect {
                                                msgSource.getMessage(UNAUTHORIZED_MSG, null, 
                                                                     Locale.getDefault()));
         
-        ApiError errorRES = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                               msgSource.getMessage(SERVER_ERROR_MSG, null, 
-                                                                    Locale.getDefault()));
-        
-        
         AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.UNAUTHORIZED);
-        SERVER_ERROR_RES = new ResponseEntity<>(errorRES, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     
@@ -104,13 +98,13 @@ public class AuthAspect {
             
             httpServletRequest.setAttribute(PRINCIPAL, token);
             
-            return pjp.proceed(pjp.getArgs());
-
         }catch(JWTCreationException e) {
             log.error("Exception occurred while trying to authenticate user request.", e);
             
             return AUTH_FAILURE_RES;
         }
+         
+        return pjp.proceed(pjp.getArgs());
     }
 }
 
