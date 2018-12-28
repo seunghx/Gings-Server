@@ -23,13 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
 
-import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 import static com.gings.utils.ResponseMessage.LOGIN_SUCCESS;
 import static com.gings.utils.ResponseMessage.LOGIN_FAIL;
-
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

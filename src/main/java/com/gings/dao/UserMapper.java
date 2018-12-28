@@ -13,10 +13,14 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 
-
+/**
+ * 
+ * 
+ * @author seunghyun
+ *
+ */
 @Mapper
 public interface UserMapper {
-
     
     /**
      * {@link User} 조회 
@@ -40,7 +44,7 @@ public interface UserMapper {
     public User findByUserId(int userId);
 
 
-    @Select("SELECT user_id, pwd, role FROM user WHERE email = #{email}")
+    @Select("SELECT user_id as userId, pwd, role FROM user WHERE email = #{email}")
     public LoginUser findByEmail(@Param("email") String email);
     
     /**
