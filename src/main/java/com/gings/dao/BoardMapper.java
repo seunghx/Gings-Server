@@ -83,15 +83,4 @@ public interface BoardMapper {
 
     @Select("SELECT COUNT(recommender_id) AS recommender FROM reply_recommend WHERE reply_id = #{replyId}")
     public int findReplyRecommendNumbers(int replyId);
-
-
-
-
-
-
-
-
-
-
-
 }

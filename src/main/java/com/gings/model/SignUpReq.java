@@ -23,7 +23,6 @@ public class SignUpReq {
     private String field;
     private String status;
     private String role;
-    private MultipartFile image;
     private boolean coworkingEnabled;
 
     private Introduce introduce;
