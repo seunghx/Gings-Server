@@ -44,7 +44,9 @@ public interface UserMapper {
     public User findByUserId(int userId);
 
 
-    @Select("SELECT user_id as userId, pwd, role FROM user WHERE email = #{email}")
+    @Select("SELECT user_id as userId, pwd, role, email_confired as emailConfirmed, first_login as firstLogin"
+         + " FROM user "
+         + " WHERE email = #{email}")
     public LoginUser findByEmail(@Param("email") String email);
     
     /**

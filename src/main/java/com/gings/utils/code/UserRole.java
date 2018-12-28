@@ -3,7 +3,7 @@ package com.gings.utils.code;
 
 public enum UserRole implements Code {
     
-    USER("USER"), ADMIN("ADMIN");
+    NORMAL_USER("USER"), ADMIN("ADMIN");
     
     private String code;
     

@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.Period;
 import java.util.Date;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import com.auth0.jwt.JWT;
@@ -39,9 +41,10 @@ public class DefaultJWTService implements JWTService {
     @Value("${jwt.user-auth.token-ttl.day}")
     private int expiredPeriod;
     
-    private final Algorithm algorithm;
+    private Algorithm algorithm;
     
-    public DefaultJWTService() {
+    @PostConstruct
+    public void init() {
         this.algorithm = Algorithm.HMAC256(secret);
     }
     

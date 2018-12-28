@@ -19,8 +19,10 @@ import com.gings.controller.Principal;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
-import com.gings.security.TokenInfo;
 import com.gings.security.UserAuthTokenInfo;
+
+import static com.gings.security.JWTService.AUTHORIZATION;
+import static com.gings.security.JWTService.BEARER_SCHEME;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,9 +41,6 @@ public class AuthAspect {
     public static final String PRINCIPAL = "Princial";
     
     private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
-
-    public static final String AUTHORIZATION = "Authorization";
-    public static final String BEARER_SCHEME = "Bearer ";
     
     private static final Class<? extends UserAuthTokenInfo> USING_TOKEN_INFO  = UserAuthTokenInfo.class;
     
@@ -91,6 +90,7 @@ public class AuthAspect {
         }
         
         jwt = jwt.replace(BEARER_SCHEME, "");
+        
         JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
             
          try {
