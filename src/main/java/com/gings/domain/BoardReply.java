@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +17,8 @@ public class BoardReply {
 
     private String content;
     private LocalDateTime writeTime;
+
+    private List<String> images;
 
     private int recommender;
 

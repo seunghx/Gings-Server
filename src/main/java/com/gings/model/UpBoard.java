@@ -23,9 +23,10 @@ public class UpBoard {
         private String category;
 
         private List<String> images;
-        private List<BoardKeyword> keywords;
+        private List<String> keywords;
 
         private int recommender;
+        private int share;
 
     }
 
