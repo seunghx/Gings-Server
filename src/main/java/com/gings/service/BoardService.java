@@ -1,7 +1,5 @@
 package com.gings.service;
 
-import com.gings.dao.BoardMapper;
-import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;

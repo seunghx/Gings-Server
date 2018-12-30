@@ -1,6 +1,5 @@
 package com.gings.service;
 
-import com.gings.dao.UserMapper;
 import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
@@ -8,7 +7,6 @@ import com.gings.domain.UserKeyword;
 import com.gings.model.DefaultRes;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
-import org.apache.ibatis.javassist.compiler.ast.Keyword;
 
 import java.util.List;
 
