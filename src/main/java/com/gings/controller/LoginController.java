@@ -67,6 +67,7 @@ public class LoginController {
     
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<DefaultRes<Void>> onUsernameNotFound(UsernameNotFoundException ex, WebRequest request) {
+        
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
         
         String message = msgSource.getMessage("response.authentication.invalid-email-password", 
