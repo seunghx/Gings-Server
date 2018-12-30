@@ -13,6 +13,7 @@ public class Login {
     
     @Getter
     @Setter
+    @AllArgsConstructor
     public static class LoginReq{
         
         @NotBlank(message = MSG_EMAIL_BLANK)
