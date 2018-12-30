@@ -8,6 +8,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.gings.security.Principal;
 import com.gings.security.authentication.AuthAspect;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +30,15 @@ public class PrincipalArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public Principal resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                      NativeWebRequest webRequest, WebDataBinderFactory binderFactory) 
-                                     throws Exception {
+                                                                                    throws Exception {
 
         log.info("Starting to resolving argument.");
         
         try {
-            Principal principal = (Principal)RequestContextHolder.getRequestAttributes()
-                                                             .getAttribute(AuthAspect.PRINCIPAL, 
-                                                                          RequestAttributes.SCOPE_REQUEST);
+            Principal principal = 
+                        (Principal)RequestContextHolder.getRequestAttributes()
+                                                       .getAttribute(AuthAspect.PRINCIPAL, 
+                                                                     RequestAttributes.SCOPE_REQUEST);
             if(principal == null) {
                 log.error("Null value prinicpal detected. Checking authentication component required.");
                 

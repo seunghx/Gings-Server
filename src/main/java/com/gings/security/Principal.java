@@ -1,4 +1,4 @@
-package com.gings.controller;
+package com.gings.security;
 
 import com.gings.utils.code.UserRole;
 

@@ -15,10 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.exceptions.JWTCreationException;
-import com.gings.controller.Principal;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
+import com.gings.security.Principal;
 import com.gings.security.UserAuthTokenInfo;
 
 import static com.gings.security.JWTService.AUTHORIZATION;
