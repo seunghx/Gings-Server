@@ -36,7 +36,7 @@ public class MailAuthenticationNumberNotificationProvider
 
     private static final String AUTH_NUMBER_KEY = "authNumber";
     private static final String IMG_CID_KEY = "identifier";
-    private static final String IMG_CID_VALUE = "authNumberImgEmail";
+    private static final String IMG_CID_VALUE = "authNumberEmailImg";
     
     @Value("${thymeleaf.template.authNumber.location}")
     private String templateLocation;
