@@ -1,6 +1,8 @@
 package com.gings.dao;
 
 import com.gings.domain.*;
+import com.gings.model.Pagination;
+import com.gings.model.UpBoard;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
 public interface BoardMapper {
 
     // 보드 전체 조회 (findAllBoard)
-    @Select("SELECT * FROM board ORDER BY write_time DESC")
+    @Select("SELECT * FROM board ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id"),
             @Result(property="writerId", column="writer_id"),
@@ -25,7 +27,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findAllBoard();
+    public List<Board> findAllBoard(@Param("pagination") final Pagination pagination);
 
     // 보드 고유 번호로 이미지 전체 조회(findImagesByBoard)
 
@@ -60,7 +62,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findBoardByUserId(int boardId);
+    public List<Board> findBoardByBoardId(int boardId);
 
 
     // 보드 고유 번호로 해당 보드 댓글 조회
@@ -78,5 +80,7 @@ public interface BoardMapper {
     // 댓글 고유 번호로 댓글 좋아요 갯수 조회
 
     @Select("SELECT COUNT(recommender_id) AS recommender FROM reply_recommend WHERE reply_id = #{replyId}")
-    public int findReplyRecommendNumbers(int replyId);
+    public int findReplyRecommendNumbersByReplyId(int replyId);
+
+    public void save(@Param("contentReq") final UpBoard.UpBoardReq upBoardReq);
 }

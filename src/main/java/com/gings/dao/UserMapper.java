@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.ibatis.mapping.FetchType;
 
-import com.gings.controller.LoginController.LoginUser;
 import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
