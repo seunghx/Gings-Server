@@ -1,7 +1,9 @@
 package com.gings.dao;
 
 import com.gings.controller.LoginController;
+
 import com.gings.controller.LoginController.LoginUser;
+
 import com.gings.model.SignUpReq;
 import org.apache.ibatis.annotations.*;
 
@@ -48,7 +50,7 @@ public interface UserMapper {
     @Select("SELECT user_id as userId, pwd, role, email_confired as emailConfirmed, first_login as firstLogin"
          + " FROM user "
          + " WHERE email = #{email}")
-    public LoginUser findByEmail(@Param("email") String email);
+    public LoginController.LoginUser findByEmail(@Param("email") String email);
     
     /**
      * {@link Introduce} 조회
@@ -92,6 +94,10 @@ public interface UserMapper {
             "status = #{user.status}, role = #{user.role}, image = #{user.image} WHERE userIdx = #{userIdx}")
     void update(@Param("userIdx") final int userIdx, @Param("user") final User user);
 
+
+    //회원 삭제
+    @Delete("DELETE FROM user WHERE user_id = #{userId}")
+    void deleteUser(@Param("userId") final int userId);
 
 
 }

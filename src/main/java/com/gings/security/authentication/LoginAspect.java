@@ -2,11 +2,11 @@ package com.gings.security.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.gings.dao.UserMapper;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.gings.dao.UserMapper;
 import com.gings.security.JWTServiceManager;
 
 import lombok.extern.slf4j.Slf4j;

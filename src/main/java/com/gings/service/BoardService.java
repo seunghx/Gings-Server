@@ -1,7 +1,5 @@
 package com.gings.service;
 
-import com.gings.dao.BoardMapper;
-import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
@@ -9,13 +7,11 @@ import com.gings.model.UpBoard;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.javassist.compiler.ast.Keyword;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

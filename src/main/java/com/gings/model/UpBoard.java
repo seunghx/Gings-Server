@@ -22,6 +22,7 @@ public class UpBoard {
         private String content;
         private String category;
 
+
         private MultipartFile[] images;
         private List<String> keywords;
 
