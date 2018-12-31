@@ -5,6 +5,7 @@ import com.gings.domain.BoardReply;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -19,13 +20,13 @@ public class UpBoard {
         private int writerId;
         private String title;
         private String content;
-        private LocalDateTime time;
         private String category;
 
-        private List<String> images;
-        private List<BoardKeyword> keywords;
+        private MultipartFile[] images;
+        private List<String> keywords;
 
         private int recommender;
+        private int share;
 
     }
 

@@ -32,19 +32,6 @@ public class BoardController {
 
 
     /**
-     *
-     * Test Data
-     */
-    public ResponseEntity saveContent(@RequestBody final UpBoard.UpBoardReq upBoardReq) {
-        try {
-            return new ResponseEntity<>(boardService.save(upBoardReq), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
      * 모든 보드 조회
      *
      * @param pagination 페이지네이션
@@ -157,6 +144,23 @@ public class BoardController {
         try {
             DefaultRes<Integer> defaultRes = boardService.findReplyRecommendNumbersByReplyId(replyId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    /**
+     * 보드 저장
+     *
+     * @param upBoardReq 보드 데이터
+     * @return ResponseEntity
+     */
+    @PostMapping("")
+    public ResponseEntity saveBoard(final UpBoard.UpBoardReq upBoardReq) {
+        try {
+            return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);

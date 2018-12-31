@@ -1,5 +1,7 @@
 package com.gings.dao;
 
+import com.gings.controller.LoginController;
+import com.gings.controller.LoginController.LoginUser;
 import com.gings.model.SignUpReq;
 import org.apache.ibatis.annotations.*;
 
@@ -89,5 +91,7 @@ public interface UserMapper {
     @Update("UPDATE user SET region = #{user.region}, job = #{user.job}, company = #{user.company}, field = #{user.field}, coworking_chk = #{user.coworking}," +
             "status = #{user.status}, role = #{user.role}, image = #{user.image} WHERE userIdx = #{userIdx}")
     void update(@Param("userIdx") final int userIdx, @Param("user") final User user);
+
+
 
 }

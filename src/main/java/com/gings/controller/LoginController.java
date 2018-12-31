@@ -102,10 +102,10 @@ public class LoginController {
      * login 수행
      */
     @PostMapping("/login")
-    public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) {
+    public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) throws Throwable {
 
         LoginUser user =
-                Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
+                 Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
                         .orElseThrow(() -> {
 
                             if(log.isInfoEnabled()) {
