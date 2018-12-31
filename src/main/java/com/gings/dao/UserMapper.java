@@ -1,5 +1,8 @@
 package com.gings.dao;
 
+
+import com.gings.controller.LoginController.LoginUser;
+
 import com.gings.model.SignUpReq;
 import org.apache.ibatis.annotations.*;
 
@@ -7,7 +10,6 @@ import java.util.List;
 
 import org.apache.ibatis.mapping.FetchType;
 
-import com.gings.controller.LoginController.LoginUser;
 import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
@@ -44,7 +46,7 @@ public interface UserMapper {
     public User findByUserId(int userId);
 
 
-    @Select("SELECT user_id as userId, pwd, role, email_confired as emailConfirmed, first_login as firstLogin"
+    @Select("SELECT user_id as userId, pwd, role, first_login as firstLogin"
          + " FROM user "
          + " WHERE email = #{email}")
     public LoginUser findByEmail(@Param("email") String email);
@@ -90,5 +92,11 @@ public interface UserMapper {
     @Update("UPDATE user SET region = #{user.region}, job = #{user.job}, company = #{user.company}, field = #{user.field}, coworking_chk = #{user.coworking}," +
             "status = #{user.status}, role = #{user.role}, image = #{user.image} WHERE userIdx = #{userIdx}")
     void update(@Param("userIdx") final int userIdx, @Param("user") final User user);
+
+
+    //회원 삭제
+    @Delete("DELETE FROM user WHERE user_id = #{userId}")
+    void deleteUser(@Param("userId") final int userId);
+
 
 }

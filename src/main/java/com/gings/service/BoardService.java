@@ -1,7 +1,6 @@
 package com.gings.service;
 
 import com.gings.dao.BoardMapper;
-import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
@@ -12,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -40,6 +41,7 @@ public class BoardService {
      */
     public DefaultRes<List<Board>> findAllBoard(final Pagination pagination) {
         final List<Board> boards = boardMapper.findAllBoard(pagination);
+        log.error("{}", boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
@@ -79,7 +81,7 @@ public class BoardService {
      * @return DefaultRes
      */
     public DefaultRes findKeywordsByBoardId(final int id) {
-        final List<BoardKeyword> keywords = boardMapper.findKeywordsByBoardId(id);
+        final List<String> keywords = boardMapper.findKeywordsByBoardId(id);
         if (keywords.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD_INFO);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD_INFO, keywords);
@@ -126,9 +128,21 @@ public class BoardService {
      * @param upBoardReq 보드 데이터
      * @return DefaultRes
      */
-    public DefaultRes save(final UpBoard.UpBoardReq upBoardReq) {
+    public DefaultRes saveBoard(final UpBoard.UpBoardReq upBoardReq) {
         try {
-            boardMapper.save(upBoardReq);
+            final int boardId = upBoardReq.getBoardId();
+            boardMapper.saveBoard(upBoardReq);
+            final List<String> sampleUrl = new LinkedList<>();
+            sampleUrl.add("abcd");
+            sampleUrl.add("efgh");
+
+            for (MultipartFile image : upBoardReq.getImages()) {
+                // 여기에다 s3에 이미지 파일 저장 //
+                log.info(sampleUrl.toString());
+                boardMapper.saveBoardImg(boardId, sampleUrl);
+            }
+            boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
+
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
             log.info(e.getMessage());

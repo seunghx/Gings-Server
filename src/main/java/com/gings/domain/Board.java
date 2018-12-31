@@ -20,7 +20,7 @@ public class Board {
     private String category;
 
     private List<String> images;
-    private List<BoardKeyword> keywords;
+    private List<String> keywords;
     private List<BoardReply> replys;
 
     private int recommender;

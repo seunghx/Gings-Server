@@ -74,7 +74,7 @@ public class LoginController {
                 null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.OK);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -85,28 +85,17 @@ public class LoginController {
                 null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(EmailNotConfirmedException.class)
-    public ResponseEntity<DefaultRes<Void>> onEmailNotConfirmed(EmailNotConfirmedException ex, WebRequest request) {
-        log.error("Exception occurred while trying to log in user. Exception : ", ex);
-
-        String message = msgSource.getMessage("response.authentication.email-not-authenticated",
-                new String[] {ex.getEmail()}, request.getLocale());
-
-        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.FORBIDDEN.value(), message),
-                HttpStatus.FORBIDDEN);
+                HttpStatus.OK);
     }
 
     /**
      * login 수행
      */
     @PostMapping("/login")
-    public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) {
+    public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) throws Throwable {
 
         LoginUser user =
-                Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
+                 Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
                         .orElseThrow(() -> {
 
                             if(log.isInfoEnabled()) {
@@ -128,12 +117,6 @@ public class LoginController {
         String email = req.getEmail();
 
         if(passwordEncoder.matches(req.getPwd(), user.getPwd())){
-
-            if(!user.isEmailConfirmed()) {
-                log.info("Login failed because user email : {} does not authenticated yet.", email);
-
-                throw new EmailNotConfirmedException("User email not confirmed.", email);
-            }
 
             log.info("Login succeeded for user email : {}", email);
 
@@ -163,22 +146,6 @@ public class LoginController {
         return new LoginRes(user.firstLogin);
     }
 
-    private class EmailNotConfirmedException extends RuntimeException {
-
-        private static final long serialVersionUID = 276919101137697050L;
-
-        private final String email;
-
-        EmailNotConfirmedException(String message, String email) {
-            super(message);
-            this.email = email;
-        }
-
-        String getEmail() {
-            return email;
-        }
-    }
-
     @Setter
     @Getter
     @ToString
@@ -186,7 +153,6 @@ public class LoginController {
         private int userId;
         private UserRole role;
         private String pwd;
-        private boolean emailConfirmed;
         private boolean firstLogin;
     }
 }
