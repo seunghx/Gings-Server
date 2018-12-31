@@ -20,7 +20,6 @@ public class TempController {
     
     @PostMapping("/temp")
     public ResponseEntity<Void> temp(Temp temp){
-        log.error("{}", temp);
         
         log.error("{}", service.uploadMultipleFiles(temp.getFile()));
         

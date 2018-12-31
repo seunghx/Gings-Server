@@ -98,5 +98,4 @@ public interface UserMapper {
     @Delete("DELETE FROM user WHERE user_id = #{userId}")
     void deleteUser(@Param("userId") final int userId);
 
-
 }
