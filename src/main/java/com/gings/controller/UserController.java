@@ -40,7 +40,7 @@ import com.gings.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestController(value = "/user")
+@RestController("user")
 public class UserController {
     
     private static final Class<? extends TokenInfo> USING_TOKEN_INFO = AuthNumberTokenInfo.class;
