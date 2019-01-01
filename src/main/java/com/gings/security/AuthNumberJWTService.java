@@ -6,8 +6,10 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -44,10 +46,29 @@ public class AuthNumberJWTService implements JWTService {
    
     @Override
     public String create(TokenInfo tokenInfo) {
-        // TODO Auto-generated method stub
-        return null;
+        // null is not instanceof UserAuthTokenInfo
+        if(!(tokenInfo instanceof AuthNumberTokenInfo)) {
+            log.warn("Invalid Argument TokenInfo. This class does not support {}.", tokenInfo); 
+            
+            throw new IllegalStateException("Illegal tokenInfo detected.");
+        }
+        
+        AuthNumberTokenInfo supportingTokenInfo = (AuthNumberTokenInfo)tokenInfo;
+        
+        try {
+            return JWT.create()
+                      .withIssuer(issuer)
+                      .withClaim(AUTH_NUMBER_CLAIM_NAME, supportingTokenInfo.getAuthNumber())
+                      .withExpiresAt(expiredAt(expiredPeriod))
+                      .sign(algorithm);
+                      
+        } catch (JWTCreationException jce) {
+            log.info("Exception occurred while trying to create JWT token.");  
+            
+            throw jce;
+        }
     }
-
+    
     @Override
     public boolean support(Class<? extends TokenInfo> tokenInfo) {
         if(tokenInfo == null) {

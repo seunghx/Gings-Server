@@ -73,7 +73,7 @@ public class DefaultJWTService implements JWTService {
                       .withIssuer(issuer)
                       .withClaim(USER_ID_CLAIM_NAME, supportingTokenInfo.getUid())
                       .withClaim(USER_ROLE_CLAIM_NAME, supportingTokenInfo.getUserRole().getCode())
-                      .withExpiresAt(expiredAt())
+                      .withExpiresAt(expiredAt(expiredPeriod))
                       .sign(algorithm);
                       
         } catch (JWTCreationException jce) {
@@ -98,11 +98,6 @@ public class DefaultJWTService implements JWTService {
     @Override
     public void validate(TokenInfo tokenInfo) {
         validateInternal(tokenInfo);
-    }
-
-    private Date expiredAt() {
-        return Date.from(Instant.now()
-                                .plus(Period.ofDays(expiredPeriod)));
     }
 
     private DecodedJWT validateInternal(TokenInfo tokenInfo) {
