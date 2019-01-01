@@ -92,7 +92,7 @@ public interface UserMapper {
     @Insert("INSERT INTO user(name,email,pwd) "
             + "VALUES(#{signUp.name}, #{signUp.email}, #{signUp.pwd})")
     @Options(useGeneratedKeys = true, keyColumn = "user.userIdx")
-    int save(@Param("signUpReq") final SignUp signUpReq);
+    int save(@Param("signUp") final SignUp signUp);
 
     //회원 정보 수정
     @Update("UPDATE user SET region = #{user.region}, job = #{user.job}, company = #{user.company}, field = #{user.field}, coworking_chk = #{user.coworking}," +
