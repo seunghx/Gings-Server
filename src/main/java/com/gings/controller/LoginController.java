@@ -123,8 +123,8 @@ public class LoginController {
             log.info("Login succeeded for user email : {}", email);
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,
-                    onLoginSuccess(user)),
-                    HttpStatus.CREATED);
+                                                                             onLoginSuccess(user)),
+                                         HttpStatus.OK);
         }else {
             log.info("Login failed because of invalid password for user email : {}", email);
 
@@ -133,21 +133,29 @@ public class LoginController {
     }
 
     private LoginRes onLoginSuccess(LoginUser user){
-
+        
+        setTokenToResponse(user);
+        
+        if(user.isFirstLogin()) {
+            userMapper.setFalseToFirstLogin(user.getUserId());
+        }
+        
+        return new LoginRes(user.firstLogin);
+    }
+    
+    private void setTokenToResponse(LoginUser user) {
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
-
+        
         JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
         String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
-
+        
         ServletWebRequest servletContainer =
                 (ServletWebRequest)RequestContextHolder.getRequestAttributes();
 
         servletContainer.getResponse()
                         .setHeader(AUTHORIZATION, jwt);
-
-        return new LoginRes(user.firstLogin);
     }
-
+    
     @Setter
     @Getter
     @ToString

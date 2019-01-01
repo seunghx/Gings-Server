@@ -84,10 +84,13 @@ public interface UserMapper {
     
     @Select("SELECT COUNT(*) from user WHERE email = #{email}")
     public int countByEmail(String email);
-
+    
+    @Update("UPADATE user SET first_login = 0 WHERE user_id = #{userId}")
+    public void setFalseToFirstLogin(int userId);
+    
     //회원 등록(회원가입)
-    @Insert("INSERT INTO user(name,email,pwd,region,job,company,field,coworking_chk,status,role,image) VALUES(#{signUpReq.name}, #{signUpReq.email},#{signUpReq.pwd}, #{signUpReq.region}, " +
-            "#{signUpReq.job}, #{signUpReq.company}, #{signUpReq.field}, #{signUpReq.coworking_chk}, #{signUpReq.status}, #{signUpReq.role}, #{signUpReq.image})")
+    @Insert("INSERT INTO user(name,email,pwd) "
+            + "VALUES(#{signUp.name}, #{signUp.email}, #{signUp.pwd})")
     @Options(useGeneratedKeys = true, keyColumn = "user.userIdx")
     int save(@Param("signUpReq") final SignUp signUpReq);
 

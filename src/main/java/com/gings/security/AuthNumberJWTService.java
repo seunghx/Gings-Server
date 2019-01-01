@@ -10,7 +10,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.gings.utils.code.UserRole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +18,7 @@ public class AuthNumberJWTService implements JWTService {
     
     private static final String AUTH_NUMBER_CLAIM_NAME = "authNumber";
 
-    @Value("${jwt.user-auth.secret}")
+    @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.auth-number.issuer}")
     private String issuer;
@@ -38,7 +37,7 @@ public class AuthNumberJWTService implements JWTService {
      */
     @Override
     public AuthNumberTokenInfo decode(TokenInfo tokenInfo) {
-        DecodedJWT decoded = validateInternal(tokenInfo);
+        validateInternal(tokenInfo);
         
         return null;
     }
@@ -57,7 +56,7 @@ public class AuthNumberJWTService implements JWTService {
             throw new NullPointerException("Class parameter tokenInfo is null.");
         }
         
-        return UserAuthTokenInfo.class.isAssignableFrom(tokenInfo);
+        return AuthNumberTokenInfo.class.isAssignableFrom(tokenInfo);
     
     }
 

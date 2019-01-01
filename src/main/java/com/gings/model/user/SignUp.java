@@ -17,7 +17,6 @@ public class SignUp {
     private static final String INVALID_PWD = "비밀 번호는 7~14 글자의 영문 대소문자 및 숫자로 구성되어야 합니다.";
     private static final String INVALID_AUTH_NUMBER = "인증 번호가 올바르지 않습니다.";
     
-    
     @NotBlank(message = EMPTY_NAME)
     private String name;
     @NotBlank(message = EMPTY_EMAIL)

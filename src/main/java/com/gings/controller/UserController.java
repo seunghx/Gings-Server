@@ -5,6 +5,7 @@ import static com.gings.security.JWTService.AUTHORIZATION;
 import java.util.Locale;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
@@ -12,11 +13,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -44,6 +48,7 @@ public class UserController {
     private final MessageSource msgSource;
     private final JWTServiceManager jwtServiceManager;
     private final AuthenticationNumberNotificationProvider notificationProvider;
+   
     
     public UserController(UserService userService, MessageSource msgSource, 
                           JWTServiceManager jwtServiceManager, 
@@ -106,14 +111,29 @@ public class UserController {
     }
     
     @PostMapping("/signup")
-    public ResponseEntity<DefaultRes<Void>> signup(@Validated SignUp signUp) {
-        verifyAuthenticationNumber(signUp.getAuthNumber());
+    public ResponseEntity<DefaultRes<Void>> signup(@Validated SignUp signUp, HttpServletRequest request) {
+        verifyAuthenticationNumber(signUp.getAuthNumber(), request);
         
-        return null;
+        userService.addNewUser(signUp);
+        
+        String message = msgSource.getMessage("response.sign-up.success", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
+                                    HttpStatus.OK);
     }
     
-    private void verifyAuthenticationNumber(String authNumber) {
+    private void verifyAuthenticationNumber(String authNumber, HttpServletRequest request) {
+        String jwt = request.getHeader(AUTHORIZATION);
         
+        AuthNumberTokenInfo tokenInfo = new AuthNumberTokenInfo(jwt, authNumber);
+        
+        if(StringUtils.isEmpty(jwt)) {
+            log.info("Received invalid empty jwt token.");
+            
+            throw new BadCredentialsException("JWT token including authentication number is empty.");
+        }
+        
+        jwtServiceManager.resolve(USING_TOKEN_INFO).validate(tokenInfo);
     }
     
     /**

@@ -1,5 +1,6 @@
 package com.gings.security;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,4 +16,8 @@ public class AuthNumberTokenInfo extends TokenInfo {
         super(token);
     }
     
+    public AuthNumberTokenInfo(String token, String authNumber) {
+        this(token);
+        this.authNumber = authNumber;
+    }
 }

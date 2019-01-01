@@ -33,7 +33,7 @@ public class DefaultJWTService implements JWTService {
     private static final String USER_ID_CLAIM_NAME = "uid";
     private static final String USER_ROLE_CLAIM_NAME = "role";
 
-    @Value("${jwt.user-auth.secret}")
+    @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.user-auth.issuer}")
     private String issuer;

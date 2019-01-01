@@ -12,6 +12,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.gings.controller.PrincipalArgumentResolver;
+import com.gings.security.AuthNumberJWTService;
 import com.gings.security.DefaultJWTService;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
@@ -29,15 +30,21 @@ public class Config implements WebMvcConfigurer {
     public JWTServiceManager jwtServiceManager() {
         List<JWTService> jwtServices = new ArrayList<>();
         jwtServices.add(defaultJWTService());
+        jwtServices.add(authNumberJWTService());
         
         return new JWTServiceManager(jwtServices);
     }
     
     @Bean
-    public DefaultJWTService defaultJWTService() {
+    public JWTService defaultJWTService() {
         return new DefaultJWTService();
     }
-
+    
+    @Bean
+    public JWTService authNumberJWTService() {
+        return new AuthNumberJWTService();
+    }
+    
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new PrincipalArgumentResolver());
