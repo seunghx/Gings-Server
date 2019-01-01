@@ -32,7 +32,6 @@ public class DefaultJWTService implements JWTService {
     
     private static final String USER_ID_CLAIM_NAME = "uid";
     private static final String USER_ROLE_CLAIM_NAME = "role";
-    
 
     @Value("${jwt.user-auth.secret}")
     private String secret;
@@ -51,33 +50,9 @@ public class DefaultJWTService implements JWTService {
     @Override
     public TokenInfo decode(TokenInfo tokenInfo) {
         
-        if(tokenInfo == null) {
-            log.info("Null value tokenInfo detected while trying to decode JWT token.");
-            
-            throw new NullPointerException("tokenInfo is null.");
-        }
+       DecodedJWT decoded = validateInternal(tokenInfo);
         
-        try {
-            JWTVerifier jwtVerifier = require(algorithm).withIssuer(issuer)
-                                                        .build();
-            
-            DecodedJWT decodedJWT = jwtVerifier.verify(tokenInfo.getToken());
-            
-            return parseToken(decodedJWT);
-        }catch (JWTVerificationException jve) {
-            
-            log.info("Error occurred while trying to decode JWT token.");
-            
-            throw jve;
-        }
-    }
-    
-    private UserAuthTokenInfo parseToken(DecodedJWT decodedJWT) {
-        UserAuthTokenInfo tokenInfo = new UserAuthTokenInfo();
-        tokenInfo.setUid(decodedJWT.getClaim(USER_ID_CLAIM_NAME).asInt());
-        tokenInfo.setUserRole(UserRole.from(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME).asString()));
-        
-        return tokenInfo;
+       return parseToken(decoded);
     }
 
     @Override
@@ -107,12 +82,6 @@ public class DefaultJWTService implements JWTService {
             throw jce;
         }
     }
-    
-    private Date expiredAt() {
-        return Date.from(Instant.now()
-                                .plus(Period.ofDays(expiredPeriod)));
-    }
-
 
     @Override
     public boolean support(Class<? extends TokenInfo> tokenInfo) {
@@ -126,4 +95,43 @@ public class DefaultJWTService implements JWTService {
         return UserAuthTokenInfo.class.isAssignableFrom(tokenInfo);
     }
 
+    @Override
+    public void validate(TokenInfo tokenInfo) {
+        validateInternal(tokenInfo);
+    }
+
+    private Date expiredAt() {
+        return Date.from(Instant.now()
+                                .plus(Period.ofDays(expiredPeriod)));
+    }
+
+    private DecodedJWT validateInternal(TokenInfo tokenInfo) {
+        
+        if(tokenInfo == null) {
+            log.info("Null value tokenInfo detected while trying to decode JWT token.");
+            
+            throw new NullPointerException("tokenInfo is null.");
+        }
+        
+        try {
+            JWTVerifier jwtVerifier = require(algorithm).withIssuer(issuer)
+                                                        .build();
+            
+            return jwtVerifier.verify(tokenInfo.getToken());
+            
+        }catch (JWTVerificationException jve) {
+            
+            log.info("Error occurred while trying to decode JWT token.");
+            
+            throw jve;
+        }
+    }
+    
+    private UserAuthTokenInfo parseToken(DecodedJWT decodedJWT) {
+        UserAuthTokenInfo tokenInfo = new UserAuthTokenInfo();
+        tokenInfo.setUid(decodedJWT.getClaim(USER_ID_CLAIM_NAME).asInt());
+        tokenInfo.setUserRole(UserRole.from(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME).asString()));
+        
+        return tokenInfo;
+    }
 }

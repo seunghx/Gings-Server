@@ -3,7 +3,6 @@ package com.gings.dao;
 
 import com.gings.controller.LoginController.LoginUser;
 
-import com.gings.model.SignUpReq;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -14,6 +13,7 @@ import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
+import com.gings.model.user.SignUp;
 
 /**
  * 
@@ -81,12 +81,15 @@ public interface UserMapper {
      */
     @Select("SELECT url from introduce_img WHERE introduce_id = #{introduceId}")
     public List<String> findImagesByIntroduceId(int introduceId);
+    
+    @Select("SELECT COUNT(*) from user WHERE email = #{email}")
+    public int countByEmail(String email);
 
     //회원 등록(회원가입)
     @Insert("INSERT INTO user(name,email,pwd,region,job,company,field,coworking_chk,status,role,image) VALUES(#{signUpReq.name}, #{signUpReq.email},#{signUpReq.pwd}, #{signUpReq.region}, " +
             "#{signUpReq.job}, #{signUpReq.company}, #{signUpReq.field}, #{signUpReq.coworking_chk}, #{signUpReq.status}, #{signUpReq.role}, #{signUpReq.image})")
     @Options(useGeneratedKeys = true, keyColumn = "user.userIdx")
-    int save(@Param("signUpReq") final SignUpReq signUpReq);
+    int save(@Param("signUpReq") final SignUp signUpReq);
 
     //회원 정보 수정
     @Update("UPDATE user SET region = #{user.region}, job = #{user.job}, company = #{user.company}, field = #{user.field}, coworking_chk = #{user.coworking}," +

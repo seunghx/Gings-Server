@@ -1,4 +1,4 @@
-package com.gings.model;
+package com.gings.model.user;
 
 import javax.validation.constraints.NotBlank;
 

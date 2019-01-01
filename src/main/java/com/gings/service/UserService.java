@@ -90,4 +90,15 @@ public class UserService {
         }
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_USER, images);
     }
+    
+    public boolean isEmailExist(String email) {
+        int count = userMapper.countByEmail(email);
+        
+        if(count == 0) {            
+            return false;
+        }else {
+            return true;
+        }
+            
+    }
 }

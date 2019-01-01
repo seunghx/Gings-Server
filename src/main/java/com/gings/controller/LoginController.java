@@ -2,8 +2,8 @@ package com.gings.controller;
 
 import com.gings.dao.UserMapper;
 import com.gings.model.DefaultRes;
-import com.gings.model.Login.LoginReq;
-import com.gings.model.Login.LoginRes;
+import com.gings.model.user.Login.LoginReq;
+import com.gings.model.user.Login.LoginRes;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 import com.gings.security.TokenInfo;
@@ -42,7 +42,9 @@ import static com.gings.security.JWTService.BEARER_SCHEME;
 /**
  *
  * login 요청 처리 핸들러.
- *
+ * 
+ * (login과 같은 인증 로직은 후에 따로 security단으로 분리하기 위해 로그인 전용으로 이 클래스를 따로 정의하였음.)
+ * 
  * @author seunghyun
  *
  */
@@ -58,7 +60,7 @@ public class LoginController {
     private final MessageSource msgSource;
 
     public LoginController(UserMapper userMapper, PasswordEncoder passwordEncoder,
-                           JWTServiceManager jwtServiceManager, MessageSource msgSource) {
+                             JWTServiceManager jwtServiceManager, MessageSource msgSource) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtServiceManager = jwtServiceManager;
@@ -71,7 +73,7 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                null, request.getLocale());
+                                              null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
                 HttpStatus.OK);
@@ -82,7 +84,7 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                null, request.getLocale());
+                                              null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
                 HttpStatus.OK);
@@ -141,7 +143,7 @@ public class LoginController {
                 (ServletWebRequest)RequestContextHolder.getRequestAttributes();
 
         servletContainer.getResponse()
-                .setHeader(AUTHORIZATION, jwt);
+                        .setHeader(AUTHORIZATION, jwt);
 
         return new LoginRes(user.firstLogin);
     }
