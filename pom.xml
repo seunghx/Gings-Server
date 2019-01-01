@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.gings</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>gingsWebApp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Gings</name>
     <description>Gings Server App</description>
