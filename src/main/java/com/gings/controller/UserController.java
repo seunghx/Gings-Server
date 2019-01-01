@@ -20,8 +20,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -34,12 +37,10 @@ import com.gings.security.TokenInfo;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller("/user")
+@RestController(value = "/user")
 public class UserController {
     
     private static final Class<? extends TokenInfo> USING_TOKEN_INFO = AuthNumberTokenInfo.class;
@@ -96,8 +97,9 @@ public class UserController {
     }
     
     @GetMapping("/authNumber")
-    public ResponseEntity<DefaultRes<Void>> getAuthenticationNubmer(@Validated EmailReq emailReq,
-                                                                    Locale locale) {
+    public ResponseEntity<DefaultRes<Void>> 
+                        getAuthenticationNubmer(@Validated EmailReq emailReq,
+                                                Locale locale) {
         
         String authNumber = getAuthenticationNumber();
         
@@ -111,7 +113,9 @@ public class UserController {
     }
     
     @PostMapping("/signup")
-    public ResponseEntity<DefaultRes<Void>> signup(@Validated SignUp signUp, HttpServletRequest request) {
+    public ResponseEntity<DefaultRes<Void>> signup(@Validated @RequestBody SignUp signUp, 
+                                                   HttpServletRequest request) {
+        
         verifyAuthenticationNumber(signUp.getAuthNumber(), request);
         
         userService.addNewUser(signUp);
@@ -154,11 +158,11 @@ public class UserController {
         
         String jwt =  jwtServiceManager.resolve(USING_TOKEN_INFO).create(tokenInfo);
         
-        ServletWebRequest servletContainer =
-                        (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttr =
+                        (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
 
-        servletContainer.getResponse()
-                        .setHeader(AUTHORIZATION, jwt);
+        requestAttr.getResponse()
+                   .setHeader(AUTHORIZATION, jwt);
         
     }
     

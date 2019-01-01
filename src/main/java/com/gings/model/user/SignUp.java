@@ -34,7 +34,6 @@ public class SignUp {
         
         @Getter
         @Setter
-        //@Email
         @NotBlank(message = NOT_BLANK_MSG)
         private String email;
     }
