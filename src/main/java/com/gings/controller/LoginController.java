@@ -46,6 +46,7 @@ import static com.gings.security.JWTService.BEARER_SCHEME;
  * 
  * (login과 같은 인증 로직은 후에 따로 security단으로 분리하기 위해 로그인 전용으로 이 클래스를 따로 정의하였음.)
  * 
+ * 
  * @author seunghyun
  *
  */

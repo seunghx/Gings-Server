@@ -24,6 +24,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.DefaultRes;
 import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
@@ -70,12 +71,22 @@ public class UserController {
         }
         
         log.error("Request email duplicated. {}", e);
-        log.warn("It might be illegal access!!");
-        log.warn("Requesting remote host : {}", remote);
+        log.warn("It might be illegal access!! Requesting remote host : {}", remote);
                   
         String message = msgSource.getMessage("response.email-duplicate", null, request.getLocale());
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CONFLICT.value(), message), 
+                                    HttpStatus.OK);
+    }
+    
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<DefaultRes<Void>> onEmailAuthTokenExpired(TokenExpiredException e,                      
+                                                                     WebRequest request) {
+        log.info("Email authentication request token expired.");
+        
+        String message = msgSource.getMessage("response.email-auth-token.expired", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
                                     HttpStatus.OK);
     }
     

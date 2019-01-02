@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
@@ -70,7 +72,7 @@ public class AuthAspect {
                                                msgSource.getMessage(UNAUTHORIZED_MSG, null, 
                                                                     Locale.getDefault()));
         
-        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.UNAUTHORIZED);
+        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.OK);
     }
     
     
@@ -94,20 +96,24 @@ public class AuthAspect {
             
          try {
 
-            UserAuthTokenInfo token = (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
+            UserAuthTokenInfo token = 
+                        (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
+            
             Principal principal = new Principal(token.getUid(), token.getUserRole());
           
             Object[] args = Arrays.stream(pjp.getArgs())
                                   .map(arg -> {
-                                      if(arg instanceof Principal)
-                                          arg = principal;
-                                      return arg;
+                                     return (arg instanceof Principal)? principal : arg;
                                   })
                                   .toArray();
 
             return pjp.proceed(args);
 
-        }catch(JWTCreationException e) {
+        } catch(TokenExpiredException e){
+            log.info("Request user token expired.");
+            
+            return AUTH_FAILURE_RES;
+        } catch(JWTDecodeException e) {
             log.error("Exception occurred while trying to authenticate user request.", e);
             
             return AUTH_FAILURE_RES;

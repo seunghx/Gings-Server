@@ -26,8 +26,9 @@ public class JWTServiceManager {
      */
     public void addJwtService(JWTService jwtService) {
         if(jwtService == null) {
-            log.info("");// 로깅은 후에
-            throw new IllegalArgumentException(); // 예외 메세지 후에
+            log.info("Received Null value parameter.");
+            
+            throw new NullPointerException("jwtService is null"); 
         }
 
         jwtServices.add(jwtService);
