@@ -64,10 +64,6 @@ public class AuthAspect {
         
     }
     
-    public HttpServletRequest getHttpServletRequest() {
-        return httpServletRequest;
-    }
-    
     @PostConstruct
     public void init() {
         ApiError authFailRES = new ApiError(HttpStatus.UNAUTHORIZED.value(),
@@ -102,10 +98,10 @@ public class AuthAspect {
             Principal principal = new Principal(token.getUid(), token.getUserRole());
           
             Object[] args = Arrays.stream(pjp.getArgs())
-                                  .filter(arg -> arg instanceof Principal)
                                   .map(arg -> {
-                                      arg = principal;
-                                      return principal;
+                                      if(arg instanceof Principal)
+                                          arg = principal;
+                                      return arg;
                                   })
                                   .toArray();
 
@@ -116,7 +112,6 @@ public class AuthAspect {
             
             return AUTH_FAILURE_RES;
         }
-        
     }
 }
 
