@@ -29,7 +29,9 @@ import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
 import com.gings.security.EmailAuthTokenInfo;
 import com.gings.security.JWTServiceManager;
+import com.gings.security.Principal;
 import com.gings.security.TokenInfo;
+import com.gings.security.authentication.Authentication;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
@@ -51,6 +53,7 @@ public class UserController {
     public UserController(UserService userService, MessageSource msgSource, 
                           JWTServiceManager jwtServiceManager, 
                           AuthenticationNumberNotificationProvider notificationProvider) {
+        
         this.userService = userService;
         this.msgSource = msgSource;
         this.jwtServiceManager = jwtServiceManager;
@@ -137,6 +140,14 @@ public class UserController {
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
                                     HttpStatus.OK);
+    }
+
+    @Authentication
+    @GetMapping("/temp")
+    public ResponseEntity<Principal> temp(Principal principal){
+        log.error("{}", principal);
+        
+        return new ResponseEntity<>(principal, HttpStatus.OK);
     }
     
     private TokenInfo getEmailFromToken(String authNumber, HttpServletRequest request) {
