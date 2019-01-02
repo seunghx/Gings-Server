@@ -29,9 +29,7 @@ import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
 import com.gings.security.EmailAuthTokenInfo;
 import com.gings.security.JWTServiceManager;
-import com.gings.security.Principal;
 import com.gings.security.TokenInfo;
-import com.gings.security.authentication.Authentication;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
@@ -48,7 +46,6 @@ public class UserController {
     private final MessageSource msgSource;
     private final JWTServiceManager jwtServiceManager;
     private final AuthenticationNumberNotificationProvider notificationProvider;
-   
     
     public UserController(UserService userService, MessageSource msgSource, 
                           JWTServiceManager jwtServiceManager, 
@@ -100,7 +97,7 @@ public class UserController {
             
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.NO_CONTENT.value(), message), 
                                         HttpStatus.OK);
-        }else {
+        } else {
             log.info("Requested email {} does not exist.", email);
             
             String message = msgSource.getMessage("response.email-not-duplicate", null, locale);
@@ -142,14 +139,6 @@ public class UserController {
                                     HttpStatus.OK);
     }
 
-    @Authentication
-    @GetMapping("/temp")
-    public ResponseEntity<Principal> temp(Principal principal){
-        log.error("{}", principal);
-        
-        return new ResponseEntity<>(principal, HttpStatus.OK);
-    }
-    
     private TokenInfo getEmailFromToken(String authNumber, HttpServletRequest request) {
         String jwt = request.getHeader(AUTHORIZATION);
         jwt = jwt.replace(BEARER_SCHEME, "");
@@ -179,6 +168,7 @@ public class UserController {
      * @param authNumber jwt token에 저장될 인증 번호.
      */
     private void setAuthToken(String authNumber, String email) {
+        
         EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo();
         tokenInfo.setAuthNumber(authNumber);
         tokenInfo.setEmail(email);
@@ -191,7 +181,5 @@ public class UserController {
 
         requestAttr.getResponse()
                    .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
-        
     }
-    
 }
