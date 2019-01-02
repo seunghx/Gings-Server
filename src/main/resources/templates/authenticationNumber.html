@@ -1,21 +1,33 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" 
  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
- layout:decorator="mailTemplate">
+>
 <body>
- <div layout:fragment="content">
+<table style="width:600; border:1px solid white; margin-left: 100px; ">
+ <tr>
+    <td align="center" bgcolor="#59393b" height="130px" style="padding: 20px 0px 20px 0px;  border-radius: 3px;">
+    <img src="cid:identifier" alt="gings representing image" width="500px" height="130px" style="display: block; border-radius: 3px;" />
+    </td>   
+ </tr>
 	<tr>
 		<td bgcolor="#ffffff" align="center" height="140px" style="border-top: 1px solid black;">
-   		<p style="font-size: 1.3em; font-family: Arial, Helvetica;"> 계정 확인을 위한 인증 번호를<br> 
+   		<p style="font-size: 1.3em; font-family: Arial, Helvetica;"> 계정 검증을 위한 인증 번호를<br> 
    		<span style="color:#59393b; font-size: 1.5em; font-family: Arial, Helvetica, sans-serif;">발송해드립니다.</span></p>
 		</td>
 	</tr>
 	<tr>
 		<td bgcolor="#ffffff" align="center" height="200px" style="border-top: 1px solid #59393b;">
    		입력 화면에 아래의 인증 번호를 입력해주세요.<br><br><br><br>
-   		인증번호 : <span style="color:#59393b; font-size: 1.5em;">[[${authNumber}]]</span><br>
+   		인증번호 : <span style="color:#59393b; font-size: 2em;">[[${authNumber}]]</span><br>
 		</td>
 	</tr>
-</div>
+	<tr>
+    <td bgcolor="#ffffff" align="center" height="100px" style="border-top: 1px solid #59393b; padding : 5px">
+    <br><p style="font-size:1.5em; color:#59393b"> 깅스를 이용해주셔서 감사합니다.</p>
+    <br><p style="font-size:0.5em; color:#59393b">본 이메일의 발송 요청을 하지 않았을 경우 저희에게 연락바랍니다.</p>
+    <br><p style="font-size:1em;">Copyright ⓒ Gings Corp. All Rights Reserved. </p>
+  </td>
+  </tr>
+  </table>
 </body>
 </html>

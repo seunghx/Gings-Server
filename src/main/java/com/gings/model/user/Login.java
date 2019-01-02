@@ -1,9 +1,10 @@
-package com.gings.model;
+package com.gings.model.user;
 
 import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class Login {
@@ -14,15 +15,13 @@ public class Login {
     @Getter
     @Setter
     @AllArgsConstructor
-
+    @NoArgsConstructor
     public static class LoginReq{
         
         @NotBlank(message = MSG_EMAIL_BLANK)
         private String email;
         @NotBlank(message = MSG_PASSWORD_BLANK)
         private String pwd;
-        
-        private boolean loginKeeped;
     }
     
     @Getter

@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.gings</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>gingsWebApp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Gings</name>
     <description>Gings Server App</description>
@@ -90,6 +90,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+       <dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+            <version>2.3.0</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>   
     </dependencies>
 
     <build>

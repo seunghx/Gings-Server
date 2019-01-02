@@ -1,10 +1,8 @@
 package com.gings.dao;
 
-import com.gings.controller.LoginController;
 
 import com.gings.controller.LoginController.LoginUser;
 
-import com.gings.model.SignUpReq;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -15,6 +13,7 @@ import com.gings.domain.Introduce;
 import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
+import com.gings.model.user.SignUp;
 
 /**
  * 
@@ -47,10 +46,10 @@ public interface UserMapper {
     public User findByUserId(int userId);
 
 
-    @Select("SELECT user_id as userId, pwd, role, email_confired as emailConfirmed, first_login as firstLogin"
+    @Select("SELECT user_id as userId, pwd, role, first_login as firstLogin"
          + " FROM user "
          + " WHERE email = #{email}")
-    public LoginController.LoginUser findByEmail(@Param("email") String email);
+    public LoginUser findByEmail(@Param("email") String email);
     
     /**
      * {@link Introduce} 조회
@@ -82,12 +81,18 @@ public interface UserMapper {
      */
     @Select("SELECT url from introduce_img WHERE introduce_id = #{introduceId}")
     public List<String> findImagesByIntroduceId(int introduceId);
-
+    
+    @Select("SELECT COUNT(*) from user WHERE email = #{email}")
+    public int countByEmail(String email);
+    
+    @Update("UPDATE user SET first_login = 0 WHERE user_id = #{userId}")
+    public void setFalseToFirstLogin(int userId);
+    
     //회원 등록(회원가입)
-    @Insert("INSERT INTO user(name,email,pwd,region,job,company,field,coworking_chk,status,role,image) VALUES(#{signUpReq.name}, #{signUpReq.email},#{signUpReq.pwd}, #{signUpReq.region}, " +
-            "#{signUpReq.job}, #{signUpReq.company}, #{signUpReq.field}, #{signUpReq.coworking_chk}, #{signUpReq.status}, #{signUpReq.role}, #{signUpReq.image})")
+    @Insert("INSERT INTO user(name,email,pwd) "
+            + "VALUES(#{signUp.name}, #{signUp.email}, #{signUp.pwd})")
     @Options(useGeneratedKeys = true, keyColumn = "user.userIdx")
-    int save(@Param("signUpReq") final SignUpReq signUpReq);
+    int save(@Param("signUp") final SignUp signUp);
 
     //회원 정보 수정
     @Update("UPDATE user SET region = #{user.region}, job = #{user.job}, company = #{user.company}, field = #{user.field}, coworking_chk = #{user.coworking}," +
@@ -98,6 +103,5 @@ public interface UserMapper {
     //회원 삭제
     @Delete("DELETE FROM user WHERE user_id = #{userId}")
     void deleteUser(@Param("userId") final int userId);
-
 
 }

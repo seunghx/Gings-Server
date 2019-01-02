@@ -1,6 +1,6 @@
 package com.gings.service;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.AmazonClientException;
@@ -39,10 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class S3MultipartService implements MultipartService {
-    
-    @Value("${cloud.aws.s3.bucket-name}")
-    private String BUCKET_NAME;
 
+    @Value("${cloud.aws.s3.default-url}")
+    private String defaultUrl;
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
     
     private final AmazonS3Client s3Client;
     private final TransferManager transferManager;
@@ -56,7 +56,6 @@ public class S3MultipartService implements MultipartService {
         this.transferManager = TransferManagerBuilder.standard()
                                                      .withS3Client(s3Client)
                                                      .build();
-       
     }
     
     /**
@@ -69,7 +68,7 @@ public class S3MultipartService implements MultipartService {
      *                                  업로드 할 이미지가 없을 경우 사전에 검사해서 이 메서드를 호출하는 것이 바람직.
      */
     @Override
-    public List<String> uploadMultipleFiles(List<MultipartFile> files, String path) {
+    public List<String> uploadMultipleFiles(List<MultipartFile> files) {
        
         if (files == null || files.isEmpty()) {
             log.info("Empty parameter files detected. while trying to upload multi-part files");
@@ -77,14 +76,24 @@ public class S3MultipartService implements MultipartService {
             throw new IllegalArgumentException("Argumet files is empty.");
         }
         
-        //else if(StringUtils.isEmpty(path)) {
-        //    log.info("Empty path parameter detected while trying to upload multi-part files");
-            
-         //   throw new IllegalArgumentException("Argument path is empty.");
-       // }
         try {
-            return uploadMultiple(files, path);
+            List<String> uploaded = new ArrayList<>();
             
+            files.stream()
+                 .forEach(file -> {
+                     try {
+                         uploaded.add(upload(file));
+                     }
+                     catch(InterruptedException e) {
+                         log.info("InterruptedException occurred while trying to upload multiple images");
+                         
+                         throw new RuntimeException(e);
+                     }  
+                 });
+            
+            log.info("Upload file succeeded.");
+
+            return uploaded;
         } catch(AmazonServiceException e) {
             log.info("AmazonServiceException occurred while trying to upload multiple images");
             
@@ -93,11 +102,7 @@ public class S3MultipartService implements MultipartService {
             log.info("AmazonClientException occurred while trying to upload multiple images");
             
             throw e;
-        } catch(InterruptedException e) {
-            log.info("InterruptedException occurred while trying to upload multiple images");
-            
-            throw new RuntimeException(e);
-        }          
+        }         
     }
     
    /**
@@ -107,15 +112,18 @@ public class S3MultipartService implements MultipartService {
     *
     */
     @Override
-    public String uploadSingleFile(MultipartFile file, String path) {
+    public String uploadSingleFile(MultipartFile file) {
         if(file == null) {
             log.info("Empty parameter files detected. while trying to upload multi-part files");
             
             throw new IllegalArgumentException("Argumet files is empty.");
         }
         try {
-            return uploadOne(file, path);
+            String uploaded =  upload(file);
             
+            log.info("Upload file succeeded.");
+
+            return uploaded;
         } catch(AmazonServiceException e) {
             log.info("AmazonServiceException occurred while trying to upload multiple images");
             
@@ -131,75 +139,8 @@ public class S3MultipartService implements MultipartService {
         }     
     }
     
-    @Override
-    public void delete(List<String> fileNames, String path) {
-        if (fileNames == null || fileNames.size() == 0) {
-            throw new IllegalArgumentException("Arguments fileNames is empty.");
-        }
 
-        if (fileNames.size() == 1)
-            deleteOne(fileNames.get(0));
-        else
-            deleteAll(fileNames);
-    }
-    
-    private String uploadOne(MultipartFile file, String path) throws InterruptedException {
-        
-        ObjectMetadata metaData = new ObjectMetadata();
-        metaData.setContentLength(file.getSize());
-        metaData.setContentType(file.getContentType());
-        String uploadingFileName = path + getNewFileName(file.getOriginalFilename());
 
-        try(InputStream ins = file.getInputStream()) {
-            PutObjectRequest request = new PutObjectRequest(BUCKET_NAME, uploadingFileName, 
-                                                            ins, metaData);
-            
-            request.setCannedAcl(CannedAccessControlList.PublicRead);
-
-            transferManager.upload(request).waitForCompletion();
-                        
-            log.info("Upload file succeeded.");
-            
-        }catch(IOException e) {
-            log.info("IOException occurred while trying to open InputStream.");
-            
-            throw new RuntimeException(e);
-        }
-        
-        return s3Client.getUrl(BUCKET_NAME, uploadingFileName).toString();
-    }
-    
-    private List<String> uploadMultiple(List<MultipartFile> files, String path) 
-                                                                    throws InterruptedException {
-        List<String> uploaded = new ArrayList<>();
-        
-        ArrayList<File> uploadingFiles = new ArrayList<File>();
-
-        files.stream()
-             .forEach(file -> {
-                 String uploadingFileName = file.getOriginalFilename();
-            
-                 File uploadingFile = new File("./"+uploadingFileName);
-            
-                 try {
-                     file.transferTo(uploadingFile);
-                 }catch(IOException e) {
-                     log.info("IOException occurred while trying to transfer multi-part file to File object.");
-                
-                     throw new RuntimeException(e);
-                 }
-                 uploadingFiles.add(uploadingFile);
-                 uploaded.add(getUploadedFileName(uploadingFileName, path));
-             }); 
-                   
-            transferManager.uploadFileList(BUCKET_NAME, "/", new File("./"), uploadingFiles)
-                           .waitForCompletion();
-                                    
-            log.info("Upload files succeeded.");
-
-            return uploaded;
-    }
-    
     /**
      * 
      * 한 개의 파일에 대한 삭제 연산을 수행.
@@ -210,21 +151,26 @@ public class S3MultipartService implements MultipartService {
      * (스케쥴러를 이용해 삭제 가능하게 삭제할 이미지 명을 리스트에 담거나 이벤트 방식으로 처리할 예정. 후에 추가.)
      * 
      */
-    private void deleteOne(String fileName) {
-
-        log.info("Deteting single file object from S3. Deleting file name : {}", 
-                                                                            fileName);
+    @Override
+    public void deleteSingleFile(String fileName) {
+        
+        log.info("Deteting single file object from S3. Deleting file name : {}", fileName);
+        
         try {
-            s3Client.deleteObject(BUCKET_NAME, fileName);
+            s3Client.deleteObject(bucketName, parseFileName(fileName));
+
+            log.info("Deleting file from S3 succeeded.");
+
         } catch(AmazonClientException e) {
             if(log.isInfoEnabled()) {
                 log.info("Error occurred while trying to delete object.");
-                
+
                 log.error("{}", e);
                 // 후에 삭제 로직 추가
             }
         }
     }
+    
 
     /**
      * 
@@ -234,16 +180,24 @@ public class S3MultipartService implements MultipartService {
      * (스케쥴러를 이용해 삭제 가능하게 삭제할 이미지 명을 리스트에 담거나 이벤트 방식으로 처리할 예정. 후에 추가.)
      *      
      */
-    private void deleteAll(List<String> fileNames) {
+    @Override
+    public void deleteMultipleFiles(List<String> fileNames) {
+        if (fileNames == null || fileNames.size() == 0) {
+            throw new IllegalArgumentException("Arguments fileNames is empty.");
+        }
 
         log.info("Deteting multiple file objects from S3.");
-
-        fileNames.forEach(file -> log.debug("Deleting file name : {}", file));
-
-        DeleteObjectsRequest dor = new DeleteObjectsRequest(BUCKET_NAME)
-                                        .withKeys(fileNames.toArray(new String[] {}));
+        
+        List<String> deletingFileNames = parseFileName(fileNames);
+        
+        DeleteObjectsRequest dor = new DeleteObjectsRequest(bucketName)
+                                        .withKeys(deletingFileNames.toArray(new String[] {}));
         try {
+            
             s3Client.deleteObjects(dor);
+            
+            log.info("Deleting multiple files from S3 succeeded.");
+
         }catch(MultiObjectDeleteException e) {
             
             if(log.isInfoEnabled()) {
@@ -259,6 +213,42 @@ public class S3MultipartService implements MultipartService {
          }
     }
     
+    
+    
+    private String upload(MultipartFile file) throws InterruptedException {
+        
+        ObjectMetadata metaData = getObjectMetadata(file);
+        
+        String uploadingFileName = newFileName(file.getOriginalFilename());
+
+        try(InputStream ins = file.getInputStream()) {
+            PutObjectRequest request = 
+                    new PutObjectRequest(bucketName, uploadingFileName, ins, metaData);
+            
+            request.setCannedAcl(CannedAccessControlList.PublicRead);
+
+            transferManager.upload(request)
+                           .waitForCompletion();
+                                    
+        }catch(IOException e) {
+            log.info("IOException occurred while trying to open InputStream.");
+            
+            throw new RuntimeException(e);
+        }
+        
+        return uploadedFileUrl(uploadingFileName);
+    }
+    
+    private ObjectMetadata getObjectMetadata(MultipartFile file) {
+        ObjectMetadata metaData = new ObjectMetadata();
+        
+        metaData.setContentType(file.getContentType());
+        metaData.setContentLength(file.getSize());
+
+        return metaData;
+    }
+    
+    
     /**
      * 
      * s3에 저장될 새 파일이름을 반환.
@@ -268,18 +258,36 @@ public class S3MultipartService implements MultipartService {
      *                                        이 예외가 던져진다는 것은 서버 코드의 잘못이므로 이 예외는 서버 에러로 
      *                                        처리되어야함.
      */
-    private static String getNewFileName(String fileName) {
-       
+    private String newFileName(String fileName) {
+        
         String randomStr = UUID.randomUUID().toString().replaceAll("-", "");
         
         return randomStr + fileName;
+     
     }
     
 
-    private String getUploadedFileName(String fileName, String path) {
+    private String uploadedFileUrl(String fileName) {
         
-        return s3Client.getUrl(BUCKET_NAME, fileName)
-                       .toString();
+        return new StringBuilder(defaultUrl).append(bucketName)
+                                            .append("/")
+                                            .append(fileName)
+                                            .toString();
+        
+    }
+    
+    private List<String> parseFileName(List<String> fileNames) {
+        List<String> replaced = new ArrayList<>();
+        
+        fileNames.stream().forEach(file -> {
+            replaced.add(parseFileName(file));
+        });
+        
+        return replaced;
+    }
+    
+    private String parseFileName(String fileName) {
+        return fileName.replace(defaultUrl + bucketName + "/", "");
     }
     
 }

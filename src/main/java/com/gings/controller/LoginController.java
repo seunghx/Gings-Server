@@ -2,8 +2,8 @@ package com.gings.controller;
 
 import com.gings.dao.UserMapper;
 import com.gings.model.DefaultRes;
-import com.gings.model.Login.LoginReq;
-import com.gings.model.Login.LoginRes;
+import com.gings.model.user.Login.LoginReq;
+import com.gings.model.user.Login.LoginRes;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 import com.gings.security.TokenInfo;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -42,7 +43,9 @@ import static com.gings.security.JWTService.BEARER_SCHEME;
 /**
  *
  * login 요청 처리 핸들러.
- *
+ * 
+ * (login과 같은 인증 로직은 후에 따로 security단으로 분리하기 위해 로그인 전용으로 이 클래스를 따로 정의하였음.)
+ * 
  * @author seunghyun
  *
  */
@@ -58,7 +61,7 @@ public class LoginController {
     private final MessageSource msgSource;
 
     public LoginController(UserMapper userMapper, PasswordEncoder passwordEncoder,
-                           JWTServiceManager jwtServiceManager, MessageSource msgSource) {
+                             JWTServiceManager jwtServiceManager, MessageSource msgSource) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtServiceManager = jwtServiceManager;
@@ -71,10 +74,10 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                null, request.getLocale());
+                                              null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.OK);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -82,21 +85,10 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                null, request.getLocale());
+                                              null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(EmailNotConfirmedException.class)
-    public ResponseEntity<DefaultRes<Void>> onEmailNotConfirmed(EmailNotConfirmedException ex, WebRequest request) {
-        log.error("Exception occurred while trying to log in user. Exception : ", ex);
-
-        String message = msgSource.getMessage("response.authentication.email-not-authenticated",
-                new String[] {ex.getEmail()}, request.getLocale());
-
-        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.FORBIDDEN.value(), message),
-                HttpStatus.FORBIDDEN);
+                HttpStatus.OK);
     }
 
     /**
@@ -129,17 +121,11 @@ public class LoginController {
 
         if(passwordEncoder.matches(req.getPwd(), user.getPwd())){
 
-            if(!user.isEmailConfirmed()) {
-                log.info("Login failed because user email : {} does not authenticated yet.", email);
-
-                throw new EmailNotConfirmedException("User email not confirmed.", email);
-            }
-
             log.info("Login succeeded for user email : {}", email);
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,
-                    onLoginSuccess(user)),
-                    HttpStatus.CREATED);
+                                                                             onLoginSuccess(user)),
+                                         HttpStatus.OK);
         }else {
             log.info("Login failed because of invalid password for user email : {}", email);
 
@@ -148,37 +134,29 @@ public class LoginController {
     }
 
     private LoginRes onLoginSuccess(LoginUser user){
-
-        TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
-
-        JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
-        String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
-
-        ServletWebRequest servletContainer =
-                (ServletWebRequest)RequestContextHolder.getRequestAttributes();
-
-        servletContainer.getResponse()
-                .setHeader(AUTHORIZATION, jwt);
-
+        
+        setTokenToResponse(user);
+        
+        if(user.isFirstLogin()) {
+            userMapper.setFalseToFirstLogin(user.getUserId());
+        }
+        
         return new LoginRes(user.firstLogin);
     }
+    
+    private void setTokenToResponse(LoginUser user) {
+        TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
+        
+        JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
+        String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
+        
+        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
+                                                    RequestContextHolder.getRequestAttributes();
 
-    private class EmailNotConfirmedException extends RuntimeException {
-
-        private static final long serialVersionUID = 276919101137697050L;
-
-        private final String email;
-
-        EmailNotConfirmedException(String message, String email) {
-            super(message);
-            this.email = email;
-        }
-
-        String getEmail() {
-            return email;
-        }
+        requestAttr.getResponse()
+                   .setHeader(AUTHORIZATION, jwt);
     }
-
+    
     @Setter
     @Getter
     @ToString
@@ -186,7 +164,6 @@ public class LoginController {
         private int userId;
         private UserRole role;
         private String pwd;
-        private boolean emailConfirmed;
         private boolean firstLogin;
     }
 }
