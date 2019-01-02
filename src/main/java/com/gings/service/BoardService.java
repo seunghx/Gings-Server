@@ -156,10 +156,10 @@ public class BoardService {
 
             boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
             log.info(e.getMessage());
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_BOARD);
         }
     }
 

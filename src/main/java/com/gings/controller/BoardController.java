@@ -8,6 +8,8 @@ import com.gings.model.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.UpBoard.UpBoardReq;
 import com.gings.model.ReBoard.ReBoardReq;
+import com.gings.security.Principal;
+import com.gings.security.authentication.Authentication;
 import com.gings.service.BoardService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -24,6 +26,7 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
+
 public class BoardController {
 
     private final BoardService boardService;
@@ -74,7 +77,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards")
-    public ResponseEntity saveBoard(final UpBoardReq upBoardReq) {
+    public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final Principal principal) {
         try {
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
