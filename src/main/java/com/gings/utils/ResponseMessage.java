@@ -23,8 +23,9 @@ public class ResponseMessage {
     public static final String UPDATE_BOARD = "보드 수정 성공";
     public static final String FAIL_UPDATE_BOARD = "보드 수정 실패";
     public static final String DELETE_BOARD = "보드 삭제 성공";
-    public static final String LIKE_BOARD = "보드 좋아요";
-    public static final String CANCEL_LIKE_BOARD = "보드 좋아요 해제";
+    public static final String LIKE_BOARD = "보드 추천 성공";
+    public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
+    public static final String FAIL_LIKE_BOARD = "보드 추천/해제 실패";
 
     public static final String READ_ALL_REBOARD = "모든 리보드 조회 성공";
     public static final String READ_REBOARD = "리보드 조회 성공";

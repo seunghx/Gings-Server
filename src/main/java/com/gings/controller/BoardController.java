@@ -67,7 +67,7 @@ public class BoardController {
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -84,7 +84,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -95,13 +95,12 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards/{boardId}/recommend")
-    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId) {
+    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final Principal principal) {
         try {
-            final int userId = 1; // token 값으로 대체
-            return new ResponseEntity<>(boardService.BoardLikes(boardId, userId), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -118,7 +117,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -135,7 +134,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.ReBoardLikes(replyId, userId), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -145,7 +144,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 

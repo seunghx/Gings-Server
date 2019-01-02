@@ -156,10 +156,10 @@ public class BoardService {
 
             boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
 
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_BOARD);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
 
@@ -173,6 +173,9 @@ public class BoardService {
 
     public DefaultRes BoardLikes(final int boardId, final int userId) {
         try {
+            if(boardMapper.findBoardByBoardId(boardId) == null)
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.NOT_FOUND_BOARD);
+
             List<Integer> boardIdList = boardMapper.findRecommendBoardsByUserId(userId);
             for(int id : boardIdList){
                 if(id == boardId){
@@ -184,7 +187,7 @@ public class BoardService {
             return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.FAIL_LIKE_BOARD);
         }
     }
 
