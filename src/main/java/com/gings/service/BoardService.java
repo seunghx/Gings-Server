@@ -158,7 +158,7 @@ public class BoardService {
 
             return DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_BOARD);
         }
     }
@@ -205,7 +205,7 @@ public class BoardService {
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_REBOARD);
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -272,7 +272,7 @@ public class BoardService {
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }

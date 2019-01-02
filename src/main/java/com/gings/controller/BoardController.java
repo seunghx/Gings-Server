@@ -26,6 +26,7 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
+@Authentication
 
 public class BoardController {
 
@@ -79,6 +80,7 @@ public class BoardController {
     @PostMapping("boards")
     public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final Principal principal) {
         try {
+            upBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
