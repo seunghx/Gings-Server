@@ -8,6 +8,8 @@ import com.gings.model.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.UpBoard.UpBoardReq;
 import com.gings.model.ReBoard.ReBoardReq;
+import com.gings.security.Principal;
+import com.gings.security.authentication.Authentication;
 import com.gings.service.BoardService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -24,6 +26,8 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
+@Authentication
+
 public class BoardController {
 
     private final BoardService boardService;
@@ -63,7 +67,7 @@ public class BoardController {
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -74,12 +78,13 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards")
-    public ResponseEntity saveBoard(final UpBoardReq upBoardReq) {
+    public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final Principal principal) {
         try {
+            upBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -90,13 +95,12 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards/{boardId}/recommend")
-    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId) {
+    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final Principal principal) {
         try {
-            final int userId = 1; // token 값으로 대체
-            return new ResponseEntity<>(boardService.BoardLikes(boardId, userId), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -113,7 +117,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -130,7 +134,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.ReBoardLikes(replyId, userId), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
@@ -140,7 +144,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
