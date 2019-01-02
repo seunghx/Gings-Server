@@ -2,6 +2,7 @@ package com.gings.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +19,7 @@ public class ReBoard {
         private String content;
         private LocalDateTime writeTime;
 
-        private List<String> images;
+        private List<MultipartFile> images;
 
         private int recommender;
     }
