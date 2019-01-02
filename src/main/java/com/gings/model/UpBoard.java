@@ -24,7 +24,7 @@ public class UpBoard {
         private String category;
 
 
-        private MultipartFile[] images;
+        private List<MultipartFile> images;
         private List<String> keywords;
 
         private int recommender;

@@ -47,7 +47,6 @@ public class BoardService {
      */
     public DefaultRes<List<Board>> findAllBoard(final Pagination pagination) {
         final List<Board> boards = boardMapper.findAllBoard(pagination);
-        log.error("{}", boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
@@ -151,14 +150,10 @@ public class BoardService {
         try {
             boardMapper.saveBoard(upBoardReq);
             final int boardId = upBoardReq.getBoardId();
-            final List<String> sampleUrl = new LinkedList<>();
-            sampleUrl.add("abcd");
-            sampleUrl.add("efgh");
 
-            for (MultipartFile image : upBoardReq.getImages()) {
-                String url = s3MultipartService.uploadSingleFile(image);
-                boardMapper.saveBoardImg(boardId, sampleUrl);
-            }
+            List<String> urlList = s3MultipartService.uploadMultipleFiles(upBoardReq.getImages());
+            boardMapper.saveBoardImg(boardId, urlList);
+
             boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
@@ -203,17 +198,10 @@ public class BoardService {
     public DefaultRes saveReBoard(final ReBoardReq reBoardReq) {
         try {
             boardMapper.saveReBoard(reBoardReq);
-            final int replyId = reBoardReq.getReplyId();
-            log.error("reply id : " + replyId);
-            final List<String> sampleUrl = new LinkedList<>();
-            sampleUrl.add("123");
-            sampleUrl.add("456");
+            final int reReplyId = reBoardReq.getReplyId();
 
-            for (MultipartFile image : reBoardReq.getImages()) {
-                // 여기에다 s3에 이미지 파일 저장 //
-                log.info(sampleUrl.toString());
-                boardMapper.saveReBoardImg(replyId, sampleUrl);
-            }
+            List<String> urlList = s3MultipartService.uploadMultipleFiles(reBoardReq.getImages());
+            boardMapper.saveReBoardImg(reReplyId, urlList);
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_REBOARD);
         } catch (Exception e) {

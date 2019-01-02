@@ -95,9 +95,15 @@ public interface BoardMapper {
                     one = @One(select = "findReplyRecommendNumbersByReplyId")),
             @Result(property = "writerId", column = "writer_id"),
             @Result(property = "content", column = "content"),
-            @Result(property = "writeTime", column = "write_time")
+            @Result(property = "writeTime", column = "write_time"),
+            @Result(property="images", column="reply_id", javaType= List.class,
+                    many=@Many(select="findReplyImagesByReplyId")),
     })
     public List<BoardReply> findReplyByBoardId(int boardId);
+
+    // 댓글 고유 번호로 댓글 이미지 전체 조회
+    @Select("SELECT url FROM reply_img WHERE reply_id = #{replyId}")
+    public List<String> findReplyImagesByReplyId(int replyId);
 
 
     // 리보드 고유 번호로 리보드 좋아요수 조회

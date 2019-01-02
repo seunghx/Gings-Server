@@ -39,14 +39,14 @@ public class BoardController {
      * @param pagination 페이지네이션
      * @return ResponseEntity
      */
-    @GetMapping("boards/all")
+    @GetMapping("boards")
     public ResponseEntity getAllBoards(@RequestBody  final Pagination pagination) {
         try {
             DefaultRes<List<Board>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
