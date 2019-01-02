@@ -1,11 +1,11 @@
 package com.gings.dao;
 
 import com.gings.domain.Board;
-import com.gings.domain.BoardKeyword;
 import com.gings.domain.BoardReply;
+import com.gings.model.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.ReBoard;
-import com.gings.model.UpBoard;
+import com.gings.model.ReBoard.ReBoardReq;
+import com.gings.model.UpBoard.UpBoardReq;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface BoardMapper {
     // 보드 전체 조회 (findAllBoard)
     @Select("SELECT * FROM board ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
-            @Result(property="boardId", column="board_id"),
+            @Result(property="boardId", column="board_id", id=true),
             @Result(property="writerId", column="writer_id"),
             @Result(property="title", column="title"),  @Result(property="content", column="content"),
             @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
@@ -40,9 +40,13 @@ public interface BoardMapper {
     @Select("SELECT content FROM board_keyword WHERE board_id = #{boardId}")
     public List<String> findKeywordsByBoardId(int boardId);
 
-    // 보드 고유 번호로 보드 좋아요 갯수 조회
+    // 보드 고유 번호로 보드 좋아요수 조회
     @Select("SELECT COUNT(recommender_id) FROM board_recommend WHERE board_id = #{boardId}")
     public int countRecommendByBoardId(int boardId);
+
+    // 회원 고유 번호로 좋아요 한 보드 조회
+    @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
+    public List<Integer> findRecommendBoardsByUserId(int userId);
 
 
     // 보드 고유 번호로 보드 조회
@@ -62,7 +66,26 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findBoardByBoardId(int boardId);
+    public Board findBoardByBoardId(int boardId);
+
+    // 회원 고유 번호로 보드 조회
+    @Select("SELECT * FROM board WHERE writer_id = #{userId} ORDER BY write_time")
+    @Results(value = {
+            @Result(property="boardId", column="board_id"),
+            @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "replys", column = "board_id", javaType = List.class,
+                    many=@Many(select="findReplyByBoardId")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId"))
+    })
+    public List<Board> findBoardByUserId(int userId);
 
 
     // 보드 고유 번호로 해당 보드 댓글 조회
@@ -77,12 +100,13 @@ public interface BoardMapper {
     public List<BoardReply> findReplyByBoardId(int boardId);
 
 
-    // 댓글 고유 번호로 댓글 좋아요 갯수 조회
+    // 리보드 고유 번호로 리보드 좋아요수 조회
     @Select("SELECT COUNT(recommender_id) AS recommender FROM reply_recommend WHERE reply_id = #{replyId}")
     public int findReplyRecommendNumbersByReplyId(int replyId);
 
-    public void save(@Param("contentReq") final UpBoard.UpBoardReq upBoardReq);
-
+    // 회원 고유 번호로 좋아요 한 리보드 조회
+    @Select("SELECT reply_id FROM reply_recommend WHERE recommender_id = #{userId}")
+    public List<Integer> findRecommendReBoardsByUserId(int userId);
 
 
 
@@ -92,16 +116,17 @@ public interface BoardMapper {
      */
 
     //업보드 작성자, 제목, 내용, 카테고리 저장
-    @Insert("INSERT INTO board(writer_id, title, content, category) VALUES(#{BoardReq.writerId}, " +
-            "#{BoardReq.title}, #{BoardReq.content}, #{BoardReq.category})")
-    @Options(useGeneratedKeys = true, keyProperty = "UpBoard.UpBoardReq.boardId")
-    void saveBoard(@Param("BoardReq") final UpBoard.UpBoardReq boardReq);
+    @Insert("INSERT INTO board(writer_id, title, content, category) VALUES(#{boardReq.writerId}, " +
+            "#{boardReq.title}, #{boardReq.content}, #{boardReq.category})")
+    @Options(useGeneratedKeys = true, keyProperty = "boardReq.boardId", keyColumn="board_id")
+    void saveBoard(@Param("boardReq") final UpBoardReq boardReq);
 
 
     //업보드 사진 저장
     @Insert({"<script>", "insert into board_img(board_id, url) values ", "<foreach collection='images' " +
             "item='item' index='index' separator=', '>(#{boardId}, #{item})</foreach>","</script>"})
-    void saveBoardImg(@Param("boardId") int boardId, @Param("img") List<String>images);
+
+    void saveBoardImg(@Param("boardId") int boardId, @Param("images") List<String>images);
 
 
     //업보드 키워드 저장
@@ -111,26 +136,27 @@ public interface BoardMapper {
 
 
     // 업보드 좋아요한 사람 저장
-    @Insert("INSERT INTO board_recommend(board_id, recommender_id) VALUES(#{UpBoardReq.boardId}, #{UpBoardReq.recommender})")
-    void saveBoardRecommender(@Param("UpBoardReq") final UpBoard.UpBoardReq boardReq);
+    @Insert("INSERT INTO board_recommend(board_id, recommender_id) VALUES(#{boardId}, #{userId})")
+    void saveBoardRecommender(@Param("boardId") int boardId, @Param("userId") int userId);
 
 
     /*
     ReBoard
      */
     //리보드 저장
-    @Insert("INSERT INTO board_reply(board_id, writer_id, content) VALUES(#{ReBoardReq.boardId}, #{ReBoardReq.writerId}," +
-            "#{ReBoardReq.content})")
-    void saveReBoard(@Param("ReBoardReq") final ReBoard.ReBoardReq reBoardReq);
+    @Insert("INSERT INTO board_reply(board_id, writer_id, content) VALUES(#{reBoardReq.boardId}, #{reBoardReq.writerId}," +
+            "#{reBoardReq.content})")
+    @Options(useGeneratedKeys = true, keyProperty = "reBoardReq.replyId", keyColumn="reply_id")
+    void saveReBoard(@Param("reBoardReq") final ReBoardReq reBoardReq);
 
     //리보드 사진 저장
     @Insert({"<script>", "insert into reply_img(reply_id, url) values ", "<foreach collection='images' " +
             "item='item' index='index' separator=', '>(#{replyId}, #{item})</foreach>","</script>"})
-    void saveReBoardImg(@Param("boardId") int boardId, @Param("img") List<String>images);
+    void saveReBoardImg(@Param("replyId") int replyId, @Param("images") List<String>images);
 
     // 리보드 좋아요한 사람 저장
-    @Insert("INSERT INTO reply_recommend(reply_id, recommender_id) VALUES(#{ReBoardReq.boardId}, #{ReBoardReq.recommender})")
-    void saveReBoardRecommender(@Param("ReBoardReq") final ReBoard.ReBoardReq reBoardReq);
+    @Insert("INSERT INTO reply_recommend(reply_id, recommender_id) VALUES(#{replyId}, #{userId})")
+    void saveReBoardRecommender(@Param("replyId") int replyId, @Param("userId") int userId);
 
 
 
@@ -141,12 +167,12 @@ public interface BoardMapper {
      */
 
     //업보드 수정하기
-    @Update("UPDATE board SET title=#{BoardReq.title}, content=#{BoardReq.content} WHERE board_id = #{boardId}")
-    void updateBoard(@Param("boardId") final int boardId, @Param("BoardReq") final UpBoard.UpBoardReq boardReq);
+    @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content} WHERE board_id = #{boardId}")
+    void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
     //업보드 공유 갯수 업데이트
     @Update("UPDATE board SET share_cnt=#{UpBoardReq.share} WHERE board_id=#{boardId}")
-    void updateBoardShare(@Param("boardId") final int boardId, @Param("UpBoardReq") final UpBoard.UpBoardReq upBoardReq);
+    void updateBoardShare(@Param("boardId") final int boardId, @Param("UpBoardReq") final UpBoardReq upBoardReq);
 
 
     /*
@@ -154,7 +180,7 @@ public interface BoardMapper {
      */
 
     @Update("UPDATE board_reply SET content=#{ReBoardReq.content} WHERE reply_id = #{replyId}")
-    void updateReBoard(@Param("replyId") final int replyId, @Param("ReBoardReq") final ReBoard.ReBoardReq reBoardReq);
+    void updateReBoard(@Param("replyId") final int replyId, @Param("ReBoardReq") final ReBoardReq reBoardReq);
 
 
 
@@ -166,4 +192,20 @@ public interface BoardMapper {
     //보드 고유번호로 보드 삭제하기
     @Delete("DELETE FROM board WHERE board_id = #{boardId}")
     void deleteBoard(@Param("boardId") final int boardId);
+
+    //보드 이미지 고유 번호로 보드 이미지 삭제하기
+    @Delete("DELETE FROM board_img WHERE image_id = #{imageId}")
+    void deleteBoardImg(@Param("imageId") final int imageId);
+
+    //보드 고유번호로 보드 키워드 삭제하기
+    @Delete("DELETE FROM board_img WHERE board_id = #{boardId}")
+    void deleteBoardKeyword(@Param("boardId") final int boardId);
+
+    //회원 고유 번호와 보드 고유 번호로 추천 취소하기
+    @Delete("DELETE FROM board_recommend WHERE board_id = #{boardId} AND recommender_id = #{userId}")
+    void deleteBoardRecommender(@Param("boardId") final int boardId, @Param("userId") final int userId);
+
+    //회원 고유 번호와 리보드 고유 번호로 추천 취소하기
+    @Delete("DELETE FROM reply_recommend WHERE reply_id = #{replyId} AND recommender_id = #{userId}")
+    void deleteReBoardRecommender(@Param("replyId") final int replyId, @Param("userId") final int userId);
 }

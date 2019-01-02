@@ -23,21 +23,22 @@ public class ResponseMessage {
     public static final String UPDATE_BOARD = "보드 수정 성공";
     public static final String FAIL_UPDATE_BOARD = "보드 수정 실패";
     public static final String DELETE_BOARD = "보드 삭제 성공";
-    public static final String LIKE_BOARD = "보드 좋아요/해제 성공";
+    public static final String LIKE_BOARD = "보드 좋아요";
+    public static final String CANCEL_LIKE_BOARD = "보드 좋아요 해제";
 
-    public static final String READ_ALL_COMMENTS = "모든 댓글 조회 성공";
-    public static final String READ_COMMENT = "댓글 조회 성공";
-    public static final String NOT_FOUND_COMMENT = "댓글이 존재하지 않습니다.";
-    public static final String CREATE_COMMENT = "댓글 작성 성공";
-    public static final String FAIL_CREATE_COMMENT = "댓글 작성 실패";
-    public static final String UPDATE_COMMENT = "댓글 수정 성공";
-    public static final String FAIL_UPDATE_COMMENT = "댓글 수정 실패";
-    public static final String DELETE_COMMENT = "댓글 삭제 성공";
-    public static final String FAIL_DELETE_COMMENT = "댓글 삭제 실패";
-    public static final String LIKE_COMMENT = "댓글 좋아요";
-    public static final String UNLIKE_COMMENT = "댓글 좋아요 해제";
-    public static final String FAIL_COMMENT = "댓글 좋아요 실패";
-    public static final String FAIL_UNLIKE_COMMENT = "댓글 좋아요 해제 실패";
+    public static final String READ_ALL_REBOARD = "모든 리보드 조회 성공";
+    public static final String READ_REBOARD = "리보드 조회 성공";
+    public static final String NOT_FOUND_REBOARD = "리보드가 존재하지 않습니다.";
+    public static final String CREATE_REBOARD = "리보드 작성 성공";
+    public static final String FAIL_CREATE_REBOARD = "리보드 작성 실패";
+    public static final String UPDATE_REBOARD = "리보드 수정 성공";
+    public static final String FAIL_UPDATE_REBOARD = "리보드 수정 실패";
+    public static final String DELETE_REBOARD = "리보드 삭제 성공";
+    public static final String FAIL_DELETE_REBOARD = "리보드 삭제 실패";
+    public static final String LIKE_REBOARD = "리보드 좋아요";
+    public static final String CANCEL_LIKE_REBOARD = "리보드 좋아요 해제";
+    public static final String FAIL_REBOARD = "리보드 좋아요 실패";
+    public static final String FAIL_CANCEL_LIKE_REBOARD = "리보드 좋아요 해제 실패";
 
     public static final String AUTHORIZED = "인증 성공";
     public static final String UNAUTHORIZED = "인증 실패";
