@@ -15,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 
-import com.gings.controller.PrincipalArgumentResolver;
 import com.gings.security.EmailAuthWTService;
 import com.gings.security.DefaultJWTService;
 import com.gings.security.JWTService;
@@ -25,7 +24,7 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 
 @Configuration
-public class Config implements WebMvcConfigurer {
+public class Config {
     
     @Autowired
     private SpringTemplateEngine templateEngine;
@@ -57,11 +56,6 @@ public class Config implements WebMvcConfigurer {
     @Bean
     public JWTService authNumberJWTService() {
         return new EmailAuthWTService();
-    }
-    
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(new PrincipalArgumentResolver());
     }
     
 }

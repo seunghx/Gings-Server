@@ -12,6 +12,6 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class Principal {
-    public int userId;
+    public Integer userId;
     public UserRole role;
 }
