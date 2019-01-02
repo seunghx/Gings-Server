@@ -3,23 +3,37 @@ package com.gings.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 
 import com.gings.controller.PrincipalArgumentResolver;
-import com.gings.security.AuthNumberJWTService;
+import com.gings.security.EmailAuthWTService;
 import com.gings.security.DefaultJWTService;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+
 
 @Configuration
 public class Config implements WebMvcConfigurer {
+    
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+    
+    @PostConstruct
+    public void init() {
+        templateEngine.addDialect(new LayoutDialect());
+    }
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,7 +56,7 @@ public class Config implements WebMvcConfigurer {
     
     @Bean
     public JWTService authNumberJWTService() {
-        return new AuthNumberJWTService();
+        return new EmailAuthWTService();
     }
     
     @Override

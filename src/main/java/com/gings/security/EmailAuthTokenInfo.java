@@ -1,6 +1,5 @@
 package com.gings.security;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,16 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AuthNumberTokenInfo extends TokenInfo {
+public class EmailAuthTokenInfo extends TokenInfo {
 
     private String authNumber;
+    private String email;
     
-    public AuthNumberTokenInfo(String token) {
+    public EmailAuthTokenInfo(String token, String authNumber) {
         super(token);
-    }
-    
-    public AuthNumberTokenInfo(String token, String authNumber) {
-        this(token);
         this.authNumber = authNumber;
     }
 }

@@ -39,27 +39,11 @@ public class DefaultJWTService implements JWTService {
     private String issuer;
     @Value("${jwt.user-auth.token-ttl.day}")
     private int expiredPeriod;
-    
-    private Algorithm algorithm;
-    
-    @PostConstruct
-    public void init() {
-        this.algorithm = Algorithm.HMAC256(secret);
-    }
-    
-    @Override
-    public TokenInfo decode(TokenInfo tokenInfo) {
-        
-       DecodedJWT decoded = validateInternal(tokenInfo);
-        
-       return parseToken(decoded);
-    }
 
     @Override
     public String create(TokenInfo tokenInfo) {
         
         // null is not instanceof UserAuthTokenInfo
-        
         if(!(tokenInfo instanceof UserAuthTokenInfo)) {
             log.warn("Invalid Argument TokenInfo. This class does not support {}.", tokenInfo); 
             
@@ -74,13 +58,28 @@ public class DefaultJWTService implements JWTService {
                       .withClaim(USER_ID_CLAIM_NAME, supportingTokenInfo.getUid())
                       .withClaim(USER_ROLE_CLAIM_NAME, supportingTokenInfo.getUserRole().getCode())
                       .withExpiresAt(expiredAt(expiredPeriod))
-                      .sign(algorithm);
+                      .sign(algorithm(secret));
                       
         } catch (JWTCreationException jce) {
             log.info("Exception occurred while trying to create JWT token.");  
             
             throw jce;
         }
+    }
+    
+
+    @Override
+    public TokenInfo decode(TokenInfo tokenInfo) {
+
+        if(tokenInfo == null) {
+            log.info("Null value tokenInfo detected while trying to decode JWT token.");
+            
+            throw new NullPointerException("tokenInfo is null.");
+        }
+        
+       DecodedJWT decoded = verifyToken(tokenInfo);
+        
+       return parseToken(decoded);
     }
 
     @Override
@@ -95,22 +94,11 @@ public class DefaultJWTService implements JWTService {
         return UserAuthTokenInfo.class.isAssignableFrom(tokenInfo);
     }
 
-    @Override
-    public void validate(TokenInfo tokenInfo) {
-        validateInternal(tokenInfo);
-    }
-
-    private DecodedJWT validateInternal(TokenInfo tokenInfo) {
-        
-        if(tokenInfo == null) {
-            log.info("Null value tokenInfo detected while trying to decode JWT token.");
-            
-            throw new NullPointerException("tokenInfo is null.");
-        }
+    private DecodedJWT verifyToken(TokenInfo tokenInfo) {
         
         try {
-            JWTVerifier jwtVerifier = require(algorithm).withIssuer(issuer)
-                                                        .build();
+            JWTVerifier jwtVerifier = require(algorithm(secret)).withIssuer(issuer)
+                                                                .build();
             
             return jwtVerifier.verify(tokenInfo.getToken());
             
@@ -124,8 +112,11 @@ public class DefaultJWTService implements JWTService {
     
     private UserAuthTokenInfo parseToken(DecodedJWT decodedJWT) {
         UserAuthTokenInfo tokenInfo = new UserAuthTokenInfo();
-        tokenInfo.setUid(decodedJWT.getClaim(USER_ID_CLAIM_NAME).asInt());
-        tokenInfo.setUserRole(UserRole.from(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME).asString()));
+        
+        tokenInfo.setUid(decodedJWT.getClaim(USER_ID_CLAIM_NAME)
+                                   .asInt());
+        tokenInfo.setUserRole(UserRole.from(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME)
+                                                      .asString()));
         
         return tokenInfo;
     }

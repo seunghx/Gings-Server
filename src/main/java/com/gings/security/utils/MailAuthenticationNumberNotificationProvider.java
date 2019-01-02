@@ -7,6 +7,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,6 +17,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import lombok.extern.slf4j.Slf4j;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 
 /**
  * 
@@ -32,8 +34,8 @@ public class MailAuthenticationNumberNotificationProvider
                                                 implements AuthenticationNumberNotificationProvider {
 
     private static final String AUTH_NUMBER_KEY = "authNumber";
-    private static final String IMG_CID = "identifier1234";
-    private static final String MIME_MESSAGE_ENCODING = "UTF-8";
+    private static final String IMG_CID = "identifier";
+    private static final String MIME_ENCODING = "UTF-8";
     
     @Value("${thymeleaf.template.authNumber.location}")
     private String templateLocation;
@@ -58,18 +60,18 @@ public class MailAuthenticationNumberNotificationProvider
     public void sendAuthenticationNumber(String email, String authNumber) {
         
         validate(email, authNumber);
-        log.error("{}", resourceLoader);
+
         String htmlMessage = getMailMessage(authNumber);
          
         try {
             MimeMessage message = mailSender.createMimeMessage();
-
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, MIME_MESSAGE_ENCODING);
+            
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, MIME_ENCODING);
             helper.setFrom(senderId);
             helper.setTo(email);
             helper.setText(htmlMessage, true);
             helper.addInline(IMG_CID, resourceLoader.getResource(representingImgLocation));
-        
+            
             mailSender.send(message);
         } catch (MessagingException e) {
             if(log.isInfoEnabled()){
