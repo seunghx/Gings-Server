@@ -1,5 +1,6 @@
 package com.gings.security.authentication;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 import javax.annotation.PostConstruct;
@@ -38,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 public class AuthAspect {
  
-    public static final String PRINCIPAL = "Princial";
+    public static final String USER_ID= "userId";
+    public static final String USER_ROLE = "role";
     
     private static final String UNAUTHORIZED_MSG = "response.authentication.failure";
     
@@ -76,7 +78,8 @@ public class AuthAspect {
     }
     
     
-    @Around("@annotation(com.gings.security.authentication.Authentication)")
+    @Around("@annotation(com.gings.security.authentication.Authentication) || "
+            + "within(@com.gings.security.authentication.Authentication *)")
     public Object around(final ProceedingJoinPoint pjp) throws Throwable {
         
         log.info("Starting to authenticate user info.");
@@ -96,15 +99,24 @@ public class AuthAspect {
          try {
 
             UserAuthTokenInfo token = (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
-            httpServletRequest.setAttribute(PRINCIPAL, new Principal(token.getUid(), token.getUserRole()));
-            
+            Principal principal = new Principal(token.getUid(), token.getUserRole());
+          
+            Object[] args = Arrays.stream(pjp.getArgs())
+                                  .filter(arg -> arg instanceof Principal)
+                                  .map(arg -> {
+                                      arg = principal;
+                                      return principal;
+                                  })
+                                  .toArray();
+
+            return pjp.proceed(args);
+
         }catch(JWTCreationException e) {
             log.error("Exception occurred while trying to authenticate user request.", e);
             
             return AUTH_FAILURE_RES;
         }
-         
-        return pjp.proceed(pjp.getArgs());
+        
     }
 }
 

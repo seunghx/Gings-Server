@@ -1,20 +1,18 @@
 package com.gings.controller;
 
 import static com.gings.security.JWTService.AUTHORIZATION;
+import static com.gings.security.JWTService.BEARER_SCHEME;
 
 import java.util.Locale;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,28 +20,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.gings.model.DefaultRes;
 import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
-import com.gings.security.AuthNumberTokenInfo;
+import com.gings.security.EmailAuthTokenInfo;
 import com.gings.security.JWTServiceManager;
+import com.gings.security.Principal;
 import com.gings.security.TokenInfo;
+import com.gings.security.authentication.Authentication;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestController("user")
+@RestController
 public class UserController {
     
-    private static final Class<? extends TokenInfo> USING_TOKEN_INFO = AuthNumberTokenInfo.class;
+    private static final Class<? extends TokenInfo> USING_TOKEN_INFO = EmailAuthTokenInfo.class;
+    private static final String XFF_HEADER_NAME = "X-Forwarded-For";
     
     private final UserService userService;
     private final MessageSource msgSource;
@@ -54,6 +53,7 @@ public class UserController {
     public UserController(UserService userService, MessageSource msgSource, 
                           JWTServiceManager jwtServiceManager, 
                           AuthenticationNumberNotificationProvider notificationProvider) {
+        
         this.userService = userService;
         this.msgSource = msgSource;
         this.jwtServiceManager = jwtServiceManager;
@@ -63,8 +63,19 @@ public class UserController {
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<DefaultRes<Void>> onUserEmailDuplicated(DuplicateKeyException e, 
                                                                   WebRequest request) {
-        log.error("Request email duplicated.", e);
         
+        String remote = request.getHeader(XFF_HEADER_NAME);
+        
+        if(remote == null) {
+            remote = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+                                                                    .getRequest()
+                                                                    .getRemoteAddr();
+        }
+        
+        log.error("Request email duplicated. {}", e);
+        log.warn("It might be illegal access!!");
+        log.warn("Requesting remote host : {}", remote);
+                  
         String message = msgSource.getMessage("response.email-duplicate", null, request.getLocale());
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CONFLICT.value(), message), 
@@ -77,8 +88,11 @@ public class UserController {
      * 
      * (일반적으로 200 OK는 GET 요청의 경우 바디에 응답 데이터가 포함되는 경우이므로)
      */
-    @GetMapping("/email")
-    public ResponseEntity<DefaultRes<Void>> checkEmailDuplication(String email, Locale locale) {
+    @GetMapping("/signup/email")
+    public ResponseEntity<DefaultRes<Void>> checkEmailDuplication(@Validated EmailReq emailReq, 
+                                                                  Locale locale) {
+        String email = emailReq.getEmail();
+        
         if(userService.isEmailExist(email)) {
             log.info("Requested email {} aleady exists.", email);
             
@@ -87,7 +101,7 @@ public class UserController {
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.NO_CONTENT.value(), message), 
                                         HttpStatus.OK);
         }else {
-            log.info("Requested email {} does not exist.");
+            log.info("Requested email {} does not exist.", email);
             
             String message = msgSource.getMessage("response.email-not-duplicate", null, locale);
             
@@ -96,14 +110,14 @@ public class UserController {
         }
     }
     
-    @GetMapping("/authNumber")
+    @GetMapping("/signup/authNumber")
     public ResponseEntity<DefaultRes<Void>> 
                         getAuthenticationNubmer(@Validated EmailReq emailReq,
                                                 Locale locale) {
         
         String authNumber = getAuthenticationNumber();
         
-        setAuthToken(authNumber);
+        setAuthToken(authNumber, emailReq.getEmail());
         notificationProvider.sendAuthenticationNumber(emailReq.getEmail(), authNumber);
         
         String message = msgSource.getMessage("response.auth-number.succees", null, locale);
@@ -116,8 +130,10 @@ public class UserController {
     public ResponseEntity<DefaultRes<Void>> signup(@Validated @RequestBody SignUp signUp, 
                                                    HttpServletRequest request) {
         
-        verifyAuthenticationNumber(signUp.getAuthNumber(), request);
+        EmailAuthTokenInfo tokenInfo = 
+                    (EmailAuthTokenInfo)getEmailFromToken(signUp.getAuthNumber(), request);
         
+        signUp.setEmail(tokenInfo.getEmail());
         userService.addNewUser(signUp);
         
         String message = msgSource.getMessage("response.sign-up.success", null, request.getLocale());
@@ -125,11 +141,20 @@ public class UserController {
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
                                     HttpStatus.OK);
     }
-    
-    private void verifyAuthenticationNumber(String authNumber, HttpServletRequest request) {
-        String jwt = request.getHeader(AUTHORIZATION);
+
+    @Authentication
+    @GetMapping("/temp")
+    public ResponseEntity<Principal> temp(Principal principal){
+        log.error("{}", principal);
         
-        AuthNumberTokenInfo tokenInfo = new AuthNumberTokenInfo(jwt, authNumber);
+        return new ResponseEntity<>(principal, HttpStatus.OK);
+    }
+    
+    private TokenInfo getEmailFromToken(String authNumber, HttpServletRequest request) {
+        String jwt = request.getHeader(AUTHORIZATION);
+        jwt = jwt.replace(BEARER_SCHEME, "");
+        
+        EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo(jwt, authNumber);
         
         if(StringUtils.isEmpty(jwt)) {
             log.info("Received invalid empty jwt token.");
@@ -137,7 +162,8 @@ public class UserController {
             throw new BadCredentialsException("JWT token including authentication number is empty.");
         }
         
-        jwtServiceManager.resolve(USING_TOKEN_INFO).validate(tokenInfo);
+        return jwtServiceManager.resolve(USING_TOKEN_INFO)
+                                .decode(tokenInfo);
     }
     
     /**
@@ -152,17 +178,19 @@ public class UserController {
     /**
      * @param authNumber jwt token에 저장될 인증 번호.
      */
-    private void setAuthToken(String authNumber) {
-        AuthNumberTokenInfo tokenInfo = new AuthNumberTokenInfo();
+    private void setAuthToken(String authNumber, String email) {
+        EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo();
         tokenInfo.setAuthNumber(authNumber);
+        tokenInfo.setEmail(email);
         
-        String jwt =  jwtServiceManager.resolve(USING_TOKEN_INFO).create(tokenInfo);
+        String jwt =  jwtServiceManager.resolve(USING_TOKEN_INFO)
+                                       .create(tokenInfo);
         
-        ServletRequestAttributes requestAttr =
-                        (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
+                                               RequestContextHolder.getRequestAttributes();
 
         requestAttr.getResponse()
-                   .setHeader(AUTHORIZATION, jwt);
+                   .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
         
     }
     

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -149,11 +150,11 @@ public class LoginController {
         JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
         String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
         
-        ServletWebRequest servletContainer =
-                (ServletWebRequest)RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
+                                                    RequestContextHolder.getRequestAttributes();
 
-        servletContainer.getResponse()
-                        .setHeader(AUTHORIZATION, jwt);
+        requestAttr.getResponse()
+                   .setHeader(AUTHORIZATION, jwt);
     }
     
     @Setter

@@ -85,7 +85,7 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) from user WHERE email = #{email}")
     public int countByEmail(String email);
     
-    @Update("UPADATE user SET first_login = 0 WHERE user_id = #{userId}")
+    @Update("UPDATE user SET first_login = 0 WHERE user_id = #{userId}")
     public void setFalseToFirstLogin(int userId);
     
     //회원 등록(회원가입)
