@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class UserStatus {
+public class ClubUser {
 
     private int userId;
     private String status;
