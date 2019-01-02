@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
@@ -41,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 public class AuthAspect {
  
+    public static final String XFF_HEADER_NAME = "X-FORWARDED-FOR";
     public static final String USER_ID= "userId";
     public static final String USER_ROLE = "role";
     
@@ -113,8 +116,15 @@ public class AuthAspect {
             log.info("Request user token expired.");
             
             return AUTH_FAILURE_RES;
-        } catch(JWTDecodeException e) {
+        } catch(JWTVerificationException e) {
+            String remote = httpServletRequest.getHeader(XFF_HEADER_NAME);
+            
+            if(remote == null) {
+                remote = httpServletRequest.getRemoteAddr();
+            }
+            
             log.error("Exception occurred while trying to authenticate user request.", e);
+            log.warn("It might be illegal access!! Requesting remote user ip : {}", remote);
             
             return AUTH_FAILURE_RES;
         }

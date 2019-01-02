@@ -24,6 +24,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.DefaultRes;
 import com.gings.model.user.SignUp;
@@ -62,13 +63,7 @@ public class UserController {
     public ResponseEntity<DefaultRes<Void>> onUserEmailDuplicated(DuplicateKeyException e, 
                                                                   WebRequest request) {
         
-        String remote = request.getHeader(XFF_HEADER_NAME);
-        
-        if(remote == null) {
-            remote = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
-                                                                    .getRequest()
-                                                                    .getRemoteAddr();
-        }
+        String remote =  getRequestedAddr();
         
         log.error("Request email duplicated. {}", e);
         log.warn("It might be illegal access!! Requesting remote host : {}", remote);
@@ -90,6 +85,22 @@ public class UserController {
                                     HttpStatus.OK);
     }
     
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<DefaultRes<Void>> onJWTVerificationException(JWTVerificationException e, 
+                                                                       WebRequest request) {
+
+        String remote =  getRequestedAddr();
+        
+        log.error("Exception occurred while trying to authenticate user request.", e);
+        log.warn("It might be illegal access!! Requesting remote user ip : {}", remote);
+    
+
+        String message = msgSource.getMessage("response.authentication.failure", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message), 
+                                    HttpStatus.OK);
+    }
+                                                                           
     /**
      * 요청으로 전달한 이메일이 존재하지 않음의 의미로 404 Not Found 응답 반환.
      * 존재할 경우 204 No Content 반환.
@@ -192,5 +203,19 @@ public class UserController {
 
         requestAttr.getResponse()
                    .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
+    }
+    
+    private String getRequestedAddr() {
+        HttpServletRequest request = 
+                ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+                                                               .getRequest();
+        
+        String remote = request.getHeader(XFF_HEADER_NAME);
+        
+        if(remote == null) {
+            remote = request.getRemoteAddr();
+        }
+        
+        return remote;
     }
 }

@@ -27,7 +27,7 @@ public interface JWTService {
     
     default Date expiredAt(int expiredPeriod) {
         Instant ins = Instant.now()
-                .plus(Period.ofDays(expiredPeriod));
+                             .plus(Period.ofDays(expiredPeriod));
         
         return Date.from(ins);
     }
