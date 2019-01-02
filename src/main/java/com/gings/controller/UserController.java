@@ -36,7 +36,7 @@ import com.gings.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestController("user")
+@RestController
 public class UserController {
     
     private static final Class<? extends TokenInfo> USING_TOKEN_INFO = EmailAuthTokenInfo.class;
@@ -85,7 +85,7 @@ public class UserController {
      * 
      * (일반적으로 200 OK는 GET 요청의 경우 바디에 응답 데이터가 포함되는 경우이므로)
      */
-    @GetMapping("/email")
+    @GetMapping("/signup/email")
     public ResponseEntity<DefaultRes<Void>> checkEmailDuplication(@Validated EmailReq emailReq, 
                                                                   Locale locale) {
         String email = emailReq.getEmail();
@@ -98,7 +98,7 @@ public class UserController {
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.NO_CONTENT.value(), message), 
                                         HttpStatus.OK);
         }else {
-            log.info("Requested email {} does not exist.");
+            log.info("Requested email {} does not exist.", email);
             
             String message = msgSource.getMessage("response.email-not-duplicate", null, locale);
             
@@ -107,7 +107,7 @@ public class UserController {
         }
     }
     
-    @GetMapping("/authNumber")
+    @GetMapping("/signup/authNumber")
     public ResponseEntity<DefaultRes<Void>> 
                         getAuthenticationNubmer(@Validated EmailReq emailReq,
                                                 Locale locale) {
