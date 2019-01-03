@@ -24,14 +24,14 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.DefaultRes;
 import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
 import com.gings.security.EmailAuthTokenInfo;
 import com.gings.security.JWTServiceManager;
-import com.gings.security.Principal;
 import com.gings.security.TokenInfo;
-import com.gings.security.authentication.Authentication;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
@@ -48,7 +48,6 @@ public class UserController {
     private final MessageSource msgSource;
     private final JWTServiceManager jwtServiceManager;
     private final AuthenticationNumberNotificationProvider notificationProvider;
-   
     
     public UserController(UserService userService, MessageSource msgSource, 
                           JWTServiceManager jwtServiceManager, 
@@ -64,17 +63,10 @@ public class UserController {
     public ResponseEntity<DefaultRes<Void>> onUserEmailDuplicated(DuplicateKeyException e, 
                                                                   WebRequest request) {
         
-        String remote = request.getHeader(XFF_HEADER_NAME);
-        
-        if(remote == null) {
-            remote = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
-                                                                    .getRequest()
-                                                                    .getRemoteAddr();
-        }
+        String remote =  getRequestedAddr();
         
         log.error("Request email duplicated. {}", e);
-        log.warn("It might be illegal access!!");
-        log.warn("Requesting remote host : {}", remote);
+        log.warn("It might be illegal access!! Requesting remote host : {}", remote);
                   
         String message = msgSource.getMessage("response.email-duplicate", null, request.getLocale());
         
@@ -82,6 +74,33 @@ public class UserController {
                                     HttpStatus.OK);
     }
     
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<DefaultRes<Void>> onEmailAuthTokenExpired(TokenExpiredException e,                      
+                                                                     WebRequest request) {
+        log.info("Email authentication request token expired.");
+        
+        String message = msgSource.getMessage("response.email-auth-token.expired", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
+                                    HttpStatus.OK);
+    }
+    
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<DefaultRes<Void>> onJWTVerificationException(JWTVerificationException e, 
+                                                                       WebRequest request) {
+
+        String remote =  getRequestedAddr();
+        
+        log.error("Exception occurred while trying to authenticate user request.", e);
+        log.warn("It might be illegal access!! Requesting remote user ip : {}", remote);
+    
+
+        String message = msgSource.getMessage("response.authentication.failure", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message), 
+                                    HttpStatus.OK);
+    }
+                                                                           
     /**
      * 요청으로 전달한 이메일이 존재하지 않음의 의미로 404 Not Found 응답 반환.
      * 존재할 경우 204 No Content 반환.
@@ -100,7 +119,7 @@ public class UserController {
             
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.NO_CONTENT.value(), message), 
                                         HttpStatus.OK);
-        }else {
+        } else {
             log.info("Requested email {} does not exist.", email);
             
             String message = msgSource.getMessage("response.email-not-duplicate", null, locale);
@@ -142,14 +161,6 @@ public class UserController {
                                     HttpStatus.OK);
     }
 
-    @Authentication
-    @GetMapping("/temp")
-    public ResponseEntity<Principal> temp(Principal principal){
-        log.error("{}", principal);
-        
-        return new ResponseEntity<>(principal, HttpStatus.OK);
-    }
-    
     private TokenInfo getEmailFromToken(String authNumber, HttpServletRequest request) {
         String jwt = request.getHeader(AUTHORIZATION);
         jwt = jwt.replace(BEARER_SCHEME, "");
@@ -179,6 +190,7 @@ public class UserController {
      * @param authNumber jwt token에 저장될 인증 번호.
      */
     private void setAuthToken(String authNumber, String email) {
+        
         EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo();
         tokenInfo.setAuthNumber(authNumber);
         tokenInfo.setEmail(email);
@@ -191,7 +203,19 @@ public class UserController {
 
         requestAttr.getResponse()
                    .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
-        
     }
     
+    private String getRequestedAddr() {
+        HttpServletRequest request = 
+                ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes())
+                                                               .getRequest();
+        
+        String remote = request.getHeader(XFF_HEADER_NAME);
+        
+        if(remote == null) {
+            remote = request.getRemoteAddr();
+        }
+        
+        return remote;
+    }
 }

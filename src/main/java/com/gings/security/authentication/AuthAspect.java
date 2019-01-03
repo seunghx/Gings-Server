@@ -16,6 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
@@ -39,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 public class AuthAspect {
  
+    public static final String XFF_HEADER_NAME = "X-FORWARDED-FOR";
     public static final String USER_ID= "userId";
     public static final String USER_ROLE = "role";
     
@@ -64,17 +69,13 @@ public class AuthAspect {
         
     }
     
-    public HttpServletRequest getHttpServletRequest() {
-        return httpServletRequest;
-    }
-    
     @PostConstruct
     public void init() {
         ApiError authFailRES = new ApiError(HttpStatus.UNAUTHORIZED.value(),
                                                msgSource.getMessage(UNAUTHORIZED_MSG, null, 
                                                                     Locale.getDefault()));
         
-        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.UNAUTHORIZED);
+        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.OK);
     }
     
     
@@ -98,25 +99,35 @@ public class AuthAspect {
             
          try {
 
-            UserAuthTokenInfo token = (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
+            UserAuthTokenInfo token = 
+                        (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
+            
             Principal principal = new Principal(token.getUid(), token.getUserRole());
           
             Object[] args = Arrays.stream(pjp.getArgs())
-                                  .filter(arg -> arg instanceof Principal)
                                   .map(arg -> {
-                                      arg = principal;
-                                      return principal;
+                                     return (arg instanceof Principal)? principal : arg;
                                   })
                                   .toArray();
 
             return pjp.proceed(args);
 
-        }catch(JWTCreationException e) {
+        } catch(TokenExpiredException e){
+            log.info("Request user token expired.");
+            
+            return AUTH_FAILURE_RES;
+        } catch(JWTVerificationException e) {
+            String remote = httpServletRequest.getHeader(XFF_HEADER_NAME);
+            
+            if(remote == null) {
+                remote = httpServletRequest.getRemoteAddr();
+            }
+            
             log.error("Exception occurred while trying to authenticate user request.", e);
+            log.warn("It might be illegal access!! Requesting remote user ip : {}", remote);
             
             return AUTH_FAILURE_RES;
         }
-        
     }
 }
 

@@ -1,5 +1,6 @@
 package com.gings.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,5 +16,6 @@ public class Club {
     private String backImg;
 
     private List<Event> event;
-    private List<UserStatus> status;
+    @JsonIgnore
+    private List<ClubUser> status;
 }

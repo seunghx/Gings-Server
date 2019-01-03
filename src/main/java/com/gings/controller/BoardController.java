@@ -44,7 +44,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @GetMapping("boards")
-    public ResponseEntity getAllBoards(@RequestBody  final Pagination pagination) {
+    public ResponseEntity getAllBoards(final Pagination pagination) {
         try {
             DefaultRes<List<Board>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);

@@ -27,6 +27,20 @@ public class ResponseMessage {
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
     public static final String FAIL_LIKE_BOARD = "보드 추천/해제 실패";
 
+    public static final String READ_ALL_CLUBS = "모든 클럽 조회 성공";
+    public static final String READ_CLUB = "클럽 조회 성공";
+    public static final String NOT_FOUND_CLUB = "클럽가 존재하지 않습니다.";
+    public static final String READ_CLUB_INFO = "클럽 정보 조회 성공";
+    public static final String NOT_FOUND_CLUB_INFO = "클럽의 정보가 존재하지 않습니다.";
+    public static final String CREATE_CLUB = "클럽 작성 성공";
+    public static final String FAIL_CREATE_CLUB = "클럽 작성 실패";
+    public static final String UPDATE_CLUB = "클럽 수정 성공";
+    public static final String FAIL_UPDATE_CLUB = "클럽 수정 실패";
+    public static final String DELETE_CLUB = "클럽 삭제 성공";
+    public static final String LIKE_CLUB = "클럽 추천 성공";
+    public static final String CANCEL_LIKE_CLUB = "클럽 추천 해제 성공";
+    public static final String FAIL_LIKE_CLUB = "클럽 추천/해제 실패";
+
     public static final String READ_ALL_REBOARD = "모든 리보드 조회 성공";
     public static final String READ_REBOARD = "리보드 조회 성공";
     public static final String NOT_FOUND_REBOARD = "리보드가 존재하지 않습니다.";

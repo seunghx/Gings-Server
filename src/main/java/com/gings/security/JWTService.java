@@ -24,8 +24,11 @@ public interface JWTService {
     default Algorithm algorithm(String secret) {
         return Algorithm.HMAC256(secret);
     }
+    
     default Date expiredAt(int expiredPeriod) {
-        return Date.from(Instant.now()
-                                .plus(Period.ofDays(expiredPeriod)));
+        Instant ins = Instant.now()
+                             .plus(Period.ofDays(expiredPeriod));
+        
+        return Date.from(ins);
     }
 }
