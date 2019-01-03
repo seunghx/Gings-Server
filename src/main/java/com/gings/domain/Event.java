@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @ToString
 public class Event {
 
-    private LocalDateTime time;
+    private String date;
+    private String time;
     private String title;
     private int limit;
     private String place;

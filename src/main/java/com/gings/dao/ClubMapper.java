@@ -2,8 +2,8 @@ package com.gings.dao;
 
 
 import com.gings.domain.Club;
-import com.gings.domain.Event;
 import com.gings.domain.ClubUser;
+import com.gings.domain.Event;
 import com.gings.model.Pagination;
 import org.apache.ibatis.annotations.*;
 
@@ -14,8 +14,8 @@ public interface ClubMapper {
 
     // 클럽 전체 조회 (findAllClub)
     @Select("SELECT club_id as clubId, intro_img as introImg, back_img as backImg " +
-            "FROM club LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
-    public List<Club> findAllClub(@Param("pagination") final Pagination pagination);
+            "FROM club")
+    public List<Club> findAllClub();
 
 
     // 클럽 고유 번호로 클럽 조회(findClubByClubId)
@@ -41,4 +41,11 @@ public interface ClubMapper {
     })
     public List<Event> findEventByClubId(int clubId);
 
+    //클럽 고유 번호로 상태여부 조회(findStatusByClub)
+    @Select("SELECT * FROM club_user WHERE club_id = #{clubId}")
+    @Results(value = {
+            @Result(property = "userId",column = "user_id"),
+            @Result(property = "status,",column = "status")
+    })
+    public List<ClubUser> findStatusByClub(int clubId);
 }

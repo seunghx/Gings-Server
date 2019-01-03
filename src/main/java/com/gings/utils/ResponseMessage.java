@@ -27,7 +27,7 @@ public class ResponseMessage {
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
     public static final String FAIL_LIKE_BOARD = "보드 추천/해제 실패";
 
-    public static final String READ_ALL_CLUBS = "모든 클럽 조회 성공";
+    public static final String READ_CLUB_USER_STATUS = "클럽 가입여부 조회 성공";
     public static final String READ_CLUB = "클럽 조회 성공";
     public static final String NOT_FOUND_CLUB = "클럽가 존재하지 않습니다.";
     public static final String READ_CLUB_INFO = "클럽 정보 조회 성공";

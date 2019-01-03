@@ -1,6 +1,7 @@
 package com.gings.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +11,7 @@ import lombok.ToString;
 @ToString
 public class ClubUser {
 
+    @JsonIgnore
     private int userId;
     private String status;
 
