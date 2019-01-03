@@ -103,6 +103,12 @@ public class BoardService {
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
     }
+    public DefaultRes<List<Board>>checkBoardByUser(final int id) {
+        final List<Board> boards = boardMapper.findBoardByUserId(id);
+        if (boards==null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.UNQUALIFIED, boards);
+    }
 
     /**
      * 보드 고유 번호로 보드 추천수 조회
