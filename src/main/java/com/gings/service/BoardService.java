@@ -3,10 +3,10 @@ package com.gings.service;
 import com.gings.dao.BoardMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
-import com.gings.model.ModifyBoard.ModifyBoardReq;
+import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.ReBoard.ReBoardReq;
-import com.gings.model.UpBoard.UpBoardReq;
+import com.gings.model.board.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -174,7 +172,7 @@ public class BoardService {
     public DefaultRes BoardLikes(final int boardId, final int userId) {
         try {
             if(boardMapper.findBoardByBoardId(boardId) == null)
-                return DefaultRes.res(StatusCode.OK, ResponseMessage.NOT_FOUND_BOARD);
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
             List<Integer> boardIdList = boardMapper.findRecommendBoardsByUserId(userId);
             for(int id : boardIdList){
@@ -187,7 +185,7 @@ public class BoardService {
             return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.FAIL_LIKE_BOARD);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
 

@@ -1,32 +1,32 @@
 package com.gings.controller;
 
 import com.gings.domain.Board;
-import com.gings.domain.BoardKeyword;
-import com.gings.domain.BoardReply;
+
 import com.gings.model.DefaultRes;
-import com.gings.model.ModifyBoard.ModifyBoardReq;
+import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.UpBoard.UpBoardReq;
-import com.gings.model.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard.UpBoardReq;
+import com.gings.model.board.ReBoard.ReBoardReq;
+
 import com.gings.security.Principal;
 import com.gings.security.authentication.Authentication;
+
 import com.gings.service.BoardService;
-import com.gings.utils.ResponseMessage;
-import com.gings.utils.StatusCode;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.AbstractDocument;
-import javax.validation.Valid;
+
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
-@Authentication
+//@Authentication
 
 public class BoardController {
 
@@ -75,6 +75,7 @@ public class BoardController {
      * 보드 저장
      *
      * @param upBoardReq 보드 데이터
+     * @param  principal jwt
      * @return ResponseEntity
      */
     @PostMapping("boards")
@@ -111,9 +112,10 @@ public class BoardController {
      * @return ResponseEntity
      */
 
-    @PostMapping("replies")
-    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq) {
+    @PostMapping("reboards")
+    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final Principal principal) {
         try {
+            reBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -124,14 +126,14 @@ public class BoardController {
     /**
      * 리보드 추천
      *
-     * @param replyId 보드 고유 번호
+     * @param reboardId 보드 고유 번호
      * @return ResponseEntity
      */
-    @PostMapping("replies/{replyId}/recommend")
-    public ResponseEntity likeReBoard(@PathVariable("replyId") @RequestBody final int replyId) {
+    @PostMapping("reboards/{reboardId}/recommend")
+    public ResponseEntity likeReBoard(@PathVariable("reboardId") @RequestBody final int reboardId) {
         try {
             final int userId = 1; // token 값으로 대체
-            return new ResponseEntity<>(boardService.ReBoardLikes(replyId, userId), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, userId), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);

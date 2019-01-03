@@ -2,10 +2,10 @@ package com.gings.dao;
 
 import com.gings.domain.Board;
 import com.gings.domain.BoardReply;
-import com.gings.model.ModifyBoard.ModifyBoardReq;
+import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.ReBoard.ReBoardReq;
-import com.gings.model.UpBoard.UpBoardReq;
+import com.gings.model.board.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard.UpBoardReq;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
