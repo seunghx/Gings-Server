@@ -20,11 +20,11 @@ public class ModifyBoard {
         private String content;
         private String category;
 
-        private List<Integer> indexOfPrevImages;
-        private List<MultipartFile> images;
+        private List<String> prevImagesUrl;
+        private List<String> postImagesUrl;
 
-        private List<Integer> indexOfPrevKeywords;
-        private List<String> keywords;
+        private List<String> prevKeywords;
+        private List<String> postKeywords;
 
     }
 

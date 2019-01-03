@@ -44,6 +44,10 @@ public interface BoardMapper {
     @Select("SELECT COUNT(recommender_id) FROM board_recommend WHERE board_id = #{boardId}")
     public int countRecommendByBoardId(int boardId);
 
+    // 보드 고유 번호로 보드 좋아요 한 회원 고유 번호 조회
+    @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{recommenderId}")
+    public List<Integer> findBoardIdByRecommenderId(int recommenderId);
+
     // 회원 고유 번호로 좋아요 한 보드 조회
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
@@ -88,9 +92,10 @@ public interface BoardMapper {
     public List<Board> findBoardByUserId(int userId);
 
 
-    // 보드 고유 번호로 해당 보드 댓글 조회
+    // 보드 고유 번호로 해당 리보드 조회
     @Select("SELECT * FROM board_reply WHERE board_id = #{boardId} ORDER BY write_time DESC")
     @Results(value = {
+            @Result(property="replyId", column="reply_id"),
             @Result(property = "recommender", column = "reply_id", javaType = int.class,
                     one = @One(select = "findReplyRecommendNumbersByReplyId")),
             @Result(property = "writerId", column = "writer_id"),
@@ -200,12 +205,12 @@ public interface BoardMapper {
     void deleteBoard(@Param("boardId") final int boardId);
 
     //보드 이미지 고유 번호로 보드 이미지 삭제하기
-    @Delete("DELETE FROM board_img WHERE image_id = #{imageId}")
-    void deleteBoardImg(@Param("imageId") final int imageId);
+    @Delete("DELETE FROM board_img WHERE url = #{imageUrl}")
+    void deleteBoardImg(@Param("imageId") final String imageUrl);
 
     //보드 고유번호로 보드 키워드 삭제하기
-    @Delete("DELETE FROM board_img WHERE board_id = #{boardId}")
-    void deleteBoardKeyword(@Param("boardId") final int boardId);
+    @Delete("DELETE FROM board_keyword WHERE board_id = #{keyword}")
+    void deleteBoardKeyword(@Param("boardId") final String keyword);
 
     //회원 고유 번호와 보드 고유 번호로 추천 취소하기
     @Delete("DELETE FROM board_recommend WHERE board_id = #{boardId} AND recommender_id = #{userId}")

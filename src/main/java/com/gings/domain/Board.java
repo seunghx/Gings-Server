@@ -13,6 +13,9 @@ import lombok.ToString;
 public class Board {
     private int boardId;
     private int writerId;
+
+    private String writer;
+
     private String title;
     private String content;
     private int share;
@@ -24,4 +27,11 @@ public class Board {
     private List<BoardReply> replys;
 
     private int recommender;
+
+    @Getter
+    @Setter
+    @ToString
+    public static class BoardRecommend {
+        private List<Integer> recommendBoardIdList;
+    }
 }

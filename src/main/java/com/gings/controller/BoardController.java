@@ -26,7 +26,7 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
-//@Authentication
+@Authentication
 
 public class BoardController {
 
@@ -130,19 +130,27 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("reboards/{reboardId}/recommend")
-    public ResponseEntity likeReBoard(@PathVariable("reboardId") @RequestBody final int reboardId) {
+    public ResponseEntity likeReBoard(@PathVariable("reboardId") final int reboardId,
+                                      final Principal principal) {
         try {
-            final int userId = 1; // token 값으로 대체
-            return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, userId), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
+    /**
+     * 보드 수정
+     *
+     * @param modifyBoardReq 수정할 보드
+     * @return ResponseEntity
+     */
     @PutMapping("boards/{boardId}")
-    public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq) {
+    public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq,
+                                      Principal principal) {
         try {
+            modifyBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());

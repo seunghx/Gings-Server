@@ -25,7 +25,6 @@ public class ResponseMessage {
     public static final String DELETE_BOARD = "보드 삭제 성공";
     public static final String LIKE_BOARD = "보드 추천 성공";
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
-    public static final String FAIL_LIKE_BOARD = "보드 추천/해제 실패";
 
     public static final String READ_ALL_CLUBS = "모든 클럽 조회 성공";
     public static final String READ_CLUB = "클럽 조회 성공";
@@ -50,10 +49,8 @@ public class ResponseMessage {
     public static final String FAIL_UPDATE_REBOARD = "리보드 수정 실패";
     public static final String DELETE_REBOARD = "리보드 삭제 성공";
     public static final String FAIL_DELETE_REBOARD = "리보드 삭제 실패";
-    public static final String LIKE_REBOARD = "리보드 좋아요";
-    public static final String CANCEL_LIKE_REBOARD = "리보드 좋아요 해제";
-    public static final String FAIL_REBOARD = "리보드 좋아요 실패";
-    public static final String FAIL_CANCEL_LIKE_REBOARD = "리보드 좋아요 해제 실패";
+    public static final String LIKE_REBOARD = "리보드 추천 성공";
+    public static final String CANCEL_LIKE_REBOARD = "리보드 추천 해제 성공";
 
     public static final String AUTHORIZED = "인증 성공";
     public static final String UNAUTHORIZED = "인증 실패";
