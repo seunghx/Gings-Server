@@ -225,36 +225,46 @@ public class MyPageController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //====================================== 설정 설정 설정 설정 설정 설정 ==================================================
  //============================================ 설정 - 자기소개 조회/저장/수정========================================================
 
     //설정 - 자기소개 조회
-    @GetMapping("/setting/{myPageUserId}")
-    public ResponseEntity tryToChangeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    @GetMapping("/setting/introduce")
+    public ResponseEntity tryToChangeIntroduce(final Principal principal){
         try{
             final int id = principal.getUserId();
-            if(id != myPageUserId){
-                DefaultRes defaultRes = myPageService.checkUser();
-                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-            }else {
-                DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
-                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-            }
+            DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         }catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+//    @GetMapping("/setting/{myPageUserId}")
+//    public ResponseEntity tryToChangeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+//        try{
+//            final int id = principal.getUserId();
+//            if(id != myPageUserId){
+//                DefaultRes defaultRes = myPageService.checkUser();
+//                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+//            }else {
+//                DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
+//                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+//            }
+//        }catch (Exception e){
+//            log.error(e.getMessage());
+//            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     //설정 - 자기소개 저장
-    @PostMapping("setting/{myPageUserId}")
-    public ResponseEntity inputIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
+    @PostMapping("setting/introduce")
+    public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
         try {
             final int id = principal.getUserId();
-            if(id != myPageUserId){
-                DefaultRes defaultRes = myPageService.checkUser();
-                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-            }else
-                return new ResponseEntity<>(myPageService.saveIntroduce(id, introduceReq), HttpStatus.OK);
+            return new ResponseEntity<>(myPageService.saveIntroduce(id, introduceReq), HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -262,15 +272,11 @@ public class MyPageController {
     }
 
     //설정 - 자기소개 수정
-    @PutMapping("/setting/{myPageUserId}")
-    public ResponseEntity changeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
+    @PutMapping("/setting/introduce")
+    public ResponseEntity changeIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
         try {
             final int id = principal.getUserId();
-            if(id != myPageUserId){
-                DefaultRes defaultRes = myPageService.checkUser();
-                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-            }else
-                return new ResponseEntity<>(myPageService.changeUserIntroduce(id, introduceReq), HttpStatus.OK);
+            return new ResponseEntity<>(myPageService.changeUserIntroduce(id, introduceReq), HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -278,8 +284,21 @@ public class MyPageController {
     }
 
     //===============================프로필 사진 변경====================================================
+    //프로필 사진 조회
+    @GetMapping("setting/image")
+    public ResponseEntity selectProfile(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.selectImg(id), HttpStatus.OK);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //프로필 사진 저장
     @PutMapping("setting/image")
-    public ResponseEntity inputIntroduce(final MyPage myPage, final Principal principal){
+    public ResponseEntity inputProfile(final MyPage myPage, final Principal principal){
         try {
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveProfileImg(id, myPage), HttpStatus.OK);
@@ -290,9 +309,40 @@ public class MyPageController {
     }
 
     //===============================프로필 정보 수정====================================================
+    //프로필 정보 조회
+    @GetMapping("setting/info")
+    public ResponseEntity selectProfileInfo(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.selectInformation(id), HttpStatus.OK);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    //프로필 정보 입력
+    @PutMapping("setting/info")
+    public ResponseEntity createProfileInfo(final MyPage myPage, final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.saveInformation(id, myPage), HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-
-
-
+    //프로필 정보 키워드 입력
+    @PostMapping("setting/info/keyword")
+    public ResponseEntity inputInfoKeyword(final MyPage myPage, final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.saveKeyword(id, myPage), HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

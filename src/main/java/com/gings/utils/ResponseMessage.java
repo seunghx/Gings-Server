@@ -1,5 +1,7 @@
 package com.gings.utils;
 
+import javax.xml.soap.SAAJResult;
+
 public class ResponseMessage {
     public static final String LOGIN_SUCCESS = "로그인 성공";
     public static final String LOGIN_FAIL = "로그인 실패";
@@ -28,8 +30,18 @@ public class ResponseMessage {
     public static final String NO_INTRODUCE_IMG = "자기소개 이미지가 없습니다.";
     public static final String UPDATED_INTRODUCE = "자기소개 수정 성공";
     public static final String FAILED_UPDATING_INTRODUCE = "자기소개 수정 실패";
+
     public static final String CREATED_PROFILE_IMG = "프로필 이미지 저장 성공";
     public static final String FAILED_TO_CREATE_PROFILE_IMG ="프로필 이미지 저장 실패";
+    public static final String CANT_FIND_PROFILEIMG = "프로필 이미지를 찾을 수 없음";
+    public static final String YES_PROFILEIMG = "프로필 조회 성공";
+
+    public static final String CREATED_PROFILE_INFO = "프로필 정보 입력 성공";
+    public static final String FAILED_TO_CREATE_PROFILE_INFO = "프로필 정보 입력 실패";
+    public static final String CANT_FIND_PROFILE_INFO = "프로필 정보 조회 실패";
+    public static final String YES_PROFILE_INFO = "프로필 정보 조회 성공";
+    public static final String CREATED_PROFILE_KEYWORD = "프로필 정보 키워드 입력 성공";
+    public static final String FAILED_TO_CREATE_PROFILE_KEYWORD = "프로필 정보 키워드 입력 실패";
 
     public static final String READ_ALL_BOARDS = "모든 보드 조회 성공";
     public static final String READ_BOARD = "보드 조회 성공";

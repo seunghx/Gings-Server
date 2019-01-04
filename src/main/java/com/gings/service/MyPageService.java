@@ -123,10 +123,10 @@ public class MyPageService {
      * @return DefaultRes
      */
     public DefaultRes<IntroduceModel.IntroduceRes> selectIntroduce(final int id){
-        final IntroduceModel.IntroduceRes myPage = userMapper.selectIntroBeforeChange(id);
-        if(myPage == null)
+        final IntroduceModel.IntroduceRes introduceRes = userMapper.selectIntroBeforeChange(id);
+        if(introduceRes == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, myPage);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, introduceRes);
     }
 
     /**
@@ -154,6 +154,13 @@ public class MyPageService {
     }
 
 
+    /**
+     *
+     *
+     * @param id
+     * @param introduceReq
+     * @return DefaultRes
+     */
     public DefaultRes changeUserIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq){
         try{
             userMapper.updateIntroduce(id, introduceReq);
@@ -175,14 +182,86 @@ public class MyPageService {
 
     }
 
+    /**
+     * 프로필 사진 조회
+     *
+     * @param id
+     * @return DefaultRes
+     */
+    public DefaultRes selectImg(final int id){
+        final MyPage.MyPageProfile profile = userMapper.selectProfileImg(id);
+        if(profile == null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.CANT_FIND_PROFILEIMG);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_PROFILEIMG, profile);
+    }
+
+    /**
+     * 프로필 사진 저장 및 업데이트
+     *
+     * @param id
+     * @param myPage
+     * @return DefaultRes
+     */
     public DefaultRes saveProfileImg(final int id, MyPage myPage){
         try{
+            s3MultipartService.deleteSingleFile(myPage.getImage());
+
             String url = s3MultipartService.uploadSingleFile(myPage.getImgFile());
             userMapper.updateProfileImg(id, url);
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_PROFILE_IMG);
         }catch (Exception e){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_IMG);
+        }
+    }
+
+    /**
+     * 프로필 정보 조회
+     *
+     * @param id
+     * @return DefaultRes
+     */
+    public DefaultRes selectInformation(final int id){
+        final MyPage myPage = userMapper.findByUserId2(id);
+        if(myPage == null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.CANT_FIND_PROFILE_INFO);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_PROFILE_INFO, myPage);
+    }
+
+    /**
+     * 프로필 정보 저장
+     *
+     * @param id
+     * @param myPage
+     * @return DefaultRes
+     */
+    public DefaultRes saveInformation(final int id, MyPage myPage){
+        try{
+            userMapper.saveProfileInfo(id, myPage);
+            final int userId = myPage.getId();
+            //userMapper.saveProfileKeyword(userId, myPage.getKeywords());
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_PROFILE_INFO);
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_INFO);
+        }
+    }
+
+    /**
+     * 프로필 정보 키워드 저장
+     *
+     * @param id
+     * @param myPage
+     * @return DefaultRes
+     */
+    public DefaultRes saveKeyword(final int id, MyPage myPage){
+        try{
+            userMapper.deleteKeyword(id);
+            userMapper.saveProfileKeyword(id, myPage.getKeywords());
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_PROFILE_KEYWORD);
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_KEYWORD);
         }
     }
 
