@@ -289,15 +289,16 @@ public class BoardService {
 
 
             for (String url : modifyBoardReq.getPrevImagesUrl()) {
-                if (boardMapper.findImageByImageUrl(url).equals(url)) {
-                    boardMapper.deleteBoardImg(url);
+                if (!(boardMapper.findImageByImageUrl(url).equals(url))) {
+                    return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
+
                 }
+                boardMapper.deleteBoardImg(url);
             }
 
-            if(!isImage) return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
-            else s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
 
 
+            s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
 
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
             boardMapper.saveBoardImg(boardId, urlList);
