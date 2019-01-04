@@ -12,7 +12,7 @@ public class JWTAuthentication implements Authentication {
     private static final String PRINCIPAL_NAME_FORMAT = "Default user principal for user %s.";
     private static final String ANONYMOUS_USER_NAME = "unauthenticated anonymous user";
     
-    private final UserAuthTokenInfo tokenInfo;
+    private UserAuthTokenInfo tokenInfo;
     
     public JWTAuthentication(UserAuthTokenInfo tokenInfo) {
         this.tokenInfo = tokenInfo;
@@ -71,5 +71,9 @@ public class JWTAuthentication implements Authentication {
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         return;
+    }
+    
+    public void setTokenInfo(UserAuthTokenInfo tokenInfo) {
+        this.tokenInfo = tokenInfo;
     }
 }

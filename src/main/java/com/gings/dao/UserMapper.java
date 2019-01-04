@@ -17,7 +17,6 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 import com.gings.model.user.SignUp;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -41,9 +40,9 @@ public interface UserMapper {
             @Result(property = "image", column = "image"),
             @Result(property = "coworkingEnabled", column = "coworking_chk"),
             @Result(property = "introduce", column = "user_id", javaType = Introduce.class,
-                    one = @One(select = "findIntroduceByUserId")),
+                    one = @One(select = "findIntroduceByUserId", fetchType = FetchType.LAZY)),
             @Result(property = "keywords", column = "user_id", javaType = List.class,
-                    many = @Many(select = "findKeywordsByUserId")),
+                    many = @Many(select = "findKeywordsByUserId", fetchType = FetchType.LAZY)),
             @Result(property = "signatures", column = "user_id", javaType = List.class,
                     many = @Many(select = "findSignaturesByUserId", fetchType = FetchType.LAZY))
     })
