@@ -2,7 +2,6 @@ package com.gings.security.authentication;
 
 import java.util.Arrays;
 import java.util.Locale;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,11 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+
 import com.gings.model.ApiError;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
@@ -32,7 +29,6 @@ import static com.gings.security.JWTService.BEARER_SCHEME;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 
  * 
  * @author seunghyun
  *
@@ -78,7 +74,6 @@ public class AuthAspect {
         AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.OK);
     }
     
-    
     @Around("@annotation(com.gings.security.authentication.Authentication) || "
             + "within(@com.gings.security.authentication.Authentication *)")
     public Object around(final ProceedingJoinPoint pjp) throws Throwable {
@@ -117,17 +112,23 @@ public class AuthAspect {
             
             return AUTH_FAILURE_RES;
         } catch(JWTVerificationException e) {
-            String remote = httpServletRequest.getHeader(XFF_HEADER_NAME);
-            
-            if(remote == null) {
-                remote = httpServletRequest.getRemoteAddr();
-            }
+            String remote = getRequestAddr();
             
             log.error("Exception occurred while trying to authenticate user request.", e);
             log.warn("It might be illegal access!! Requesting remote user ip : {}", remote);
             
             return AUTH_FAILURE_RES;
         }
+    }
+    
+    private String getRequestAddr() {
+        String remote = httpServletRequest.getHeader(XFF_HEADER_NAME);
+        
+        if(remote == null) {
+            remote = httpServletRequest.getRemoteAddr();
+        }
+        
+        return remote;
     }
 }
 

@@ -79,13 +79,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
         log.error("An Exception occurred while trying to bind object", ex);
 
-        ApiError apiError = new ApiError(status.value(),
-                msgSource.getMessage("response.exception.BindException", null, request.getLocale()));
-
+        String message = msgSource.getMessage("response.exception.BindException", null, request.getLocale());
+        
+        ApiError apiError = new ApiError(status.value(), message);
+                
         ex.getBindingResult().getFieldErrors()
                              .stream()
-                             .forEach(e -> apiError.addDetail(e.getField(), 
-                                                              msgSource.getMessage(e, request.getLocale())));
+                             .forEach(e -> apiError.addDetail(e.getField(), message));
 
         ex.getBindingResult().getGlobalErrors().stream()
                 .forEach(e -> apiError.addDetail(e.getObjectName(), msgSource.getMessage(e, request.getLocale())));
