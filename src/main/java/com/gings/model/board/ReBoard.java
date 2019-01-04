@@ -14,7 +14,9 @@ public class ReBoard {
     public static class ReBoardReq{
         private int replyId;
         private int boardId;
+
         private int writerId;
+        private String writer;
 
         private String content;
         private LocalDateTime writeTime;

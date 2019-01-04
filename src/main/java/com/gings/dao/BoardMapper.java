@@ -78,6 +78,8 @@ public interface BoardMapper {
                     many=@Many(select="findKeywordsByBoardId")),
             @Result(property = "replys", column = "board_id", javaType = List.class,
                     many=@Many(select="findReplyByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
@@ -114,6 +116,7 @@ public interface BoardMapper {
             @Result(property = "writeTime", column = "write_time"),
             @Result(property="images", column="reply_id", javaType= List.class,
                     many=@Many(select="findReplyImagesByReplyId")),
+
     })
     public List<BoardReply> findReplyByBoardId(int boardId);
 

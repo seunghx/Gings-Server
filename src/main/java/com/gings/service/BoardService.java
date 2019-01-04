@@ -77,6 +77,13 @@ public class BoardService {
         board.setField(userMapper.findByUserId(board.getWriterId()).getField());
         board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
         //board.setWriterImage(userMapper.findImagesByIntroduceId());
+
+        List<BoardReply> boardReplies = boardMapper.findReplyByBoardId(id);
+        for(BoardReply boardReply : boardReplies){
+            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
+        }
+        board.setReplys(boardReplies);
+
         if (board == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, board);
@@ -280,18 +287,18 @@ public class BoardService {
         try {
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
-            s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
-            Boolean isImageDB = true;
-            if(isImageDB) {
-                for (String url : modifyBoardReq.getPrevImagesUrl()) {
-                    if (boardMapper.findImageByImageUrl(url) == url) {
-                        boardMapper.deleteBoardImg(url);
-                    }
+
+            for (String url : modifyBoardReq.getPrevImagesUrl()) {
+                if (boardMapper.findImageByImageUrl(url).equals(url)) {
+                    boardMapper.deleteBoardImg(url);
                 }
             }
-            else{
-                return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
-            }
+
+            if(!isImage) return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
+            else s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
+
+
+
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
             boardMapper.saveBoardImg(boardId, urlList);
 
