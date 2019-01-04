@@ -20,5 +20,8 @@ public class Club {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Event> event;
     @JsonIgnore
-    private ClubUser status;
+    private List<ClubUser> users;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String userStatus;
+
 }

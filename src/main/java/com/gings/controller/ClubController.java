@@ -53,9 +53,9 @@ public class ClubController {
      * @return ResponseEntity
      */
     @GetMapping("clubs/{clubId}")
-    public ResponseEntity getClubByClubId(@PathVariable("clubId") final int clubId){
+    public ResponseEntity getClubByClubId(@PathVariable("clubId") final int clubId, final Principal principal) throws Throwable{
         try{
-            DefaultRes<Club> defaultRes = clubService.findClubByClubId(clubId);
+            DefaultRes<Club> defaultRes = clubService.findClubByClubId(clubId,principal.getUserId());
             return new ResponseEntity<>(defaultRes,HttpStatus.OK);
         }catch (Exception exception)
         {
@@ -65,20 +65,16 @@ public class ClubController {
     }
 
     /**
-     * 클럽에 가입여부 조회
-     * @param clubId
-     * @return ResponseEntity
+     * 클럽 가입
+     * @return ResqponseEntity
      */
-    @GetMapping("clubs/status/{clubId}")
-    public ResponseEntity getStatusByClubId(@PathVariable("clubId") final int clubId, final Principal principal){
-        System.out.println("컨트롤러");
+    @PostMapping("clubs/{clubId}/join")
+    public ResponseEntity joinClub(@PathVariable("clubId") final int clubId, final Principal principal) {
         try{
-            DefaultRes<String> defaultRes = clubService.findStatusByClub(clubId,principal.getUserId());
-            return new ResponseEntity<>(defaultRes,HttpStatus.OK);
-        } catch (Exception exception)
-        {
+            return new ResponseEntity<>(clubService.joinClub(clubId, principal.getUserId()), HttpStatus.OK);
+        } catch (Exception exception){
             log.error(exception.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 }
