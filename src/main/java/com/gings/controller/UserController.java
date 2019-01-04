@@ -149,8 +149,10 @@ public class UserController {
     public ResponseEntity<DefaultRes<Void>> signup(@Validated @RequestBody SignUp signUp, 
                                                    HttpServletRequest request) {
         
+        String jwt = resolveJWTToken(request);
+        
         EmailAuthTokenInfo tokenInfo = 
-                    (EmailAuthTokenInfo)getEmailFromToken(signUp.getAuthNumber(), request);
+                    (EmailAuthTokenInfo)getEmailFromToken(signUp.getAuthNumber(), jwt);
         
         signUp.setEmail(tokenInfo.getEmail());
         userService.addNewUser(signUp);
@@ -160,10 +162,27 @@ public class UserController {
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
                                     HttpStatus.OK);
     }
+    
+    private String resolveJWTToken(HttpServletRequest request) {
 
-    private TokenInfo getEmailFromToken(String authNumber, HttpServletRequest request) {
         String jwt = request.getHeader(AUTHORIZATION);
-        jwt = jwt.replace(BEARER_SCHEME, "");
+        if(StringUtils.isEmpty(jwt)) {
+            log.warn("Illegal request. JWT token is null.");
+            
+            throw new BadCredentialsException("JWT token is null");
+        }
+        
+        if(!jwt.startsWith(BEARER_SCHEME)) {
+            log.warn("Illegal request. Invalid JWT token detected. jwt : {}", jwt);
+            
+            throw new BadCredentialsException("JWT token does not start with " + BEARER_SCHEME);
+        }
+        
+        return jwt.replace(BEARER_SCHEME, "");
+    }
+
+    private TokenInfo getEmailFromToken(String authNumber, String jwt) {
+        
         
         EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo(jwt, authNumber);
         

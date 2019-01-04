@@ -14,4 +14,5 @@ import lombok.ToString;
 public class Principal {
     public Integer userId;
     public UserRole role;
+    public String email;
 }
