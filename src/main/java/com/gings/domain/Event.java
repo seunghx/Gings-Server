@@ -13,6 +13,7 @@ import java.util.List;
 @ToString
 public class Event {
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int eventId;
     private String date;
     private String time;

@@ -65,6 +65,23 @@ public class ClubController {
     }
 
     /**
+     * 이벤트 고유번호로 이벤트 조회
+     * @param clubId, eventId
+     * @return ResponseEntity
+     */
+    @GetMapping("clubs/{clubId}/{eventId}")
+    public ResponseEntity getEventByEventId(@PathVariable("clubId") final int clubId, @PathVariable("eventId") final int eventId, final Principal principal){
+        try{
+            DefaultRes<Event> defaultRes = clubService.findEventByEvent(clubId,eventId,principal.getUserId());
+            return new ResponseEntity<>(defaultRes,HttpStatus.OK);
+        }catch (Exception exception)
+        {
+            log.error(exception.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * 클럽 가입
      * @return ResqponseEntity
      */
@@ -72,6 +89,20 @@ public class ClubController {
     public ResponseEntity joinClub(@PathVariable("clubId") final int clubId, final Principal principal) {
         try{
             return new ResponseEntity<>(clubService.joinClub(clubId, principal.getUserId()), HttpStatus.OK);
+        } catch (Exception exception){
+            log.error(exception.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+        }
+    }
+
+    /**
+     * 이벤트 가입
+     * @return ResqponseEntity
+     */
+    @PostMapping("events/{eventId}/join")
+    public ResponseEntity joinEvent(@PathVariable("eventId") final int eventId, final Principal principal) {
+        try{
+            return new ResponseEntity<>(clubService.joinEvent(eventId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception exception){
             log.error(exception.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
