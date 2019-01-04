@@ -21,7 +21,7 @@ public class ModifyBoard {
         private String category;
 
         private List<String> prevImagesUrl;
-        private List<String> postImagesUrl;
+        private List<MultipartFile> postImages;
 
         private List<String> prevKeywords;
         private List<String> postKeywords;
