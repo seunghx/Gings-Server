@@ -7,12 +7,16 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 
-
+/**
+ * 
+ * @author seunghyun
+ *
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
-    /**
+    /*
      * 우선 rabbitmq 사용 안함.
      * 
      * @Value("${spring.rabbitmq.host}")
@@ -37,11 +41,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     }
 
+    // 후에 웹 채팅 추가할 경우 registrty.withSockJS() 추가 예정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/connect")
-                .setAllowedOrigins("*")
-                .withSockJS();
+                .setAllowedOrigins("*");
+               
     }
 
 }

@@ -20,21 +20,19 @@ import com.gings.security.EmailAuthWTService;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 
+/**
+ * 
+ * @author seunghyun
+ *
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String WS_CONNECT = "/connect";
     
-    private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
