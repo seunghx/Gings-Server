@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -37,7 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.csrf()
+                .disable()
+                .authorizeRequests()
                 .anyRequest()
                 .permitAll()
                 .antMatchers(WS_CONNECT)
@@ -57,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public JWTServiceManager jwtServiceManager() {
         List<JWTService> jwtServices = new ArrayList<>();
         jwtServices.add(defaultJWTService());
-        jwtServices.add(authNumberJWTService());
+        jwtServices.add(emailNumberJWTService());
         
         return new JWTServiceManager(jwtServices);
     }
@@ -68,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     
     @Bean
-    public JWTService authNumberJWTService() {
+    public JWTService emailNumberJWTService() {
         return new EmailAuthWTService();
     }
 }

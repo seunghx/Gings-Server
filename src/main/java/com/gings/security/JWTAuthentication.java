@@ -42,8 +42,8 @@ public class JWTAuthentication implements Authentication {
     }
 
     @Override
-    public String getCredentials() {
-        return tokenInfo.getToken();
+    public UserAuthTokenInfo getCredentials() {
+        return tokenInfo;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class JWTAuthentication implements Authentication {
     }
 
     @Override
-    public Object getPrincipal() {
+    public Principal getPrincipal() {
         if(tokenInfo == null || tokenInfo.getUid() == 0 || tokenInfo.getUserRole() == null) {
             return null;
         }

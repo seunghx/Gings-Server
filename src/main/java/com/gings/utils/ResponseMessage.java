@@ -22,6 +22,8 @@ public class ResponseMessage {
 
     public static final String NO_INTRODUCE = "자기소개가 없습니다.";
     public static final String YES_INTRODUCE = "자기소개 조회 성공";
+    public static final String CREATE_INTRODUCE = "자기소개 저장 성공";
+    public static final String FAILED_TO_CREATE_INTRODUCE = "자기소개 저장 실패";
     public static final String NO_KEYWORD = "키워드가 없습니다.";
     public static final String NO_SIGNITURE = "시그니처 보드가 없습니다.";
     public static final String NO_INTRODUCE_IMG = "자기소개 이미지가 없습니다.";
