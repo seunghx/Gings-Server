@@ -167,7 +167,7 @@ public class MyPageController {
      * @param principal
      * @return ResponseEntity
      */
-    @GetMapping("mine/guestboard")
+    @GetMapping("/mine/guestboard")
     public ResponseEntity findGuestBoards(final Principal principal){
         try{
             final int id = principal.getUserId();
@@ -278,6 +278,16 @@ public class MyPageController {
     }
 
     //===============================프로필 사진 변경====================================================
+    @PutMapping("setting/image")
+    public ResponseEntity inputIntroduce(final MyPage myPage, final Principal principal){
+        try {
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.saveProfileImg(id, myPage), HttpStatus.OK);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     //===============================프로필 정보 수정====================================================
 

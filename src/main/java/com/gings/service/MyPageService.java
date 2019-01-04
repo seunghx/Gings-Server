@@ -175,4 +175,15 @@ public class MyPageService {
 
     }
 
+    public DefaultRes saveProfileImg(final int id, MyPage myPage){
+        try{
+            String url = s3MultipartService.uploadSingleFile(myPage.getImgFile());
+            userMapper.updateProfileImg(id, url);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_PROFILE_IMG);
+        }catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_IMG);
+        }
+    }
+
 }

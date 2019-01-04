@@ -17,6 +17,7 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 import com.gings.model.user.SignUp;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -237,8 +238,10 @@ public interface UserMapper {
     void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") List<String> image);
 
 
-//    @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
-//            "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
-//    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") MultipartFile image);
+    /*
+    프로필 사진 저장
+     */
+    @Update("UPDATE user SET image= #{url} WHERE user_id = #{id}")
+    void updateProfileImg(@Param("id") final int id, @Param("url") final String url);
 
 }
