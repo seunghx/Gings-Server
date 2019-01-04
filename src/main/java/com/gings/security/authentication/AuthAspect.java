@@ -71,7 +71,7 @@ public class AuthAspect {
                                                msgSource.getMessage(UNAUTHORIZED_MSG, null, 
                                                                     Locale.getDefault()));
         
-        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.OK);
+        AUTH_FAILURE_RES = new ResponseEntity<>(authFailRES, HttpStatus.UNAUTHORIZED);
     }
     
     @Around("@annotation(com.gings.security.authentication.Authentication) || "
