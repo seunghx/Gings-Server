@@ -15,12 +15,16 @@ public class BoardReply {
     private int replyId;
     private int writerId;
 
+    private String writer;
+
     private String content;
     private LocalDateTime writeTime;
 
     private List<String> images;
 
     private int recommender;
+
+
 
 
 }

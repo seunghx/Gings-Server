@@ -55,6 +55,7 @@ public class HomeBoard {
         private List<String> keywords;
         private List<BoardReply> replys;
 
+        private int numOfReply;
         private int recommender;
 
     }
