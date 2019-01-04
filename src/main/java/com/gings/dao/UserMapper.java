@@ -17,7 +17,6 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 import com.gings.model.user.SignUp;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -41,9 +40,9 @@ public interface UserMapper {
             @Result(property = "image", column = "image"),
             @Result(property = "coworkingEnabled", column = "coworking_chk"),
             @Result(property = "introduce", column = "user_id", javaType = Introduce.class,
-                    one = @One(select = "findIntroduceByUserId")),
+                    one = @One(select = "findIntroduceByUserId", fetchType = FetchType.LAZY)),
             @Result(property = "keywords", column = "user_id", javaType = List.class,
-                    many = @Many(select = "findKeywordsByUserId")),
+                    many = @Many(select = "findKeywordsByUserId", fetchType = FetchType.LAZY)),
             @Result(property = "signatures", column = "user_id", javaType = List.class,
                     many = @Many(select = "findSignaturesByUserId", fetchType = FetchType.LAZY))
     })
@@ -192,9 +191,8 @@ public interface UserMapper {
     /*
     Guest Board 저장
     */
-    @Insert("INSERT INTO guestboard(user_id, writer_id, content) VALUES(#{guestModelReq.id}, #{writerId}, " +
-            "#{guestModelReq.content})")
-    void saveGuest(@Param("guestModelReq") final GuestModel.GuestModelReq guestModelReq, @Param("writerId") final int writerId);
+    @Insert("INSERT INTO guestboard(user_id, writer_id, content) VALUES(#{myPageUserId}, #{id}, #{guestModelReq.content})")
+    void saveGuest(@Param("guestModelReq") final GuestModel.GuestModelReq guestModelReq, @Param("myPageUserId") final int myPageUserId, @Param("id") final int id);
 
 
     //==================================================================================================================
@@ -211,6 +209,17 @@ public interface UserMapper {
     public IntroduceModel.IntroduceRes selectIntroBeforeChange(int userId);
 
     /*
+    자기소개 저장(최초)
+     */
+    @Insert("INSERT INTO introduce(user_id, content) VALUES(#{id}, #{introduceReq.content})")
+    @Options(useGeneratedKeys = true, keyProperty = "introduceReq.id", keyColumn = "introduce_id")
+    void saveIntroByUserId(@Param("id") final int id, @Param("introduceReq") final IntroduceModel.IntroduceReq introduceReq);
+
+    @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
+            "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
+    void saveIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") List<String> image);
+
+    /*
     자기소개 수정
      */
     @Update("UPDATE introduce SET content= #{introduceReq.content} WHERE user_id = #{id}")
@@ -218,16 +227,19 @@ public interface UserMapper {
     void updateIntroduce(@Param("id") final int id, @Param("introduceReq") final IntroduceModel.IntroduceReq introduceReq);
 
 
-    @Delete("DELETE FROM introduce_img WHERE image_id= #{imageId}")
-    void deleteIntroduceImg(@Param("imageId") final int imageId);
+    @Delete("DELETE FROM introduce_img WHERE url= #{imgUrl}")
+    void deleteIntroduceImg(@Param("imgUrl") final String imgUrl);
 
 
     @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
             "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
-    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") MultipartFile image);
+    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") List<String> image);
 
-//    @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
-//            "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
-//    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") MultipartFile image);
+
+    /*
+    프로필 사진 저장
+     */
+    @Update("UPDATE user SET image= #{url} WHERE user_id = #{id}")
+    void updateProfileImg(@Param("id") final int id, @Param("url") final String url);
 
 }

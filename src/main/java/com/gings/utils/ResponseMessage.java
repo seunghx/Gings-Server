@@ -22,11 +22,14 @@ public class ResponseMessage {
 
     public static final String NO_INTRODUCE = "자기소개가 없습니다.";
     public static final String YES_INTRODUCE = "자기소개 조회 성공";
+    public static final String CREATE_INTRODUCE = "자기소개 저장 성공";
+    public static final String FAILED_TO_CREATE_INTRODUCE = "자기소개 저장 실패";
     public static final String NO_KEYWORD = "키워드가 없습니다.";
-    public static final String NO_SIGNITURE = "시그니처 보드가 없습니다.";
     public static final String NO_INTRODUCE_IMG = "자기소개 이미지가 없습니다.";
     public static final String UPDATED_INTRODUCE = "자기소개 수정 성공";
     public static final String FAILED_UPDATING_INTRODUCE = "자기소개 수정 실패";
+    public static final String CREATED_PROFILE_IMG = "프로필 이미지 저장 성공";
+    public static final String FAILED_TO_CREATE_PROFILE_IMG ="프로필 이미지 저장 실패";
 
     public static final String READ_ALL_BOARDS = "모든 보드 조회 성공";
     public static final String READ_BOARD = "보드 조회 성공";
@@ -44,6 +47,8 @@ public class ResponseMessage {
     public static final String JOIN_CLUB = "클럽 가입 승인 신청 성공";
     public static final String JOIN_EVENT = "이벤트 참여 승인 신청 성공";
     public static final String READ_CLUB = "클럽 조회 성공";
+    public static final String READ_EVENT = "이벤트 조회 성공";
+    public static final String NOT_FOUND_EVENT = "이벤트가 존재하지 않습니다.";
     public static final String NOT_FOUND_CLUB = "클럽가 존재하지 않습니다.";
     public static final String READ_CLUB_INFO = "클럽 정보 조회 성공";
     public static final String NOT_FOUND_CLUB_INFO = "클럽의 정보가 존재하지 않습니다.";

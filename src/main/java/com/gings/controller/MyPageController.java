@@ -33,14 +33,34 @@ public class MyPageController {
         this.boardService = boardService;
     }
 
+    //====================================== 마이 페이지 ====================================================
     /**
-     * 마이페이지 회원 고유 번호로 상단 정보 출력
+     * 자신의 마이페이지 회원 고유 번호로 상단 정보 출력
      *
      * @param principal 토큰으로 회원 아이디 가져오기
      * @return ResponseEntity
      */
-    @GetMapping("/{myPageUserId}")
-    public ResponseEntity getUser(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    @GetMapping("/mine")
+    public ResponseEntity getMyUser(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            DefaultRes<MyPage> defaultRes = myPageService.findByUserId(id);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 타인의 마이페이지 회원 고유 번호로 상단 정보 출력
+     *
+     * @param myPageUserId
+     * @param principal 토큰으로 회원 아이디 가져오기
+     * @return ResponseEntity
+     */
+    @GetMapping("others/{myPageUserId}")
+    public ResponseEntity getOtherUser(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
@@ -57,13 +77,32 @@ public class MyPageController {
     }
 
     /**
-     * 마이페이지 회원 고유 번호로 중간 정보 출력
+     * 자신의 마이페이지 회원 고유 번호로 중간 정보 출력
      *
      * @param principal 토큰으로 회원 아이디 가져오기
      * @return ResponseEntity
      */
-    @GetMapping("/introduce/{myPageUserId}")
-    public ResponseEntity getUserIntro(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    @GetMapping("mine/introduce")
+    public ResponseEntity getMyUserIntro(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            DefaultRes<MyPage.MyPageIntro> defaultRes = myPageService.userIntroduce(id);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 타인의 마이페이지 회원 고유 번호로 중간 정보 출력
+     *
+     * @param myPageUserId
+     * @param principal 토큰으로 회원 아이디 가져오기
+     * @return ResponseEntity
+     */
+    @GetMapping("others/introduce/{myPageUserId}")
+    public ResponseEntity getOtherUserIntro(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
@@ -79,7 +118,32 @@ public class MyPageController {
         }
     }
 
-    @GetMapping("/active/{myPageUserId}")
+    /**
+     * 자신의 마이페이지 활동 보드 조회
+     *
+     * @param principal
+     * @return ResponseEntity
+     */
+    @GetMapping("mine/active")
+    public ResponseEntity getUserActive(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+                DefaultRes<List<Board>>defaultRes = boardService.findBoardByUserId(id);
+                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    /**
+     * 타인의 마이페이지 회원 고유 번호로 활동 보드 출력
+     * @param myPageUserId
+     * @param principal
+     * @return ResponseEntity
+     */
+    @GetMapping("others/active/{myPageUserId}")
     public ResponseEntity getUserActive(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
         try{
             final int id = principal.getUserId();
@@ -95,8 +159,34 @@ public class MyPageController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//==================================게스트 보드 조회===========================================================
-    @GetMapping("/guestboard/{myPageUserId}")
+//========================================= 게스트 보드 ===========================================================
+
+    /**
+     * 자신의 마이페이지 게스트 보드 조회
+     *
+     * @param principal
+     * @return ResponseEntity
+     */
+    @GetMapping("/mine/guestboard")
+    public ResponseEntity findGuestBoards(final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.checkfindGuestBoard(id);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 타인의 마이페이지 게스트 보드 조회
+     *
+     * @param myPageUserId
+     * @param principal
+     * @return ResponseEntity
+     */
+    @GetMapping("others/guestboard/{myPageUserId}")
     public ResponseEntity findGuestBoards(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
         try{
             final int id = principal.getUserId();
@@ -104,7 +194,7 @@ public class MyPageController {
                 DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.checkfindGuestBoard(myPageUserId);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
             }else {
-                DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.findGuestBoard(id);
+                DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.findGuestBoard(myPageUserId);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
             }
         } catch (Exception e){
@@ -113,6 +203,14 @@ public class MyPageController {
         }
     }
 
+    /**
+     * 게스트 보드 저장
+     *
+     * @param myPageUserId
+     * @param guestModelReq
+     * @param principal
+     * @return
+     */
     @PostMapping("/guestboard/{myPageUserId}")
     public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, final GuestModel.GuestModelReq guestModelReq, final Principal principal){
         try{
@@ -121,16 +219,16 @@ public class MyPageController {
                 DefaultRes defaultRes = myPageService.checkUser();
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
             }else
-                return new ResponseEntity<>(myPageService.createGuest(guestModelReq, id), HttpStatus.OK);
+                return new ResponseEntity<>(myPageService.createGuest(guestModelReq, myPageUserId, id), HttpStatus.OK);
         }catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
- //============================================ 자기소개 수정========================================================
+ //============================================ 설정 - 자기소개 조회/저장/수정========================================================
 
-    //여기서도 토큰 id랑 수정하려는 사랑 id chk
-    @GetMapping("/changeIntro/{myPageUserId}")
+    //설정 - 자기소개 조회
+    @GetMapping("/setting/{myPageUserId}")
     public ResponseEntity tryToChangeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
         try{
             final int id = principal.getUserId();
@@ -147,7 +245,24 @@ public class MyPageController {
         }
     }
 
-    @PutMapping("/changeIntro/{myPageUserId}")
+    //설정 - 자기소개 저장
+    @PostMapping("setting/{myPageUserId}")
+    public ResponseEntity inputIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
+        try {
+            final int id = principal.getUserId();
+            if(id != myPageUserId){
+                DefaultRes defaultRes = myPageService.checkUser();
+                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+            }else
+                return new ResponseEntity<>(myPageService.saveIntroduce(id, introduceReq), HttpStatus.OK);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //설정 - 자기소개 수정
+    @PutMapping("/setting/{myPageUserId}")
     public ResponseEntity changeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
         try {
             final int id = principal.getUserId();
@@ -163,8 +278,20 @@ public class MyPageController {
     }
 
     //===============================프로필 사진 변경====================================================
+    @PutMapping("setting/image")
+    public ResponseEntity inputIntroduce(final MyPage myPage, final Principal principal){
+        try {
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.saveProfileImg(id, myPage), HttpStatus.OK);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     //===============================프로필 정보 수정====================================================
-    //
+
+
 
 
 

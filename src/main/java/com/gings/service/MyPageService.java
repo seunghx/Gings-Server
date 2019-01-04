@@ -2,6 +2,7 @@ package com.gings.service;
 
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
+import com.gings.domain.Introduce;
 import com.gings.model.DefaultRes;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
@@ -69,14 +70,14 @@ public class MyPageService {
     }
 
     /**
-     * 시그니처 보드 작성
+     * 게스트 보드 작성
      *
      * @param guestModelReq 객체
      * @return DefaultRes
      */
-    public DefaultRes createGuest(final GuestModel.GuestModelReq guestModelReq, final int id){
+    public DefaultRes createGuest(final GuestModel.GuestModelReq guestModelReq, final int myPageUserId, final int id){
         try{
-            userMapper.saveGuest(guestModelReq, id);
+            userMapper.saveGuest(guestModelReq, myPageUserId, id);
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_GUESTBOARD);
         }catch (Exception e){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -89,7 +90,7 @@ public class MyPageService {
 
 
     /**
-     * 시그니처 보드 출력
+     * 게스트 보드 출력
      *
      * @param id 유저 고유 번호
      * @return DefaultRes
@@ -104,8 +105,6 @@ public class MyPageService {
         }
     }
 
-
-
     public DefaultRes<List<GuestModel.GuestModelRes>>checkfindGuestBoard(final int id){
         try{
             final List<GuestModel.GuestModelRes> guestModelRes = userMapper.findGuestBoardByUserId(id);
@@ -116,8 +115,9 @@ public class MyPageService {
         }
     }
 
+    //================================설정 - 자기소개 출력/저장/수정================================================
     /**
-     * 마이페이지 유저 자기소개 출력
+     * 설정 유저 자기소개 출력
      *
      * @param id 회원 고유 번호
      * @return DefaultRes
@@ -129,6 +129,30 @@ public class MyPageService {
         return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, myPage);
     }
 
+    /**
+     * 설정 유저 자기소개 저장
+     *
+     * @param id 회원 고유 번호
+     * @return DefaultRes
+     */
+    public DefaultRes<IntroduceModel.IntroduceReq> saveIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq){
+        try{
+            userMapper.saveIntroByUserId(id, introduceReq);
+            final int introduceId = introduceReq.getId();
+            System.out.println(introduceId);
+
+            List<String> urlList = s3MultipartService.uploadMultipleFiles(introduceReq.getImages());
+
+            userMapper.saveIntroduceImg(introduceId, urlList);
+
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
+
+        }catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_INTRODUCE);
+        }
+    }
+
 
     public DefaultRes changeUserIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq){
         try{
@@ -136,27 +160,30 @@ public class MyPageService {
             final int introduceId = introduceReq.getId();
 
             System.out.println(introduceId);
-
+            s3MultipartService.deleteMultipleFiles(introduceReq.getPrevImagesUrl());
             //userMapper.deleteIntroduceImg(introduceId);
-            final List<String> sampleUrl = new LinkedList<>();
 
-            List<Integer> indexOfPrevImages=introduceReq.getIndexOfPrevImages();
-            List<MultipartFile> images = introduceReq.getImages();
-            for(int i : indexOfPrevImages){ userMapper.deleteIntroduceImg(i); }
-
-            for(MultipartFile image : images ){
-                // S3 저장
-                userMapper.updateIntroduceImg(introduceId, image);
+            for(String url : introduceReq.getPrevImagesUrl()){
+                userMapper.deleteIntroduceImg(url);
             }
-
-
-
+            userMapper.updateIntroduceImg(introduceId, introduceReq.getPostImagesUrl());
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATED_INTRODUCE);
         } catch (Exception e){
             log.info(e.getMessage());
             return DefaultRes.res(StatusCode.FAILED, ResponseMessage.FAILED_UPDATING_INTRODUCE);
         }
 
+    }
+
+    public DefaultRes saveProfileImg(final int id, MyPage myPage){
+        try{
+            String url = s3MultipartService.uploadSingleFile(myPage.getImgFile());
+            userMapper.updateProfileImg(id, url);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_PROFILE_IMG);
+        }catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_IMG);
+        }
     }
 
 }

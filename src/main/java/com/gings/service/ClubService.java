@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 
 /**
  *
- * @author nury
+ * @author nuri
  */
 @Slf4j
 @Service
@@ -106,7 +106,44 @@ public class ClubService {
         }
     }
 
+    /**
+     * 이벤트 가입
+     */
+    public DefaultRes joinEvent(final int eventId, final int userId) {
+        try {
+            clubMapper.joinEvent(eventId, userId,"참여승인중");
+            return DefaultRes.res(StatusCode.OK,ResponseMessage.JOIN_EVENT);
+        } catch (Exception exception)
+        {
+            log.error(exception.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR,ResponseMessage.DB_ERROR);
+        }
+    }
 
+    /**
+     * 이벤트 고유 번호로 이벤트 조회
+     * @param clubId, eventId
+     * @return DefaultRes
+     */
+    public DefaultRes findEventByEvent(final int clubId, final int eventId, final int userId){
+        final Event event = clubMapper.findEventByEvent(clubId,eventId);
+
+        List<EventUser> eventUsers = event.getUsers();
+
+        String status = eventUsers.stream()
+                .filter(user -> user.getUserId() == userId)
+                .findAny()
+                .map(user -> user.getStatus())
+                .orElse("참여하기");
+        event.setEventStatus(status);
+
+        log.error("Find Club info success. club info : {}",event);
+
+        if(event == null) {
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_EVENT);
+        }
+        return DefaultRes.res(StatusCode.OK,ResponseMessage.READ_EVENT, event);
+    }
     public static class NoSuchClubException extends RuntimeException {
         public NoSuchClubException(String message){
             super(message);

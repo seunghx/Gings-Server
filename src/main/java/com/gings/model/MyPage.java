@@ -1,5 +1,6 @@
 package com.gings.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gings.domain.UserKeyword;
 import com.gings.model.board.UpBoard;
 
@@ -27,6 +28,9 @@ public class MyPage {
     private boolean coworkingEnabled;
     private List<UserKeyword> keywords;
 
+    @JsonIgnore
+    private MultipartFile imgFile;
+
     @Setter
     @Getter
     public static class MyPageOther{
@@ -53,14 +57,9 @@ public class MyPage {
         private UpBoard upBoard;
     }
 
-//    @Getter
-//    @Setter
-//    public static class MyPageIntroReq{
-//        private int introduceId;
-//        private int id;
-//        private String content;
-//        private List<String> imgs = new ArrayList<>();
-//    }
+    @Getter
+    @Setter
+    public static class MyPageProfile{
 
-
+    }
 }
