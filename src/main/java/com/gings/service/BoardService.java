@@ -291,12 +291,9 @@ public class BoardService {
             for (String url : modifyBoardReq.getPrevImagesUrl()) {
                 if (!(boardMapper.findImageByImageUrl(url).equals(url))) {
                     return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
-
                 }
                 boardMapper.deleteBoardImg(url);
             }
-
-
 
             s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
 
