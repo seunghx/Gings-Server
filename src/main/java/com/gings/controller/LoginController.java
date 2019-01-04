@@ -78,7 +78,7 @@ public class LoginController {
                                               null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.OK);
+                                    HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -89,7 +89,7 @@ public class LoginController {
                                               null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.OK);
+                                    HttpStatus.UNAUTHORIZED);
     }
 
     /**

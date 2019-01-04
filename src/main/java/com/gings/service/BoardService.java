@@ -295,9 +295,7 @@ public class BoardService {
                 }
                 boardMapper.deleteBoardImg(url);
             }
-
-
-
+            
             s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
 
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
