@@ -1,38 +1,23 @@
 package com.gings.utils.code;
 
+import java.util.Collection;
+import java.util.function.Supplier;
 
-public enum UserRole implements Code {
-    
-    NORMAL_USER("USER"), ADMIN("ADMIN");
-    
-    private String code;
-    
-    UserRole(String code) {
-        this.code = code;
-    }
-    
-    @Override
-    public String getCode() {
-        return code;
-    }
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 
-    @Override
-    public String getName() {
-        return name();
-    }
-
-    @Override
-    public boolean equalsByCode(String code) {
-        return this.code.equals(code);
+public enum UserRole {
+    
+    USER(() -> AuthorityUtils.createAuthorityList("USER")), 
+    ADMIN(() -> AuthorityUtils.createAuthorityList("USER, ADMIN"));
+    
+    private Supplier<Collection<GrantedAuthority>> authorityProvider;
+    
+    UserRole(Supplier<Collection<GrantedAuthority>> authorityProvider) {
+        this.authorityProvider = authorityProvider;
     }
     
-    public static UserRole from(String code) {
-        for(UserRole userRole : values()) {
-            if(userRole.equalsByCode(code)){
-                return userRole;
-            }
-        }
-        
-        throw new IllegalArgumentException("Invalid UserRole code.");
+    public Collection<GrantedAuthority> getAuthorities(){
+        return authorityProvider.get();
     }
 }

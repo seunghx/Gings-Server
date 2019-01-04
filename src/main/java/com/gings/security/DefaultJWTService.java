@@ -51,7 +51,7 @@ public class DefaultJWTService implements JWTService {
             return JWT.create()
                       .withIssuer(issuer)
                       .withClaim(USER_ID_CLAIM_NAME, supportingTokenInfo.getUid())
-                      .withClaim(USER_ROLE_CLAIM_NAME, supportingTokenInfo.getUserRole().getCode())
+                      .withClaim(USER_ROLE_CLAIM_NAME, supportingTokenInfo.getUserRole().name())
                       .withExpiresAt(expiredAt(expiredPeriod))
                       .sign(algorithm(secret));
                       
@@ -61,7 +61,6 @@ public class DefaultJWTService implements JWTService {
             throw jce;
         }
     }
-    
 
     @Override
     public TokenInfo decode(TokenInfo tokenInfo) {
@@ -110,8 +109,8 @@ public class DefaultJWTService implements JWTService {
         
         tokenInfo.setUid(decodedJWT.getClaim(USER_ID_CLAIM_NAME)
                                    .asInt());
-        tokenInfo.setUserRole(UserRole.from(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME)
-                                                      .asString()));
+        tokenInfo.setUserRole(UserRole.valueOf(decodedJWT.getClaim(USER_ROLE_CLAIM_NAME)
+                                                         .asString()));
         
         return tokenInfo;
     }
