@@ -56,7 +56,7 @@ public class BoardService {
         final List<HomeBoardAllRes> boards = boardMapper.findAllBoard(pagination);
         for(HomeBoardAllRes board : boards) {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setRole(userMapper.findByUserId(board.getWriterId()).getRole());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
             //board.setWriterImage(userMapper.findImagesByIntroduceId());
         }
@@ -74,7 +74,7 @@ public class BoardService {
     public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int id) {
         final HomeBoardOneRes board = boardMapper.findBoardByBoardId(id);
         board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-        board.setRole(userMapper.findByUserId(board.getWriterId()).getRole());
+        board.setField(userMapper.findByUserId(board.getWriterId()).getField());
         board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
         //board.setWriterImage(userMapper.findImagesByIntroduceId());
         if (board == null)

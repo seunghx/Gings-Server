@@ -16,7 +16,7 @@ public class HomeBoard {
         private int writerId;
 
         private String writer;
-        private String role;
+        private String field;
         private String company;
         //private String writerImage;
 
@@ -41,7 +41,7 @@ public class HomeBoard {
         private int writerId;
 
         private String writer;
-        private String role;
+        private String field;
         private String company;
         //private String writerImage;
 

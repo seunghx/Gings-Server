@@ -26,7 +26,7 @@ import com.gings.security.JWTServiceManager;
  *
  */
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String WS_CONNECT = "/connect";
@@ -37,7 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.csrf()
+                .disable()
+                .authorizeRequests()
                 .anyRequest()
                 .permitAll()
                 .antMatchers(WS_CONNECT)
