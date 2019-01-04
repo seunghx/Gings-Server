@@ -2,12 +2,16 @@ package com.gings.security.authentication;
 
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -81,8 +85,13 @@ public class JWTUserAuthenticationProvider implements AuthenticationProvider {
         return JWTAuthentication.class.isAssignableFrom(authentication);
     }
 
-
     private String getRequestAddr() {
-       return null;
+        HttpServletRequest request = ((ServletRequestAttributes)
+                                                    RequestContextHolder.getRequestAttributes())
+                                                                        .getRequest();
+        
+        String remote = request.getHeader(XFF_HEADER_NAME);
+        
+        return remote != null? remote : request.getRemoteAddr();
     }
 }
