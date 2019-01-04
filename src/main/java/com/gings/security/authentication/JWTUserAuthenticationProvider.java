@@ -1,5 +1,7 @@
 package com.gings.security.authentication;
 
+import java.util.Optional;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -27,16 +29,23 @@ public class JWTUserAuthenticationProvider implements AuthenticationProvider {
             log.info("Authentication type parameter {} is not accepted for this class.");
             throw new InternalAuthenticationServiceException("Received unsupported authentication.");
         }
-        
-        JWTAuthentication jwtAuthentication = (JWTAuthentication)authentication;
-        
-        
-        return null;
+                
+        UserAuthTokenInfo tokenInfo = authenticateInternal((JWTAuthentication)authentication);
+        return new JWTAuthentication(tokenInfo);
     }
     
-    private TokenInfo authenticateInternal(UserAuthTokenInfo tokenInfo) {
-        return jwtServiceManager.resolve(tokenInfo.getClass())
-                                .decode(tokenInfo);
+    private UserAuthTokenInfo authenticateInternal(JWTAuthentication authentication) {
+        UserAuthTokenInfo tokenInfo = 
+                Optional.ofNullable(authentication.getCredentials())
+                        .orElseThrow(() -> {
+                            log.info("Received null valued authentication.");
+                                                  
+                            throw new InternalAuthenticationServiceException("Null value authentication");
+                        });
+        
+        
+        return (UserAuthTokenInfo)jwtServiceManager.resolve(tokenInfo.getClass())
+                                                   .decode(tokenInfo);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public JWTServiceManager jwtServiceManager() {
         List<JWTService> jwtServices = new ArrayList<>();
         jwtServices.add(defaultJWTService());
-        jwtServices.add(authNumberJWTService());
+        jwtServices.add(emailNumberJWTService());
         
         return new JWTServiceManager(jwtServices);
     }
@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     
     @Bean
-    public JWTService authNumberJWTService() {
+    public JWTService emailNumberJWTService() {
         return new EmailAuthWTService();
     }
 }
