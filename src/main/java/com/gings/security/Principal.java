@@ -15,4 +15,9 @@ public class Principal {
     public Integer userId;
     public UserRole role;
     public String email;
+    
+    public Principal(Integer userId, UserRole role) {
+        this.userId = userId;
+        this.role = role;
+    }
 }

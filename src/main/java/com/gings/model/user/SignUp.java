@@ -4,6 +4,8 @@ package com.gings.model.user;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import com.gings.utils.code.UserRole;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +28,8 @@ public class SignUp {
     @NotBlank(message = EMPTY_PWD)
     @Pattern(regexp = "^[a-zA-Z0-9]{7,14}$", message = INVALID_PWD)
     private String pwd;
+    // 아직 일반 유저 밖에 없으니 정의만해놓음.
+    private UserRole role = UserRole.USER;
 
     @NotBlank
 

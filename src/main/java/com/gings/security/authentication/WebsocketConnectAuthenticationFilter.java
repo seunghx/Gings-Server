@@ -23,7 +23,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.gings.dao.UserMapper;
-import com.gings.security.JWTAuthentication;
 import com.gings.security.JWTService;
 import com.gings.security.JWTServiceManager;
 import com.gings.security.Principal;
@@ -72,8 +71,8 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
                                                       Principal.class);
                 
             return new WebsocketConnectingAuthentication(principal);
-        }catch {
-            
+        }catch(Exception e){
+            throw e;
         }
       
     }
@@ -105,7 +104,7 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
         
 
         SecurityContext sc = SecurityContextHolder.createEmptyContext();
-        sc.setAuthentication(userAuth);
+        sc.setAuthentication(authentication);
         SecurityContextHolder.setContext(sc);
         
         chain.doFilter(request, response);

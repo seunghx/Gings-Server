@@ -92,8 +92,8 @@ public interface UserMapper {
     public void setFalseToFirstLogin(int userId);
     
     //회원 등록(회원가입)
-    @Insert("INSERT INTO user(name,email,pwd) "
-            + "VALUES(#{signUp.name}, #{signUp.email}, #{signUp.pwd})")
+    @Insert("INSERT INTO user(name,email,pwd, role) "
+            + "VALUES(#{signUp.name}, #{signUp.email}, #{signUp.pwd}, #{signUp.role})")
     @Options(useGeneratedKeys = true, keyColumn = "user.userIdx")
     int save(@Param("signUp") final SignUp signUp);
 
