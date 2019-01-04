@@ -36,11 +36,6 @@ public class Config {
     }
     
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    
-    @Bean
     public JWTServiceManager jwtServiceManager() {
         List<JWTService> jwtServices = new ArrayList<>();
         jwtServices.add(defaultJWTService());
