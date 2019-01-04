@@ -25,7 +25,7 @@ import com.gings.security.JWTServiceManager;
  *
  */
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String WS_CONNECT = "/connect";

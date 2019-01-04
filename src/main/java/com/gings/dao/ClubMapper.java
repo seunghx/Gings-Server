@@ -33,6 +33,7 @@ public interface ClubMapper {
     // 클럽 고유 번호로 이벤트 전체 조회(findEventsByClub)
     @Select("SELECT * FROM event WHERE club_id = #{clubId}")
     @Results(value = {
+            @Result(property = "eventId",column = "event_id"),
             @Result(property = "date",column = "date"),
             @Result(property = "time",column = "time"),
             @Result(property = "title",column = "title"),
@@ -44,6 +45,21 @@ public interface ClubMapper {
             many = @Many(select = "findStatusByEvent"))
     })
     public List<Event> findEventByClubId(int clubId);
+
+    //이벤트 고유 번호로 이벤트 조회(findEventByEvent)
+    @Select("SELECT * FROM event WHERE club_id = #{clubId} AND event_id = #{eventId}")
+    @Results(value = {
+            @Result(property = "date",column = "date"),
+            @Result(property = "time",column = "time"),
+            @Result(property = "title",column = "title"),
+            @Result(property = "limit",column = "limit_person"),
+            @Result(property = "place",column = "place"),
+            @Result(property = "eventImg",column = "event_img"),
+            @Result(property = "detailImg",column = "detail_img"),
+            @Result(property = "users",column = "event_id",javaType = List.class,
+                    many = @Many(select = "findStatusByEvent"))
+    })
+    public Event findEventByEvent(int clubId, int eventId);
 
     //클럽 고유 번호로 가입여부 조회(findStatusByClub)
     @Select("SELECT user_id as userId, status as users FROM club_user WHERE club_id = #{clubId}")
@@ -58,4 +74,7 @@ public interface ClubMapper {
     @Insert("INSERT INTO club_user(club_id,user_id,status) VALUES(#{clubId},#{userId},#{clubStatus})")
     void joinClub(int clubId, int userId, String clubStatus);
 
+    //이벤트 가입
+    @Insert("INSERT INTO event_user(event_id,user_id,status) VALUES(#{eventId}, #{userId}, #{eventStatus})")
+    void joinEvent(int eventId, int userId, String eventStatus);
 }
