@@ -2,9 +2,12 @@ package com.gings.dao;
 
 import com.gings.domain.Board;
 import com.gings.domain.BoardReply;
+import com.gings.model.board.HomeBoard.HomeBoardAllRes;
+import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.board.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import org.apache.ibatis.annotations.*;
 
@@ -25,12 +28,12 @@ public interface BoardMapper {
                     many=@Many(select="findImagesByBoardId")),
             @Result(property = "keywords", column = "board_id", javaType = List.class,
                     many=@Many(select="findKeywordsByBoardId")),
-            @Result(property = "replys", column = "board_id", javaType = List.class,
-                    many=@Many(select="findReplyByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findAllBoard(@Param("pagination") final Pagination pagination);
+    public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
 
     // 보드 고유 번호로 이미지 전체 조회(findImagesByBoard)
     @Select("SELECT url FROM board_img WHERE board_id = #{boardId}")
@@ -39,6 +42,14 @@ public interface BoardMapper {
     // 보드 고유 번호로 키워드 전체 조회(findKeywordsByBoardId)
     @Select("SELECT content FROM board_keyword WHERE board_id = #{boardId}")
     public List<String> findKeywordsByBoardId(int boardId);
+
+    // 이미지 url로 이미지 조회
+    @Select("SELECT url FROM board_img WHERE url = #{url}")
+    public String findImageByImageUrl(String url);
+
+    // 키워드로 키워드 조회
+    @Select("SELECT content FROM board_keyword WHERE content = #{keyword}")
+    public String findKeywordByKeyword(String keyword);
 
     // 보드 고유 번호로 보드 좋아요수 조회
     @Select("SELECT COUNT(recommender_id) FROM board_recommend WHERE board_id = #{boardId}")
@@ -70,7 +81,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public Board findBoardByBoardId(int boardId);
+    public HomeBoardOneRes findBoardByBoardId(int boardId);
 
     // 회원 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE writer_id = #{userId} ORDER BY write_time")
@@ -105,6 +116,10 @@ public interface BoardMapper {
                     many=@Many(select="findReplyImagesByReplyId")),
     })
     public List<BoardReply> findReplyByBoardId(int boardId);
+
+    // 보드 고유 번호로 댓글수 조회
+    @Select("SELECT COUNT(reply_id) FROM board_reply WHERE board_id = #{boardId}")
+    public int countReply(int boardId);
 
     // 댓글 고유 번호로 댓글 이미지 전체 조회
     @Select("SELECT url FROM reply_img WHERE reply_id = #{replyId}")
@@ -178,7 +193,7 @@ public interface BoardMapper {
      */
 
     //업보드 수정하기
-    @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content} WHERE board_id = #{boardId}")
+    @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content}, category=#{ModifyBoardReq.category} WHERE board_id = #{boardId}")
     void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
     //업보드 공유 갯수 업데이트
@@ -206,11 +221,11 @@ public interface BoardMapper {
 
     //보드 이미지 고유 번호로 보드 이미지 삭제하기
     @Delete("DELETE FROM board_img WHERE url = #{imageUrl}")
-    void deleteBoardImg(@Param("imageId") final String imageUrl);
+    void deleteBoardImg(@Param("imageUrl") final String imageUrl);
 
     //보드 고유번호로 보드 키워드 삭제하기
-    @Delete("DELETE FROM board_keyword WHERE board_id = #{keyword}")
-    void deleteBoardKeyword(@Param("boardId") final String keyword);
+    @Delete("DELETE FROM board_keyword WHERE content = #{keyword}")
+    void deleteBoardKeyword(@Param("keyword") final String keyword);
 
     //회원 고유 번호와 보드 고유 번호로 추천 취소하기
     @Delete("DELETE FROM board_recommend WHERE board_id = #{boardId} AND recommender_id = #{userId}")

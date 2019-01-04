@@ -1,6 +1,7 @@
 package com.gings.model;
 
 import com.gings.domain.UserKeyword;
+import com.gings.model.board.UpBoard;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

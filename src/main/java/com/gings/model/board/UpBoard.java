@@ -30,4 +30,50 @@ public class UpBoard {
         private int share;
 
     }
+
+    @Getter
+    @Setter
+    public static class UpBoardAllRes {
+        private int boardId;
+        private int writerId;
+
+        private String writer;
+
+        private String title;
+        private String content;
+        private int share;
+        private LocalDateTime time;
+        private String category;
+
+        private List<String> images;
+        private List<String> keywords;
+
+        private int reply;
+
+        private int recommender;
+
+    }
+
+    @Getter
+    @Setter
+    public static class UpBoardOneRes {
+        private int boardId;
+        private int writerId;
+
+        private String writer;
+
+        private String title;
+        private String content;
+        private int share;
+        private LocalDateTime time;
+        private String category;
+
+        private List<String> images;
+        private List<String> keywords;
+
+        private List<BoardReply> replys;
+
+        private int recommender;
+
+    }
 }

@@ -3,8 +3,12 @@ package com.gings.controller;
 import com.gings.domain.Board;
 
 import com.gings.model.DefaultRes;
+import com.gings.model.board.HomeBoard.HomeBoardAllRes;
+import com.gings.model.board.HomeBoard.HomeBoardOneRes;
+
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
+import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 
@@ -46,7 +50,7 @@ public class BoardController {
     @GetMapping("boards")
     public ResponseEntity getAllBoards(final Pagination pagination) {
         try {
-            DefaultRes<List<Board>> defaultRes = boardService.findAllBoard(pagination);
+            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -63,7 +67,7 @@ public class BoardController {
     @GetMapping("boards/{boardId}")
     public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId) {
         try {
-            DefaultRes<Board> defaultRes = boardService.findBoardByBoardId(boardId);
+            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
