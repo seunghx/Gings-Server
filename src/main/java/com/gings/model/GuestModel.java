@@ -4,23 +4,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GuestModel {
         @Getter
         @Setter
         public static class GuestModelReq{
-            private int id;
+            //private int id;    //마이페이지 유저 id
             private String content;
         }
 
         @Getter
         @Setter
         public static class GuestModelRes{
-            private GuestModelUser guestModelUser;
             private String content;
             private LocalDateTime time;
+            private GuestModelUser guestModelUser;
         }
 
         @Getter
@@ -28,9 +26,10 @@ public class GuestModel {
         public static class GuestModelUser{
             private int id;
             private String name;
-            private String image;
-            private String company;  //소속
             private String job;     //역할
+            private String company;  //소속
+            private String image;
+
         }
 
 

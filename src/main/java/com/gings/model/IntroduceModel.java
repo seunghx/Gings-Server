@@ -13,10 +13,14 @@ public class IntroduceModel {
     @Setter
     public static class IntroduceReq {
         //private int introduceId;
-        private int id;
+        private int id;    //사실상 introduceId야
+        //아래부터 받는 애들
         private String content;
-        private List<Integer> indexOfPrevImages;
         private List<MultipartFile> images;
+
+        private List<String> prevImagesUrl;
+        private List<String> postImagesUrl;
+
     }
 
     @Getter
