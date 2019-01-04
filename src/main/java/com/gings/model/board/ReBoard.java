@@ -1,4 +1,4 @@
-package com.gings.model;
+package com.gings.model.board;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -26,7 +26,11 @@ public class SignUp {
     @NotBlank(message = EMPTY_PWD)
     @Pattern(regexp = "^[a-zA-Z0-9]{7,14}$", message = INVALID_PWD)
     private String pwd;
+
+    @NotBlank
+
     @NotBlank(message = EMPTY_AUTH_NUMBER)
+
     @Pattern(regexp="^[0-9]{4}$", message = INVALID_AUTH_NUMBER)
     private String authNumber;
     

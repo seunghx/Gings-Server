@@ -3,6 +3,9 @@ package com.gings.dao;
 
 import com.gings.controller.LoginController.LoginUser;
 
+import com.gings.model.GuestModel;
+import com.gings.model.IntroduceModel;
+import com.gings.model.MyPage;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 import com.gings.model.user.SignUp;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -103,5 +107,127 @@ public interface UserMapper {
     //회원 삭제
     @Delete("DELETE FROM user WHERE user_id = #{userId}")
     void deleteUser(@Param("userId") final int userId);
+
+    //================================================================================================================
+    //=================================================================================================================
+
+    /*
+    회원 고유 번호로 유저 정보 조회
+     */
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "region", column = "region"), @Result(property = "job", column = "job"),
+            @Result(property = "company", column = "company"),@Result(property = "field", column = "field"),
+            @Result(property = "status", column = "status"), @Result(property = "coworkingEnabled", column = "coworking_chk"),
+            @Result(property = "image", column = "image"),
+            @Result(property = "keywords", column = "user_id", javaType = List.class,
+                    many = @Many(select = "findKeywordsByUserId"))
+    })
+    public MyPage findByUserId2(int userId);
+
+
+    //=================================================================================================================
+
+    /*
+    회원 고유 번호로 자기소개 글 조회
+     */
+    @Select("SELECT * FROM introduce WHERE user_id = #{userId}")
+    @Results(value = {
+            @Result(property = "content", column = "content"),
+            @Result(property = "imgs", column = "introduce_id", javaType = List.class,
+                    many = @Many(select = "findImagesByIntroduceId")),
+            @Result(property = "time", column = "write_time")
+    })
+    public MyPage.MyPageIntro findUserIntro(int userId);
+
+//    @Select("SELECT * FROM introduce WHERE user_id = #{userId}")
+//    @Results(value = {
+//            @Result(property = "myPageOther", column = "user_id", javaType = MyPage.MyPageOther.class,
+//                    one = @One(select = "findUserOtherInfoByUserId")),
+//            @Result(property = "content", column = "content"),
+//            @Result(property = "imgs", column = "introduce_id", javaType = List.class,
+//                    many = @Many(select = "findImagesByIntroduceId")),
+//            @Result(property = "time", column = "write_time")
+//    })
+//    public MyPage.MyPageIntro findUserIntro(int userId);
+
+
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "field", column = "field"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "coworkingEnabled", column = "coworking_chk"),
+            @Result(property = "image", column = "image")
+    })
+    public MyPage.MyPageOther findUserOtherInfoByUserId(int userId);
+
+    /*
+    회원 고유 번호로 시그니처 조회
+     */
+
+    @Select("SELECT * FROM guestboard WHERE user_id = #{userId} ORDER BY write_time DESC")
+    @Results(value ={
+            @Result(property = "guestModelUser", column = "writer_id", javaType = GuestModel.GuestModelUser.class,
+                    one = @One(select = "findByUserId3")),
+            @Result(property = "content", column = "content"),
+            @Result(property = "time", column = "write_time")
+    })
+    public List<GuestModel.GuestModelRes> findGuestBoardByUserId(int userId);
+
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "job", column = "job"),
+            @Result(property = "company", column = "company"),
+            @Result(property = "image", column = "image")
+    })
+    public GuestModel.GuestModelUser findByUserId3(int userId);
+
+
+    /*
+    Guest Board 저장
+    */
+    @Insert("INSERT INTO guestboard(user_id, writer_id, content) VALUES(#{guestModelReq.id}, #{writerId}, " +
+            "#{guestModelReq.content})")
+    void saveGuest(@Param("guestModelReq") final GuestModel.GuestModelReq guestModelReq, @Param("writerId") final int writerId);
+
+
+    //==================================================================================================================
+
+    /*
+    자기소개 수정 전 select
+     */
+    @Select("SELECT * FROM introduce WHERE user_id = #{userId}")
+    @Results(value = {
+            @Result(property = "content", column = "content"),
+            @Result(property = "imgs", column = "introduce_id", javaType = List.class,
+                    many = @Many(select = "findImagesByIntroduceId"))
+    })
+    public IntroduceModel.IntroduceRes selectIntroBeforeChange(int userId);
+
+    /*
+    자기소개 수정
+     */
+    @Update("UPDATE introduce SET content= #{introduceReq.content} WHERE user_id = #{id}")
+    @Options(useGeneratedKeys = true, keyProperty = "introduceReq.id", keyColumn = "introduce_id")
+    void updateIntroduce(@Param("id") final int id, @Param("introduceReq") final IntroduceModel.IntroduceReq introduceReq);
+
+
+    @Delete("DELETE FROM introduce_img WHERE image_id= #{imageId}")
+    void deleteIntroduceImg(@Param("imageId") final int imageId);
+
+
+    @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
+            "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
+    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") MultipartFile image);
+
+//    @Insert({"<script>", "insert into introduce_img(introduce_id, url) values ", "<foreach collection='image' "+
+//            "item='item' index='index' separator=', ' > (#{introduceId}, #{item})</foreach>","</script>"})
+//    void updateIntroduceImg(@Param("introduceId") final int introduceId, @Param("image") MultipartFile image);
 
 }

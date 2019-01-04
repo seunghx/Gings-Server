@@ -1,21 +1,18 @@
-package com.gings.model;
+package com.gings.model.board;
 
-import com.gings.domain.BoardKeyword;
-import com.gings.domain.BoardReply;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
 import java.util.List;
 
-public class UpBoard {
+public class ModifyBoard {
     @Getter
     @Setter
     @NotBlank
-    public static class UpBoardReq {
+    public static class ModifyBoardReq {
         private int boardId;
         private int writerId;
 
@@ -23,12 +20,11 @@ public class UpBoard {
         private String content;
         private String category;
 
+        private List<String> prevImagesUrl;
+        private List<String> postImagesUrl;
 
-        private List<MultipartFile> images;
-        private List<String> keywords;
-
-        private int recommender;
-        private int share;
+        private List<String> prevKeywords;
+        private List<String> postKeywords;
 
     }
 
