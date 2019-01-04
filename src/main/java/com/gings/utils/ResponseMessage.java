@@ -13,6 +13,21 @@ public class ResponseMessage {
     public static final String FAIL_UPDATE_USER = "회원 정보 수정 실패";
     public static final String DELETE_USER = "회원 탈퇴 성공";
 
+    public static final String UNQUALIFIED = "자격 없음";
+
+    public static final String CREATE_GUESTBOARD = "게스트 보드 작성 성공";
+    public static final String READ_GUESTBOARD = "게스트 보드 조회 성공";
+    public static final String FAILED_TO_GET_GUESTBOARD = "게스트 보드 조회 실패";
+    public static final String FAILED_TO_CREATE_GUESTBOARD = "게스트 보드 저장 실패";
+
+    public static final String NO_INTRODUCE = "자기소개가 없습니다.";
+    public static final String YES_INTRODUCE = "자기소개 조회 성공";
+    public static final String NO_KEYWORD = "키워드가 없습니다.";
+    public static final String NO_SIGNITURE = "시그니처 보드가 없습니다.";
+    public static final String NO_INTRODUCE_IMG = "자기소개 이미지가 없습니다.";
+    public static final String UPDATED_INTRODUCE = "자기소개 수정 성공";
+    public static final String FAILED_UPDATING_INTRODUCE = "자기소개 수정 실패";
+
     public static final String READ_ALL_BOARDS = "모든 보드 조회 성공";
     public static final String READ_BOARD = "보드 조회 성공";
     public static final String NOT_FOUND_BOARD = "보드가 존재하지 않습니다.";
@@ -25,7 +40,6 @@ public class ResponseMessage {
     public static final String DELETE_BOARD = "보드 삭제 성공";
     public static final String LIKE_BOARD = "보드 추천 성공";
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
-    public static final String FAIL_LIKE_BOARD = "보드 추천/해제 실패";
 
     public static final String JOIN_CLUB = "클럽 가입 승인 신청 성공";
     public static final String JOIN_EVENT = "이벤트 참여 승인 신청 성공";
@@ -51,10 +65,8 @@ public class ResponseMessage {
     public static final String FAIL_UPDATE_REBOARD = "리보드 수정 실패";
     public static final String DELETE_REBOARD = "리보드 삭제 성공";
     public static final String FAIL_DELETE_REBOARD = "리보드 삭제 실패";
-    public static final String LIKE_REBOARD = "리보드 좋아요";
-    public static final String CANCEL_LIKE_REBOARD = "리보드 좋아요 해제";
-    public static final String FAIL_REBOARD = "리보드 좋아요 실패";
-    public static final String FAIL_CANCEL_LIKE_REBOARD = "리보드 좋아요 해제 실패";
+    public static final String LIKE_REBOARD = "리보드 추천 성공";
+    public static final String CANCEL_LIKE_REBOARD = "리보드 추천 해제 성공";
 
     public static final String AUTHORIZED = "인증 성공";
     public static final String UNAUTHORIZED = "인증 실패";

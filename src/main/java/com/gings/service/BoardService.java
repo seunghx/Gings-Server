@@ -1,22 +1,26 @@
 package com.gings.service;
 
 import com.gings.dao.BoardMapper;
+import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
-import com.gings.model.ModifyBoard.ModifyBoardReq;
+import com.gings.model.board.HomeBoard.HomeBoardOneRes;
+import com.gings.model.board.HomeBoard.HomeBoardAllRes;
+import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.ReBoard.ReBoardReq;
-import com.gings.model.UpBoard.UpBoardReq;
+import com.gings.model.board.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard;
+import com.gings.model.board.UpBoard.UpBoardOneRes;
+import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +30,7 @@ import java.util.List;
 public class BoardService {
     private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
     private final BoardMapper boardMapper;
+    private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
 
     /**
@@ -33,8 +38,10 @@ public class BoardService {
      *
      * @param boardMapper
      */
-    public BoardService(final BoardMapper boardMapper, final S3MultipartService s3MultipartService) {
+    public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
+                        final S3MultipartService s3MultipartService) {
         this.boardMapper = boardMapper;
+        this.userMapper = userMapper;
         this.s3MultipartService = s3MultipartService;
     }
 
@@ -45,8 +52,9 @@ public class BoardService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<Board>> findAllBoard(final Pagination pagination) {
-        final List<Board> boards = boardMapper.findAllBoard(pagination);
+    public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination) {
+        final List<HomeBoardAllRes> boards = boardMapper.findAllBoard(pagination);
+        for(HomeBoardAllRes board : boards) board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
@@ -58,8 +66,9 @@ public class BoardService {
      * @param id 보드 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<Board> findBoardByBoardId(final int id) {
-        final Board board = boardMapper.findBoardByBoardId(id);
+    public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int id) {
+        final HomeBoardOneRes board = boardMapper.findBoardByBoardId(id);
+        board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
         if (board == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, board);
@@ -102,6 +111,12 @@ public class BoardService {
         if (boards==null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
+    }
+    public DefaultRes<List<Board>>checkBoardByUser(final int id) {
+        final List<Board> boards = boardMapper.findBoardByUserId(id);
+        if (boards==null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.UNQUALIFIED, boards);
     }
 
     /**
@@ -174,20 +189,27 @@ public class BoardService {
     public DefaultRes BoardLikes(final int boardId, final int userId) {
         try {
             if(boardMapper.findBoardByBoardId(boardId) == null)
-                return DefaultRes.res(StatusCode.OK, ResponseMessage.NOT_FOUND_BOARD);
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
             List<Integer> boardIdList = boardMapper.findRecommendBoardsByUserId(userId);
-            for(int id : boardIdList){
-                if(id == boardId){
-                    boardMapper.deleteBoardRecommender(boardId,userId);
-                    return DefaultRes.res(StatusCode.OK, ResponseMessage.CANCEL_LIKE_BOARD);
+
+            Board.BoardRecommend boardLike = new Board.BoardRecommend();
+
+            for(int id : boardIdList) {
+                if (id == boardId) {
+                    boardMapper.deleteBoardRecommender(boardId, userId);
+                    boardLike.setRecommendBoardIdList(boardMapper.findBoardIdByRecommenderId(userId));
+                    return DefaultRes.res(StatusCode.OK, ResponseMessage.CANCEL_LIKE_BOARD, boardLike);
                 }
             }
+
             boardMapper.saveBoardRecommender(boardId, userId);
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD);
+            boardLike.setRecommendBoardIdList(boardMapper.findBoardIdByRecommenderId(userId));
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD, boardLike);
+
         } catch (Exception e) {
             log.error(e.getMessage());
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.FAIL_LIKE_BOARD);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
 
@@ -250,28 +272,25 @@ public class BoardService {
         try {
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
-            final List<String> sampleUrl = new LinkedList<>();
-            sampleUrl.add("가나다");
-            sampleUrl.add("라마바");
-            sampleUrl.add("사아자");
-
-            List<Integer> indexOfPrevImages= modifyBoardReq.getIndexOfPrevImages();
-            List<MultipartFile> images = modifyBoardReq.getImages();
-
-
-            for(int i : indexOfPrevImages){ boardMapper.deleteBoardImg(i); }
-
-            for(MultipartFile image : images ){
-                // S3 저장
+            s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
+            Boolean isImageDB = true;
+            if(isImageDB) {
+                for (String url : modifyBoardReq.getPrevImagesUrl()) {
+                    if (boardMapper.findImageByImageUrl(url) == url) {
+                        boardMapper.deleteBoardImg(url);
+                    }
+                }
             }
-            boardMapper.saveBoardImg(boardId, sampleUrl);
+            else{
+                return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            }
+            List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
+            boardMapper.saveBoardImg(boardId, urlList);
 
-            List<Integer> indexOfPrevKeywords = modifyBoardReq.getIndexOfPrevKeywords();
-            List<String> keywords = modifyBoardReq.getKeywords();
-
-
-            for(int i : indexOfPrevKeywords){ boardMapper.deleteBoardImg(i); }
-            boardMapper.saveBoardKeyword(boardId, keywords);
+            for(String keywords : modifyBoardReq.getPrevKeywords()){
+                boardMapper.deleteBoardKeyword(keywords);
+            }
+            boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
@@ -279,8 +298,5 @@ public class BoardService {
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
-
-
-
 }
 

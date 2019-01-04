@@ -1,25 +1,29 @@
 package com.gings.controller;
 
 import com.gings.domain.Board;
-import com.gings.domain.BoardKeyword;
-import com.gings.domain.BoardReply;
+
 import com.gings.model.DefaultRes;
-import com.gings.model.ModifyBoard.ModifyBoardReq;
+import com.gings.model.board.HomeBoard.HomeBoardAllRes;
+import com.gings.model.board.HomeBoard.HomeBoardOneRes;
+
+import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
-import com.gings.model.UpBoard.UpBoardReq;
-import com.gings.model.ReBoard.ReBoardReq;
+import com.gings.model.board.UpBoard.UpBoardOneRes;
+import com.gings.model.board.UpBoard.UpBoardReq;
+import com.gings.model.board.ReBoard.ReBoardReq;
+
 import com.gings.security.Principal;
 import com.gings.security.authentication.Authentication;
+
 import com.gings.service.BoardService;
-import com.gings.utils.ResponseMessage;
-import com.gings.utils.StatusCode;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.AbstractDocument;
-import javax.validation.Valid;
+
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -46,7 +50,7 @@ public class BoardController {
     @GetMapping("boards")
     public ResponseEntity getAllBoards(final Pagination pagination) {
         try {
-            DefaultRes<List<Board>> defaultRes = boardService.findAllBoard(pagination);
+            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -63,7 +67,7 @@ public class BoardController {
     @GetMapping("boards/{boardId}")
     public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId) {
         try {
-            DefaultRes<Board> defaultRes = boardService.findBoardByBoardId(boardId);
+            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -75,6 +79,7 @@ public class BoardController {
      * 보드 저장
      *
      * @param upBoardReq 보드 데이터
+     * @param  principal jwt
      * @return ResponseEntity
      */
     @PostMapping("boards")
@@ -111,9 +116,10 @@ public class BoardController {
      * @return ResponseEntity
      */
 
-    @PostMapping("replies")
-    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq) {
+    @PostMapping("reboards")
+    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final Principal principal) {
         try {
+            reBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -124,23 +130,31 @@ public class BoardController {
     /**
      * 리보드 추천
      *
-     * @param replyId 보드 고유 번호
+     * @param reboardId 보드 고유 번호
      * @return ResponseEntity
      */
-    @PostMapping("replies/{replyId}/recommend")
-    public ResponseEntity likeReBoard(@PathVariable("replyId") @RequestBody final int replyId) {
+    @PostMapping("reboards/{reboardId}/recommend")
+    public ResponseEntity likeReBoard(@PathVariable("reboardId") final int reboardId,
+                                      final Principal principal) {
         try {
-            final int userId = 1; // token 값으로 대체
-            return new ResponseEntity<>(boardService.ReBoardLikes(replyId, userId), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
 
+    /**
+     * 보드 수정
+     *
+     * @param modifyBoardReq 수정할 보드
+     * @return ResponseEntity
+     */
     @PutMapping("boards/{boardId}")
-    public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq) {
+    public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq,
+                                      Principal principal) {
         try {
+            modifyBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
