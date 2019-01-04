@@ -35,28 +35,4 @@ public class Config {
         templateEngine.addDialect(new LayoutDialect());
     }
     
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    
-    @Bean
-    public JWTServiceManager jwtServiceManager() {
-        List<JWTService> jwtServices = new ArrayList<>();
-        jwtServices.add(defaultJWTService());
-        jwtServices.add(authNumberJWTService());
-        
-        return new JWTServiceManager(jwtServices);
-    }
-    
-    @Bean
-    public JWTService defaultJWTService() {
-        return new DefaultJWTService();
-    }
-    
-    @Bean
-    public JWTService authNumberJWTService() {
-        return new EmailAuthWTService();
-    }
-    
 }

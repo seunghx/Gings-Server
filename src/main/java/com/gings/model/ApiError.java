@@ -35,6 +35,7 @@ public class ApiError {
     private static class Detail {
 
         private final String target;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private final String message;
 
         Detail(String target, String message) {
