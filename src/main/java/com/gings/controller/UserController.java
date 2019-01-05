@@ -71,7 +71,7 @@ public class UserController {
         String message = msgSource.getMessage("response.email-duplicate", null, request.getLocale());
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CONFLICT.value(), message), 
-                                    HttpStatus.OK);
+                                    HttpStatus.CONFLICT);
     }
     
     @ExceptionHandler(TokenExpiredException.class)
@@ -82,7 +82,7 @@ public class UserController {
         String message = msgSource.getMessage("response.email-auth-token.expired", null, request.getLocale());
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.OK);
+                                    HttpStatus.UNAUTHORIZED);
     }
     
     @ExceptionHandler(JWTVerificationException.class)
@@ -98,7 +98,7 @@ public class UserController {
         String message = msgSource.getMessage("response.authentication.failure", null, request.getLocale());
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message), 
-                                    HttpStatus.OK);
+                                    HttpStatus.UNAUTHORIZED);
     }
                                                                            
     /**

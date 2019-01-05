@@ -285,16 +285,19 @@ public class BoardService {
 
     public DefaultRes updateBoard(final int boardId, final ModifyBoardReq modifyBoardReq){
         try {
+
+
+
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
 
             for (String url : modifyBoardReq.getPrevImagesUrl()) {
+                log.error(url);
                 if (!(boardMapper.findImageByImageUrl(url).equals(url))) {
                     return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
                 }
                 boardMapper.deleteBoardImg(url);
             }
-
             s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
 
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
