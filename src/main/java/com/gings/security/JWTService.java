@@ -19,7 +19,7 @@ public interface JWTService {
     /**
      * 
      * @param  tokenInfo  단지 문자열 jwt token만으로 verify 및 decode가 가능한 경우도 있지만  
-     *                    인증 번호나 IP 주소와 같은 값들에 대한 verification이 필요할 경우도 있어 
+     *                    인증 번호나 IP 주소와 같은 값을 포함한 verification이 필요할 경우도 있어 
      *                    파라미터 타입을 문자열이 아닌 객체 타입으로 지정함.
      */
     public TokenInfo decode(TokenInfo tokenInfo);

@@ -29,9 +29,9 @@ public class WebsocketConnectingAuthentication implements Authentication {
     
     private static final long serialVersionUID = 2561946285897548899L;
     
-    private final Principal principal;
-    
-    public WebsocketConnectingAuthentication(Principal principal) {
+    private final WebSocketPrincipal principal;
+   
+    public WebsocketConnectingAuthentication(WebSocketPrincipal principal) {
         
         validate(principal);
         this.principal = principal;
