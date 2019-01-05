@@ -26,7 +26,7 @@ public class MyPage {
     private String status;
     private String image;   //프로필
     private boolean coworkingEnabled;
-    private List<UserKeyword> keywords;
+    private List<String> keywords;
 
     @JsonIgnore
     private MultipartFile imgFile;
@@ -60,6 +60,6 @@ public class MyPage {
     @Getter
     @Setter
     public static class MyPageProfile{
-
+        private String image;
     }
 }
