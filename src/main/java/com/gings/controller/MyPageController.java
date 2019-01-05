@@ -261,7 +261,7 @@ public class MyPageController {
 //        }
 //    }
 
-    //설정 - 자기소개 저장
+    //설정 - 자기소개 저장/수정
     @PostMapping("setting/introduce")
     public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
         try {
@@ -273,17 +273,7 @@ public class MyPageController {
         }
     }
 
-    //설정 - 자기소개 수정
-    @PutMapping("/setting/introduce")
-    public ResponseEntity changeIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
-        try {
-            final int id = principal.getUserId();
-            return new ResponseEntity<>(myPageService.changeUserIntroduce(id, introduceReq), HttpStatus.OK);
-        } catch (Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 
     //===============================프로필 사진 변경====================================================
     //프로필 사진 조회
