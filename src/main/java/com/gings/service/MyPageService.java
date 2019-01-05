@@ -128,9 +128,9 @@ public class MyPageService implements ApplicationEventPublisherAware{
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<IntroduceModel.IntroduceRes> selectIntroduce(final int id){
-        final IntroduceModel.IntroduceRes introduceRes = userMapper.selectIntroBeforeChange(id);
-        if(introduceRes == null)
+    public DefaultRes<List<IntroduceModel.IntroduceRes>> selectIntroduce(final int id){
+        final List<IntroduceModel.IntroduceRes> introduceRes = userMapper.selectIntroBeforeChange(id);
+        if(introduceRes.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, introduceRes);
     }

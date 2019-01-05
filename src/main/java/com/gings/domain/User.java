@@ -22,7 +22,7 @@ public class User {
     private String image;
     private boolean coworkingEnabled;
 
-    private Introduce introduce;
+    private List <Introduce> introduce;
     private List<UserKeyword> keywords;
     private List<Signature> signatures;
 

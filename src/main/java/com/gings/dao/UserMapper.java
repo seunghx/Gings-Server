@@ -41,8 +41,8 @@ public interface UserMapper {
             @Result(property = "status", column = "status"), @Result(property = "role", column = "role"),
             @Result(property = "image", column = "image"),
             @Result(property = "coworkingEnabled", column = "coworking_chk"),
-            @Result(property = "introduce", column = "user_id", javaType = Introduce.class,
-                    one = @One(select = "findIntroduceByUserId")),
+            @Result(property = "introduce", column = "user_id", javaType = List.class,
+                    many = @Many(select = "findIntroduceByUserId")),
             @Result(property = "keywords", column = "user_id", javaType = List.class,
                     many = @Many(select = "findKeywordsByUserId")),
             @Result(property = "signatures", column = "user_id", javaType = List.class,
@@ -200,7 +200,7 @@ public interface UserMapper {
             @Result(property = "imgs", column = "introduce_id", javaType = List.class,
                     many = @Many(select = "findImagesByIntroduceId"))
     })
-    public IntroduceModel.IntroduceRes selectIntroBeforeChange(int userId);
+    public List<IntroduceModel.IntroduceRes> selectIntroBeforeChange(int userId);
 
     /*
     자기소개 저장(최초)
