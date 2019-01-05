@@ -59,7 +59,7 @@ public class BoardService {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            //board.setWriterImage(userMapper.findImagesByIntroduceId());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
         }
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
@@ -77,11 +77,12 @@ public class BoardService {
         board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
         board.setField(userMapper.findByUserId(board.getWriterId()).getField());
         board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-        //board.setWriterImage(userMapper.findImagesByIntroduceId());
+        board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
 
         List<BoardReply> boardReplies = boardMapper.findReplyByBoardId(id);
         for(BoardReply boardReply : boardReplies){
             boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
+            boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
         }
         board.setReplys(boardReplies);
 

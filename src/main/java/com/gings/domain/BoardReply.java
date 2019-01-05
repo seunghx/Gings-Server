@@ -13,9 +13,10 @@ import java.util.List;
 public class BoardReply {
 
     private int replyId;
-    private int writerId;
 
+    private int writerId;
     private String writer;
+    private String writerImage;
 
     private String content;
     private LocalDateTime writeTime;

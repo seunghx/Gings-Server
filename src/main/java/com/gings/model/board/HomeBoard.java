@@ -13,12 +13,13 @@ public class HomeBoard {
     @Setter
     public static class HomeBoardAllRes {
         private int boardId;
-        private int writerId;
 
+        private int writerId;
         private String writer;
+        private String writerImage;
+
         private String field;
         private String company;
-        //private String writerImage;
 
         private String title;
         private String content;
@@ -38,12 +39,13 @@ public class HomeBoard {
     @Setter
     public static class HomeBoardOneRes {
         private int boardId;
-        private int writerId;
 
+        private int writerId;
         private String writer;
+        private String writerImage;
+
         private String field;
         private String company;
-        //private String writerImage;
 
         private String title;
         private String content;
