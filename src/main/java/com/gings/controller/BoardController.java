@@ -59,6 +59,8 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
+            //log.error(e.getMessage());
+            e.printStackTrace();
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
