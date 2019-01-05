@@ -10,6 +10,9 @@ import com.gings.model.MyPage;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,11 +22,13 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class MyPageService {
+public class MyPageService implements ApplicationEventPublisherAware{
+   
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
 
+    private ApplicationEventPublisher eventPublisher;
 
     public MyPageService(BoardMapper boardMapper, UserMapper userMapper, S3MultipartService s3MultipartService) {
         this.boardMapper = boardMapper;
@@ -123,9 +128,9 @@ public class MyPageService {
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<IntroduceModel.IntroduceRes> selectIntroduce(final int id){
-        final IntroduceModel.IntroduceRes introduceRes = userMapper.selectIntroBeforeChange(id);
-        if(introduceRes == null)
+    public DefaultRes<List<IntroduceModel.IntroduceRes>> selectIntroduce(final int id){
+        final List<IntroduceModel.IntroduceRes> introduceRes = userMapper.selectIntroBeforeChange(id);
+        if(introduceRes.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, introduceRes);
     }
@@ -264,6 +269,12 @@ public class MyPageService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_PROFILE_KEYWORD);
         }
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+        
     }
 
 }

@@ -236,7 +236,7 @@ public class MyPageController {
     public ResponseEntity tryToChangeIntroduce(final Principal principal){
         try{
             final int id = principal.getUserId();
-            DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
+            DefaultRes<List<IntroduceModel.IntroduceRes>> defaultRes = myPageService.selectIntroduce(id);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         }catch (Exception e){
             log.error(e.getMessage());

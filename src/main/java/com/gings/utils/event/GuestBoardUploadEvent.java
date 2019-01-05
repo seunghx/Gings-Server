@@ -13,11 +13,19 @@ public class GuestBoardUploadEvent extends ApplicationEvent{
      
     private static final long serialVersionUID = 4089870190152778313L;
 
-    private final int userId;
+    private final int ownerId;
+    private final int guestId;
     
-    public GuestBoardUploadEvent(Object source, int userId) {
+    /**
+     * 
+     * @param ownerId - 프로필 주인 id
+     * @param guestId - 게스트 보드 작성자 id
+     * 
+     */
+    public GuestBoardUploadEvent(Object source, int ownerId, int guestId) {
         super(source);
-        this.userId = userId;
+        this.guestId = guestId;
+        this.ownerId = ownerId;
     }
 
 }
