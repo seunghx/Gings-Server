@@ -106,7 +106,8 @@ public class PushNotificationServiceImpl implements PushNotificationService,
     // 쓰이는 클래스는 아님 
     @Override
     public void onReplyLikeEvent(ReplyLikeEvent event) {
-        //String boardType = event.getBoardType();
+        //
+        String boardType = null;
         
         String message = null;
         

@@ -11,7 +11,6 @@ import lombok.ToString;
 @ToString
 public class BoardLikeEvent extends ApplicationEvent {
 
-    
     private static final long serialVersionUID = 7676214081469187223L;
     
     private final int boardId;
