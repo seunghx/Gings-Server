@@ -13,10 +13,15 @@ public class BoardBannedEvent extends ApplicationEvent {
     
     private static final long serialVersionUID = 5207308072424299645L;
 
-    private final int userId;
+    private final int writerId;
     
-    public BoardBannedEvent(Object source, int userId) {
+    /**
+     * 
+     * @param source
+     * @param userId
+     */
+    public BoardBannedEvent(Object source, int writerId) {
         super(source);
-        this.userId = userId;
+        this.writerId = writerId;
     }
 }
