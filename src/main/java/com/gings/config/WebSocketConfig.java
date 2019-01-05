@@ -30,7 +30,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
      * @Value("${spring.rabbitmq.password}")
      * private String rabbitPass;
      */
-    
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 
@@ -48,7 +47,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint(WS_CONNECT)
                 .setAllowedOrigins("*");
-               
     }
 
 }

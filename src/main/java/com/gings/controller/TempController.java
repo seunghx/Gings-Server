@@ -1,7 +1,16 @@
 package com.gings.controller;
 
+import java.security.Principal;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,4 +39,31 @@ public class TempController {
         
         return new ResponseEntity<>(temp, HttpStatus.OK);
     }
+    
+    @SubscribeMapping("/topic/temp")
+    public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {
+         
+        log.error("Subscription success.");
+        log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
+        
+    }
+
+    @MessageMapping("/topic/temp")
+    @SendTo("/topic/temp")
+    public ECHO sendStageChatMessage(ECHO echo) {
+        log.error("Message sending success");
+        log.error("Message : {}", echo);
+        
+        return echo;
+    }
+    
+    
+    @Getter
+    @Setter
+    @ToString
+    public static class ECHO {
+        String message;
+    }
+    
+
 }
