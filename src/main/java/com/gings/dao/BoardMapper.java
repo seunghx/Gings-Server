@@ -6,6 +6,7 @@ import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
+import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
@@ -120,6 +121,19 @@ public interface BoardMapper {
     })
     public List<BoardReply> findReplyByBoardId(int boardId);
 
+    // 리보드 고유 번호로 리보드 조회
+    @Select("SELECT * FROM board_reply WHERE reply_id = #{replyId}")
+    @Results(value = {
+            @Result(property = "replyId", column = "reply_id"),
+            @Result(property = "writerId", column = "writer_id"),
+            @Result(property = "content", column = "content"),
+            @Result(property = "writeTime", column = "write_time"),
+            @Result(property="images", column="reply_id", javaType= List.class,
+                    many=@Many(select="findReplyImagesByReplyId")),
+    })
+
+    public BoardReply findReplyByReplyId(int replyId);
+
     // 보드 고유 번호로 댓글수 조회
     @Select("SELECT COUNT(reply_id) FROM board_reply WHERE board_id = #{boardId}")
     public int countReply(int boardId);
@@ -196,7 +210,7 @@ public interface BoardMapper {
      */
 
     //업보드 수정하기
-    @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content}, category=#{ModifyBoardReq.category} WHERE board_id = #{boardId}")
+    @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content}, category=#{ModifyBoardReq.category}, write_time = now() WHERE board_id = #{boardId}")
     void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
     //업보드 공유 갯수 업데이트
@@ -208,8 +222,8 @@ public interface BoardMapper {
     ReBoard
      */
 
-    @Update("UPDATE board_reply SET content=#{ReBoardReq.content} WHERE reply_id = #{replyId}")
-    void updateReBoard(@Param("replyId") final int replyId, @Param("ReBoardReq") final ReBoardReq reBoardReq);
+    @Update("UPDATE board_reply SET content=#{ModifyReBoardReq.content}, write_time = now() WHERE reply_id = #{replyId}")
+    void updateReBoard(@Param("replyId") final int replyId, @Param("ModifyReBoardReq") final ModifyReBoardReq modifyReBoardReq);
 
 
 
@@ -222,9 +236,17 @@ public interface BoardMapper {
     @Delete("DELETE FROM board WHERE board_id = #{boardId}")
     void deleteBoard(@Param("boardId") final int boardId);
 
+    //보드 고유번호로 보드 삭제하기
+    @Delete("DELETE FROM board_reply WHERE reply_id = #{reboardId}")
+    void deleteReBoard(@Param("reboardId") final int reboardId);
+
     //보드 이미지 고유 번호로 보드 이미지 삭제하기
     @Delete("DELETE FROM board_img WHERE url = #{imageUrl}")
     void deleteBoardImg(@Param("imageUrl") final String imageUrl);
+
+    //보드 이미지 고유 번호로 보드 이미지 삭제하기
+    @Delete("DELETE FROM reply_img WHERE url = #{imageUrl}")
+    void deleteReBoardImg(@Param("imageUrl") final String imageUrl);
 
     //보드 고유번호로 보드 키워드 삭제하기
     @Delete("DELETE FROM board_keyword WHERE content = #{keyword}")
