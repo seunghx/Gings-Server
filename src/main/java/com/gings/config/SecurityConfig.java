@@ -27,8 +27,6 @@ import com.gings.security.JWTServiceManager;
 @Configuration
 //@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static final String WS_CONNECT = "/connect";
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -41,8 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .anyRequest()
                 .permitAll()
-                .antMatchers(WS_CONNECT)
-                .authenticated()
+           //     .antMatchers(WS_CONNECT)
+           //     .authenticated()
             .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

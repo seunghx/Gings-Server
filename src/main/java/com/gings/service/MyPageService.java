@@ -43,6 +43,7 @@ public class MyPageService {
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_USER);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_USER, myPage);
     }
+    
     public DefaultRes<MyPage> checkUserId(final int id){
         final MyPage myPage = userMapper.findByUserId2(id);
         if (myPage == null)

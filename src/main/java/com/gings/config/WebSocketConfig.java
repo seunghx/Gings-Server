@@ -16,6 +16,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
+    private static final String WS_CONNECT = "/connect";
+    
     /*
      * 우선 rabbitmq 사용 안함.
      * 
@@ -28,7 +30,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
      * @Value("${spring.rabbitmq.password}")
      * private String rabbitPass;
      */
-    
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
 
@@ -44,9 +45,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     // 후에 웹 채팅 추가할 경우 registrty.withSockJS() 추가 예정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/connect")
-                .setAllowedOrigins("*");
-               
+        registry.addEndpoint(WS_CONNECT)
+        .setAllowedOrigins("*")
+
+                .withSockJS();
     }
 
 }

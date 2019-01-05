@@ -41,8 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class UserController {
     
-    private static final Class<? extends TokenInfo> USING_TOKEN_INFO = EmailAuthTokenInfo.class;
     private static final String XFF_HEADER_NAME = "X-Forwarded-For";
+    private static final Class<? extends TokenInfo> USING_TOKEN_INFO = EmailAuthTokenInfo.class;
     
     private final UserService userService;
     private final MessageSource msgSource;

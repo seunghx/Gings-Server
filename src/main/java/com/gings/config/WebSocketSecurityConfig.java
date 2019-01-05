@@ -16,5 +16,8 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
                 .authenticated();
     }
     
-    // 예외 응답 메세지 처리 나중에
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
 }
