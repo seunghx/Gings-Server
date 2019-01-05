@@ -13,7 +13,7 @@ import java.util.List;
 public interface ClubMapper {
 
     // 클럽 전체 조회 (findAllClub)
-    @Select("SELECT club_id as clubId, intro_img as introImg, back_img as backImg " +
+    @Select("SELECT club_id as clubId, intro_img as introImg, back_img as backImg, title as title " +
             "FROM club")
     public List<Club> findAllClub();
 
@@ -21,6 +21,7 @@ public interface ClubMapper {
     // 클럽 고유 번호로 클럽 조회(findClubByClubId)
     @Select("SELECT * FROM club WHERE club_id = #{clubId}")
     @Results(value = {
+            @Result(property = "title",column = "title"),
             @Result(property = "introImg",column = "intro_img"),
             @Result(property = "backImg",column = "back_img"),
             @Result(property = "event",column = "club_id", javaType = List.class,

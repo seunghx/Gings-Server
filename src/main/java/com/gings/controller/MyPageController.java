@@ -212,14 +212,16 @@ public class MyPageController {
      * @return
      */
     @PostMapping("/guestboard/{myPageUserId}")
-    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, final GuestModel.GuestModelReq guestModelReq, final Principal principal){
+    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final Principal principal){
         try{
             final int id = principal.getUserId();
             if(id == myPageUserId){
                 DefaultRes defaultRes = myPageService.checkUser();
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-            }else
+            }else {
+                System.out.println("확인하자 : " + guestModelReq.getContent());
                 return new ResponseEntity<>(myPageService.createGuest(guestModelReq, myPageUserId, id), HttpStatus.OK);
+            }
         }catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);

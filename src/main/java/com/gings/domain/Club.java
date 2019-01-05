@@ -16,6 +16,7 @@ public class Club {
     private int clubId;
     private String introImg;
     private String backImg;
+    private String title;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<Event> event;
