@@ -18,6 +18,8 @@ import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,12 +30,14 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class BoardService {
-    private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
+public class BoardService implements ApplicationEventPublisherAware {
+
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
-
+    
+    private ApplicationEventPublisher eventPublisher;
+    
     /**
      * 생성자 의존성 주입
      *
@@ -350,6 +354,13 @@ public class BoardService {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
+    }
+
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+        
     }
 }
 
