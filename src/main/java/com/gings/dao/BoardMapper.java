@@ -123,6 +123,15 @@ public interface BoardMapper {
 
     // 리보드 고유 번호로 리보드 조회
     @Select("SELECT * FROM board_reply WHERE reply_id = #{replyId}")
+    @Results(value = {
+            @Result(property = "replyId", column = "reply_id"),
+            @Result(property = "writerId", column = "writer_id"),
+            @Result(property = "content", column = "content"),
+            @Result(property = "writeTime", column = "write_time"),
+            @Result(property="images", column="reply_id", javaType= List.class,
+                    many=@Many(select="findReplyImagesByReplyId")),
+    })
+
     public BoardReply findReplyByReplyId(int replyId);
 
     // 보드 고유 번호로 댓글수 조회
@@ -226,6 +235,10 @@ public interface BoardMapper {
     //보드 고유번호로 보드 삭제하기
     @Delete("DELETE FROM board WHERE board_id = #{boardId}")
     void deleteBoard(@Param("boardId") final int boardId);
+
+    //보드 고유번호로 보드 삭제하기
+    @Delete("DELETE FROM board_reply WHERE reply_id = #{reboardId}")
+    void deleteReBoard(@Param("reboardId") final int reboardId);
 
     //보드 이미지 고유 번호로 보드 이미지 삭제하기
     @Delete("DELETE FROM board_img WHERE url = #{imageUrl}")

@@ -306,7 +306,7 @@ public class BoardService {
             postBoard.setField(userMapper.findByUserId(postBoard.getWriterId()).getField());
             postBoard.setCompany(userMapper.findByUserId(postBoard.getWriterId()).getCompany());
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD, postBoard);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD, postBoard);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
@@ -336,7 +336,7 @@ public class BoardService {
             BoardReply boardReply = boardMapper.findReplyByReplyId(replyId);
             boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD, boardReply);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD, boardReply);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);

@@ -1,5 +1,6 @@
 package com.gings.controller;
 
+import com.gings.dao.BoardMapper;
 import com.gings.domain.Board;
 
 import com.gings.model.DefaultRes;
@@ -18,6 +19,8 @@ import com.gings.security.authentication.Authentication;
 
 import com.gings.service.BoardService;
 
+import com.gings.utils.ResponseMessage;
+import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -36,9 +39,11 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardMapper boardMapper;
 
-    public BoardController(final BoardService boardService) {
+    public BoardController(final BoardService boardService, final BoardMapper boardMapper) {
         this.boardService = boardService;
+        this.boardMapper = boardMapper;
     }
 
 
@@ -55,7 +60,7 @@ public class BoardController {
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -72,7 +77,7 @@ public class BoardController {
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -90,7 +95,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -106,7 +111,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -124,7 +129,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -141,7 +146,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -159,7 +164,7 @@ public class BoardController {
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -177,10 +182,41 @@ public class BoardController {
             return new ResponseEntity<>(boardService.updateReBoard(reboardId,modifyReBoardReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
+    /**
+     * 보드 삭제
+     *
+     * @return ResponseEntity
+     */
+    @DeleteMapping("boards/{boardId}")
+    public ResponseEntity deleteBoard(@PathVariable final int boardId) {
+        try {
+            boardMapper.deleteBoard(boardId);
+            DefaultRes defaultRes = DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_BOARD);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 
-
+    /**
+     * 리보드 삭제
+     *
+     * @return ResponseEntity
+     */
+    @DeleteMapping("reboards/{reboardId}")
+    public ResponseEntity deleteReBoard(@PathVariable final int reboardId) {
+        try {
+            boardMapper.deleteReBoard(reboardId);
+            DefaultRes defaultRes = DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_REBOARD);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }
