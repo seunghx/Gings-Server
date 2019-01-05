@@ -325,7 +325,7 @@ public class MyPageController {
     
     //프로필 정보 입력
     @PutMapping("setting/info")
-    public ResponseEntity createProfileInfo(final MyPage myPage, final Principal principal){
+    public ResponseEntity createProfileInfo(@RequestBody final MyPage myPage, final Principal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveInformation(id, myPage), HttpStatus.OK);
@@ -337,7 +337,7 @@ public class MyPageController {
 
     //프로필 정보 키워드 입력
     @PostMapping("setting/info/keyword")
-    public ResponseEntity inputInfoKeyword(final MyPage myPage, final Principal principal){
+    public ResponseEntity inputInfoKeyword(@RequestBody final MyPage myPage, final Principal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveKeyword(id, myPage), HttpStatus.OK);
