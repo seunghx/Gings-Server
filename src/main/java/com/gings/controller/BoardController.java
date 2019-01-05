@@ -8,6 +8,7 @@ import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
+import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
@@ -161,5 +162,25 @@ public class BoardController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
         }
     }
+
+    /**
+     * 리보드 수정
+     *
+     * @param modifyReBoardReq 수정할 보드
+     * @return ResponseEntity
+     */
+    @PutMapping("reboards/{reboardId}")
+    public ResponseEntity updateReBoard(@PathVariable final int reboardId, final ModifyReBoardReq modifyReBoardReq,
+                                      Principal principal) {
+        try {
+            modifyReBoardReq.setWriterId(principal.getUserId());
+            return new ResponseEntity<>(boardService.updateReBoard(reboardId,modifyReBoardReq), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.OK);
+        }
+    }
+
+
 
 }

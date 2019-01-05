@@ -28,6 +28,24 @@ public class ReBoard {
 
     @Getter
     @Setter
+    public static class ModifyReBoardReq{
+        private int replyId;
+        private int boardId;
+
+        private int writerId;
+        private String writer;
+
+        private String content;
+        private LocalDateTime writeTime;
+
+        private List<String> prevImagesUrl;
+        private List<MultipartFile> postImages;
+
+        private int recommender;
+    }
+
+    @Getter
+    @Setter
     public static class ReBoardRes{
         private String name;
         private String content;

@@ -8,6 +8,7 @@ import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
+import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.model.board.UpBoard;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
@@ -285,17 +286,9 @@ public class BoardService {
 
     public DefaultRes updateBoard(final int boardId, final ModifyBoardReq modifyBoardReq){
         try {
-
-
-
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
-
             for (String url : modifyBoardReq.getPrevImagesUrl()) {
-                log.error(url);
-                if (!(boardMapper.findImageByImageUrl(url).equals(url))) {
-                    return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAIL_UPDATE_BOARD);
-                }
                 boardMapper.deleteBoardImg(url);
             }
             s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
@@ -308,7 +301,42 @@ public class BoardService {
             }
             boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            HomeBoardOneRes postBoard = boardMapper.findBoardByBoardId(boardId);
+            postBoard.setWriter(userMapper.findByUserId(postBoard.getWriterId()).getName());
+            postBoard.setField(userMapper.findByUserId(postBoard.getWriterId()).getField());
+            postBoard.setCompany(userMapper.findByUserId(postBoard.getWriterId()).getCompany());
+
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD, postBoard);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 리보드 수정
+     *
+     * @param replyId 보드 데이터
+     * @param modifyReBoardReq 보드 데이터
+     * @return DefaultRes
+     */
+
+    public DefaultRes updateReBoard(final int replyId, final ModifyReBoardReq modifyReBoardReq){
+        try {
+            boardMapper.updateReBoard(replyId, modifyReBoardReq);
+
+            for (String url : modifyReBoardReq.getPrevImagesUrl()) {
+                boardMapper.deleteReBoardImg(url);
+            }
+            s3MultipartService.deleteMultipleFiles(modifyReBoardReq.getPrevImagesUrl());
+
+            List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
+            boardMapper.saveReBoardImg(replyId, urlList);
+
+            BoardReply boardReply = boardMapper.findReplyByReplyId(replyId);
+            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
+
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD, boardReply);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
