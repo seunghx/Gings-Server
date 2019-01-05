@@ -306,6 +306,7 @@ public class BoardService {
             postBoard.setWriter(userMapper.findByUserId(postBoard.getWriterId()).getName());
             postBoard.setField(userMapper.findByUserId(postBoard.getWriterId()).getField());
             postBoard.setCompany(userMapper.findByUserId(postBoard.getWriterId()).getCompany());
+            postBoard.setWriterImage(userMapper.findByUserId(postBoard.getWriterId()).getImage());
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD, postBoard);
         } catch (Exception e) {
@@ -336,6 +337,7 @@ public class BoardService {
 
             BoardReply boardReply = boardMapper.findReplyByReplyId(replyId);
             boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
+            boardReply.setWriterImage(userMapper.findByUserId(boardReply.getWriterId()).getImage());
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD, boardReply);
         } catch (Exception e) {

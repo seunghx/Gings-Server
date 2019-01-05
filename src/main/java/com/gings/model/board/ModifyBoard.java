@@ -14,7 +14,10 @@ public class ModifyBoard {
     @NotBlank
     public static class ModifyBoardReq {
         private int boardId;
+
         private int writerId;
+        private String writer;
+        private String writerImage;
 
         private String title;
         private String content;
