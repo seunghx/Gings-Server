@@ -156,12 +156,13 @@ public class MyPageService implements ApplicationEventPublisherAware{
                 return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
             } else {
                 userMapper.updateIntroduce(id, introduceReq);
-                final int introduceId = userMapper.findIntroduceByUserId(id).get(0).getId();
                 s3MultipartService.deleteMultipleFiles(introduceReq.getPrevImagesUrl());
                 for (String url : introduceReq.getPrevImagesUrl()) {
                     userMapper.deleteIntroduceImg(url);
                 }
                 List<String> urlList = s3MultipartService.uploadMultipleFiles(introduceReq.getImages());
+                final int introduceId = userMapper.findIntroduceByUserId(id).get(0).getId();
+                System.out.println("자기소개 아이디는 : " +introduceId);
                 userMapper.updateIntroduceImg(introduceId, urlList);
                 return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
             }

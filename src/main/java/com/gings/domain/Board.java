@@ -28,6 +28,8 @@ public class Board {
 
     private int recommender;
 
+
+
     @Getter
     @Setter
     @ToString
