@@ -36,14 +36,13 @@ import lombok.extern.slf4j.Slf4j;
  * spring security websocket suuport를 이용할 경우 websocket connect 요청을 한 유저 정보를 이용해
  * connection이 유지되는 동안의 유저 정보를 가져올 수 있음. 이를 위해 connect 요청에 대한 인증 정보를 
  * spring security가 알 수 있도록 아래 필터 정의. 
- * 
- * (명시적으로 stomp header에 요청 유저의 id를 전달하는 것은 악의적으로 바꿀 수 있으므로 좋지 않음.)
+ *   
  * 
  * @author seunghyun
  *
  */
 @Slf4j
-public class WebsocketConnectAuthenticationFilter extends AbstractAuthenticationProcessingFilter{
+public class StompConnectAuthenticationFilter extends AbstractAuthenticationProcessingFilter{
 
     private static final String XFF_HEADER_NAME = "X-Forwarded-For";
     
@@ -51,14 +50,27 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
     private final UserMapper userMapper;
     private final ModelMapper modelMapper = new ModelMapper();
     
-    protected WebsocketConnectAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
+    protected StompConnectAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
                                                    JWTServiceManager jwtServiceManager,
                                                    UserMapper userMapper) {
         super(requiresAuthenticationRequestMatcher);
         this.jwtServiceManager = jwtServiceManager;
         this.userMapper = userMapper;
     }
-
+    
+    /**
+     * 
+     * 아래 메서드를 보면 유저 id로 유저 정보를 받아오는 것을 알 수 있다.
+     * 
+     * <pre> userMapper.findByUserId(tokenInfo.getUid()</pre>
+     * 
+     * 이유는 spring의 stomp over websocket을 이용해 특정 유저에게 메세지를 전달(알림 등)할 경우 웹소켓
+     * 세션 연결된 유저를 유일하게 구분할 수 있는 String 타입이 필요하기 때문에 email 정보가 필요하며
+     * (int 타입 user id를 String으로 사용해도되나(기존 깅스 어플리케이션에서는 user id기반) 매번 
+     * int에서 String으로 String에서 int로 변경해줘야하는 불편이 존재.) 그 외에 채팅 sender 정보를 위해 
+     * user name 값도 가져올 필요가 있다.
+     * 
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
                                                 throws AuthenticationException, IOException, ServletException {
@@ -90,6 +102,18 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
             
             throw new BadCredentialsException("Invalid JWT token.", e);
         }
+    }
+    
+    @Override
+    public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, 
+                                         FilterChain chain, Authentication authentication) 
+                                                                 throws IOException, ServletException {
+        
+        SecurityContext sc = SecurityContextHolder.createEmptyContext();
+        sc.setAuthentication(authentication);
+        SecurityContextHolder.setContext(sc);
+        
+        chain.doFilter(request, response);
     }
     
     private boolean isValidToken(String jwt) {
@@ -125,18 +149,6 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
         String remote = request.getHeader(XFF_HEADER_NAME);
         
         return remote != null? remote : request.getRemoteAddr();
-    }
-    
-    @Override
-    public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, 
-                                         FilterChain chain, Authentication authentication) 
-                                                             throws IOException, ServletException {
-        
-        SecurityContext sc = SecurityContextHolder.createEmptyContext();
-        sc.setAuthentication(authentication);
-        SecurityContextHolder.setContext(sc);
-        
-        chain.doFilter(request, response);
     }
     
 }
