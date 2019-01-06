@@ -1,15 +1,20 @@
 package com.gings.service;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.gings.dao.BoardMapper;
+import com.gings.dao.PushNotificationMapper;
 import com.gings.dao.UserMapper;
 import com.gings.domain.User;
+import com.gings.domain.Board;
 import com.gings.domain.PushNotification;
 import com.gings.utils.NotificationEventListener;
+import com.gings.utils.code.NotificationType;
 import com.gings.utils.event.BoardBannedEvent;
 import com.gings.utils.event.BoardLikeEvent;
 import com.gings.utils.event.GuestBoardUploadEvent;
@@ -46,27 +51,29 @@ public class PushNotificationServiceImpl implements PushNotificationService, Not
 
     private static final String PUSH_DESTINATION = "/queue/notification";
     
-    private static final String BOARD_BANNED = "response.event.onBoardBanned";
-    private static final String BOARD_LIKE = "response.event.board-like";
-    private static final String ANSWER_REPLY_LIKE = "response.event.reply-like.answer";
-    private static final String COWORKING_REPLY_LIKE = "response.event.reply-like.coworking";
-    private static final String INSPIRATION_REPLY_LIKE = "response.event.reply-like.inspiration";
-    private static final String ANSWER_REPLY_UPLOAD = "response.event.reply-upload.answer";
-    private static final String INSPIRATION_REPLY_UPLOAD = "response.event.reply-upload.inspiration";
-    private static final String COWORKING_REPLY_UPLOAD = "response.event.reply-upload.coworking";
-    private static final String GUEST_BOARD_UPLOAD = "response.event.guest-board-upload";
+    private static final String BOARD_BANNED = "당신의 게시글이 신고 및 규정 위반으로 삭제 처리되었습니다. 이의 혹은 오류가 있을 경우 멤버십 센터에 문의주세요.";
+    private static final String BOARD_LIKE = "%s 멤버가 당신의 보드를 추천했어요! %s";
+    private static final String ANSWER_REPLY_LIKE = "%s 멤버가 당신의 게스트 보드에 글을 남겼어요!";
+    private static final String COWORKING_REPLY_LIKE = "%s 멤버가 당신의 답변을 추천했어요! %s";
+    private static final String INSPIRATION_REPLY_LIKE = "%s 멤버가 당신의 답글을 추천했어요! %s";
+    private static final String ANSWER_REPLY_UPLOAD = "%s 멤버가 당신의 참여를 추천했어요! %s";
+    private static final String INSPIRATION_REPLY_UPLOAD = "%s 멤버가 당신의 질문에 답변했어요! %s";
+    private static final String COWORKING_REPLY_UPLOAD = "%s 멤버가 당신의 영감에 답글을 달았어요! %s";
+    private static final String GUEST_BOARD_UPLOAD = "%s 멤버가 당신의 협업 제안에 응했어요! %s";
                
-    private final MessageSource messageSource;
     private final SimpMessagingTemplate messagingTemplate;
+    private final PushNotificationMapper notificationMapper;
     private final UserMapper userMapper;
+    private final BoardMapper boardMapper;
     
-    public PushNotificationServiceImpl(MessageSource messageSource, 
-                                       SimpMessagingTemplate messagingTemplate,
-                                       UserMapper userMapper) {
+    public PushNotificationServiceImpl(SimpMessagingTemplate messagingTemplate,
+                                       PushNotificationMapper notificationMapper,
+                                       UserMapper userMapper, BoardMapper boardMapper) {
         
-        this.messageSource = messageSource;
-        this.messagingTemplate = messagingTemplate;
         this.userMapper = userMapper;
+        this.messagingTemplate = messagingTemplate;
+        this.notificationMapper = notificationMapper;
+        this.boardMapper = boardMapper;
     }
     
     /**
@@ -82,25 +89,40 @@ public class PushNotificationServiceImpl implements PushNotificationService, Not
      */
     @Override
     public void onBoardBannedEvent(BoardBannedEvent event) {
-        int userId = event.getWriterId();
+      
+        User user = userMapper.findByUserId(event.getWriterId());    
         
-        User user = userMapper.findByUserId(userId);    
+        PushNotification notification = new PushNotification();
+        notification.setUserId(user.getId());
+        notification.setMessage(BOARD_BANNED);
+        notification.setNotificationType(NotificationType.BOARD_BANNED);
         
-        String message = messageSource.getMessage(BOARD_BANNED, null, Locale.getDefault());
+        notificationMapper.save(notification);
         
-       // messagingTemplate.convertAndSendToUser(user.getEmail(), PUSH_DESTINATION, payload);
+        messagingTemplate.convertAndSendToUser(user.getEmail(), PUSH_DESTINATION, notification);
     }
 
     @Override
     public void onBoardLikeEvent(BoardLikeEvent event) {
-        String message = messageSource.getMessage(BOARD_LIKE, null, Locale.getDefault());
+      
+        /*
+        User user = userMapper.findByUserId(event.getLikerId());
+        Board board = boardMapper.findBoardByBoardId(event.getBoardId());
+        
+        PushNotification notification = new PushNotification();
+        notification.setUserId(board.getWriterId());
+        notification.setMessage(message);
+        notification.setNotificationType(board.getCategory());
+        */
+        
+      //  String message = messageSource.getMessage(BOARD_LIKE, null, Locale.getDefault());
         
     }
 
     @Override
     public void onGuestBoardUploadEvent(GuestBoardUploadEvent event) {
         
-        String message = messageSource.getMessage(GUEST_BOARD_UPLOAD, null, Locale.getDefault());
+      //  String message = messageSource.getMessage(GUEST_BOARD_UPLOAD, null, Locale.getDefault());
 
         
     }
@@ -116,11 +138,11 @@ public class PushNotificationServiceImpl implements PushNotificationService, Not
         String message = null;
         
         if("QUESTION".equals(boardType)) {
-            message = messageSource.getMessage(ANSWER_REPLY_LIKE, null, Locale.getDefault());
+            //message = messageSource.getMessage(ANSWER_REPLY_LIKE, null, Locale.getDefault());
         }else if("INSPIRATION".equals(boardType)) {
-            message = messageSource.getMessage(INSPIRATION_REPLY_LIKE, null, Locale.getDefault());
+            //message = messageSource.getMessage(INSPIRATION_REPLY_LIKE, null, Locale.getDefault());
         }else if("COWORKING".equals(boardType)) {
-            message = messageSource.getMessage(COWORKING_REPLY_LIKE, null, Locale.getDefault());
+            //message = messageSource.getMessage(COWORKING_REPLY_LIKE, null, Locale.getDefault());
         }else {
             log.warn("Invalid board type detected. Invalid board type : {}", boardType);
             throw new IllegalStateException("Invalid board type detected.");
@@ -141,7 +163,19 @@ public class PushNotificationServiceImpl implements PushNotificationService, Not
     // 내일 board type enum으로 변경
     @Override
     public void onReplyUploadEvent(ReplyUploadEvent event) {
-        String message = messageSource.getMessage(BOARD_LIKE, null, Locale.getDefault());
+      //  String message = messageSource.getMessage(BOARD_LIKE, null, Locale.getDefault());
+        
+    }
+
+    @Override
+    public List<PushNotification> getNewerPushNotifications(int olderId, int userId) {
+        
+        return null;
+    }
+
+    @Override
+    public void confirmNotifications(int notificationId, int userId) {
+        // TODO Auto-generated method stub
         
     }
 

@@ -2,6 +2,8 @@ package com.gings.domain;
 
 import java.time.LocalDateTime;
 
+import com.gings.utils.code.NotificationType;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,12 +13,11 @@ import lombok.ToString;
 @ToString
 public class PushNotification {
     
-    public int id;
-    public int userId;
-    //public NotificationType notificationType;
-    public String NotificationType;
-    public String message;
-    public boolean confirmed;
-    public LocalDateTime time;
+    private int id;
+    private int userId;
+    private NotificationType notificationType;
+    private String message;
+    private boolean confirmed;
+    private LocalDateTime notifyTime;
     
 }
