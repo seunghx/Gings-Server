@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SessionConnectedListener implements ApplicationListener<SessionConnectedEvent> {
 
     // Methods
-    // ==========================================================================================================================
-
+    // =================================================================================================
+    
     @Override
     public void onApplicationEvent(SessionConnectedEvent event) {
         if(log.isInfoEnabled()) {
