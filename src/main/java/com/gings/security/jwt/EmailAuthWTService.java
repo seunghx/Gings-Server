@@ -1,4 +1,4 @@
-package com.gings.security;
+package com.gings.security.jwt;
 
 import static com.auth0.jwt.JWT.require;
 

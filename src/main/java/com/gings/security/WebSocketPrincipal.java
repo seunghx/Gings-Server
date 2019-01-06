@@ -34,6 +34,7 @@ public class WebSocketPrincipal extends Principal{
      */
     private String email;
     private String name;
+    
     public WebSocketPrincipal(int userId, UserRole role, String email, String name) {
         super(userId, role);
         this.email = email;

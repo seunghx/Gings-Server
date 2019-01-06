@@ -25,13 +25,13 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class WebsocketConnectingAuthentication implements Authentication {
+public class StompConnectingAuthentication implements Authentication {
     
     private static final long serialVersionUID = 2561946285897548899L;
     
     private final WebSocketPrincipal principal;
    
-    public WebsocketConnectingAuthentication(WebSocketPrincipal principal) {
+    public StompConnectingAuthentication(WebSocketPrincipal principal) {
         
         validate(principal);
         this.principal = principal;
@@ -41,7 +41,7 @@ public class WebsocketConnectingAuthentication implements Authentication {
         if(principal == null || principal.getRole() == null || 
            StringUtils.isEmpty(principal.getEmail()) || principal.getUserId() == 0) {
             
-            log.debug("Invalid principal detected. Invalid principal : {}", principal);
+            log.info("Invalid principal detected. Invalid principal : {}", principal);
             
             throw new IllegalArgumentException("Invalid principal argument");
         }

@@ -13,10 +13,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.gings.security.DefaultJWTService;
-import com.gings.security.EmailAuthWTService;
-import com.gings.security.JWTService;
-import com.gings.security.JWTServiceManager;
+import com.gings.security.jwt.DefaultJWTService;
+import com.gings.security.jwt.EmailAuthWTService;
+import com.gings.security.jwt.JWTService;
+import com.gings.security.jwt.JWTServiceManager;
 
 /**
  * 

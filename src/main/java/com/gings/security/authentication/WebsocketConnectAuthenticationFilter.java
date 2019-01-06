@@ -23,11 +23,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.dao.UserMapper;
-import com.gings.security.JWTService;
-import com.gings.security.JWTServiceManager;
-import com.gings.security.UserAuthTokenInfo;
-import com.gings.security.WebsocketConnectingAuthentication;
+import com.gings.security.StompConnectingAuthentication;
 import com.gings.security.WebSocketPrincipal;
+import com.gings.security.jwt.JWTService;
+import com.gings.security.jwt.JWTServiceManager;
+import com.gings.security.jwt.UserAuthTokenInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,7 +76,7 @@ public class WebsocketConnectAuthenticationFilter extends AbstractAuthentication
             WebSocketPrincipal principal = modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
                                                            WebSocketPrincipal.class);
             
-            return new WebsocketConnectingAuthentication(principal);
+            return new StompConnectingAuthentication(principal);
             
         }catch(TokenExpiredException e){
             log.info("Request user token expired.");

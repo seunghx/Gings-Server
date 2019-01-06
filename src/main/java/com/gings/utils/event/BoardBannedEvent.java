@@ -15,11 +15,6 @@ public class BoardBannedEvent extends ApplicationEvent {
 
     private final int writerId;
     
-    /**
-     * 
-     * @param source
-     * @param userId
-     */
     public BoardBannedEvent(Object source, int writerId) {
         super(source);
         this.writerId = writerId;

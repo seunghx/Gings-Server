@@ -1,5 +1,8 @@
 package com.gings.security.authentication;
 
+import static com.gings.security.jwt.JWTService.AUTHORIZATION;
+import static com.gings.security.jwt.JWTService.BEARER_SCHEME;
+
 import java.util.Arrays;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
@@ -18,13 +21,10 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import com.gings.model.ApiError;
-import com.gings.security.JWTService;
-import com.gings.security.JWTServiceManager;
 import com.gings.security.Principal;
-import com.gings.security.UserAuthTokenInfo;
-
-import static com.gings.security.JWTService.AUTHORIZATION;
-import static com.gings.security.JWTService.BEARER_SCHEME;
+import com.gings.security.jwt.JWTService;
+import com.gings.security.jwt.JWTServiceManager;
+import com.gings.security.jwt.UserAuthTokenInfo;
 
 import lombok.extern.slf4j.Slf4j;
 

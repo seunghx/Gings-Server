@@ -1,7 +1,7 @@
 package com.gings.controller;
 
-import static com.gings.security.JWTService.AUTHORIZATION;
-import static com.gings.security.JWTService.BEARER_SCHEME;
+import static com.gings.security.jwt.JWTService.AUTHORIZATION;
+import static com.gings.security.jwt.JWTService.BEARER_SCHEME;
 
 import java.util.Locale;
 import java.util.Random;
@@ -29,9 +29,9 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.model.DefaultRes;
 import com.gings.model.user.SignUp;
 import com.gings.model.user.SignUp.EmailReq;
-import com.gings.security.EmailAuthTokenInfo;
-import com.gings.security.JWTServiceManager;
-import com.gings.security.TokenInfo;
+import com.gings.security.jwt.EmailAuthTokenInfo;
+import com.gings.security.jwt.JWTServiceManager;
+import com.gings.security.jwt.TokenInfo;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 

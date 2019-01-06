@@ -1,4 +1,4 @@
-package com.gings.security;
+package com.gings.security.jwt;
 
 
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.gings.security;
+package com.gings.security.jwt;
 
 import java.time.Instant;
 import java.time.Period;
