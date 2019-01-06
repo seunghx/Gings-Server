@@ -3,6 +3,7 @@ package com.gings.service;
 import java.util.List;
 import java.util.Locale;
 
+import com.gings.utils.event.*;
 import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,6 @@ import com.gings.domain.Board;
 import com.gings.domain.PushNotification;
 import com.gings.utils.NotificationEventListener;
 import com.gings.utils.code.NotificationType;
-import com.gings.utils.event.BoardBannedEvent;
-import com.gings.utils.event.BoardLikeEvent;
-import com.gings.utils.event.GuestBoardUploadEvent;
-import com.gings.utils.event.ReplyLikeEvent;
-import com.gings.utils.event.ReplyUploadEvent;
-
 
 import lombok.extern.slf4j.Slf4j;
 
