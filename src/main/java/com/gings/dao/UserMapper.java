@@ -217,7 +217,7 @@ public interface UserMapper {
     자기소개 수정
      */
     @Update("UPDATE introduce SET content= #{introduceReq.content} WHERE user_id = #{id}")
-    @Options(useGeneratedKeys = true, keyProperty = "introduceReq.id", keyColumn = "introduce_id")
+    @Options(useGeneratedKeys = true, keyProperty = "introduceReq.id", keyColumn = "id")
     void updateIntroduce(@Param("id") final int id, @Param("introduceReq") final IntroduceModel.IntroduceReq introduceReq);
 
 
