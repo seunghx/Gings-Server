@@ -2,6 +2,7 @@ package com.gings.model.board;
 
 import com.gings.domain.BoardKeyword;
 import com.gings.domain.BoardReply;
+import com.gings.utils.code.BoardCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ public class UpBoard {
 
         private String title;
         private String content;
-        private String category;
+        private Enum<BoardCategory> category;
 
 
         private List<MultipartFile> images;
@@ -43,7 +44,7 @@ public class UpBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private String category;
+        private Enum<BoardCategory> category;
 
         private List<String> images;
         private List<String> keywords;
@@ -66,7 +67,7 @@ public class UpBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private String category;
+        private Enum<BoardCategory> category;
 
         private List<String> images;
         private List<String> keywords;

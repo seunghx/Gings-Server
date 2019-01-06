@@ -1,6 +1,7 @@
 package com.gings.model.board;
 
 import com.gings.domain.BoardReply;
+import com.gings.utils.code.BoardCategory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,7 @@ public class HomeBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private String category;
+        private Enum<BoardCategory> category;
 
         private List<String> images;
         private List<String> keywords;
@@ -51,7 +52,7 @@ public class HomeBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private String category;
+        private Enum<BoardCategory> category;
 
         private List<String> images;
         private List<String> keywords;
