@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 
 import com.gings.dao.UserMapper;
 import com.gings.domain.User;
@@ -40,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@Service
 public class PushNotificationServiceImpl implements NotificationEventListener {
 
     private static final String PUSH_DESTINATION = "/queue/notification";
