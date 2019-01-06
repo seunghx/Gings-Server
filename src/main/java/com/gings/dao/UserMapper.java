@@ -3,6 +3,7 @@ package com.gings.dao;
 
 import com.gings.controller.LoginController.LoginUser;
 
+import com.gings.domain.*;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
 import com.gings.model.MyPage;
@@ -12,10 +13,6 @@ import java.util.List;
 
 import org.apache.ibatis.mapping.FetchType;
 
-import com.gings.domain.Introduce;
-import com.gings.domain.Signature;
-import com.gings.domain.User;
-import com.gings.domain.UserKeyword;
 import com.gings.model.user.SignUp;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +52,19 @@ public interface UserMapper {
             + " FROM user "
             + " WHERE email = #{email}")
     public LoginUser findByEmail(@Param("email") String email);
+
+    /**
+     * {@link User} 조회
+     */
+    @Select("SELECT * FROM user WHERE name LIKE CONCAT('%',#{keyword},'%') OR company LIKE CONCAT('%',#{keyword},'%') OR field LIKE CONCAT('%',#{keyword},'%') OR job LIKE CONCAT('%',#{keyword},'%') ")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"), @Result(property = "name", column = "name"),
+            @Result(property = "company", column = "company"),
+            @Result(property = "image", column = "image"),
+            @Result(property = "introduce", column = "user_id", javaType = List.class,
+                    many = @Many(select = "findIntroduceByUserId"))
+    })
+    public List<Directory> findUsersByKeyword(String keyword);
 
     /**
      * {@link Introduce} 조회
