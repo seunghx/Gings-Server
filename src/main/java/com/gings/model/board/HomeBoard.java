@@ -26,7 +26,7 @@ public class HomeBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
         private List<String> images;
         private List<String> keywords;
@@ -52,7 +52,7 @@ public class HomeBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
         private List<String> images;
         private List<String> keywords;

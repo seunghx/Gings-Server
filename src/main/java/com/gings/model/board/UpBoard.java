@@ -21,7 +21,7 @@ public class UpBoard {
 
         private String title;
         private String content;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
 
         private List<MultipartFile> images;
@@ -44,7 +44,7 @@ public class UpBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
         private List<String> images;
         private List<String> keywords;
@@ -67,7 +67,7 @@ public class UpBoard {
         private String content;
         private int share;
         private LocalDateTime time;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
         private List<String> images;
         private List<String> keywords;

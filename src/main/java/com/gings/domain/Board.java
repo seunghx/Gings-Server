@@ -3,6 +3,7 @@ package com.gings.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.gings.utils.code.BoardCategory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,7 +21,7 @@ public class Board {
     private String content;
     private int share;
     private LocalDateTime time;
-    private String category;
+    private BoardCategory category;
 
     private List<String> images;
     private List<String> keywords;
