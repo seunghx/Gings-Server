@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.gings.dao.UserMapper;
 import com.gings.domain.User;
+import com.gings.domain.PushNotification;
 import com.gings.utils.NotificationEventListener;
 import com.gings.utils.event.BoardBannedEvent;
 import com.gings.utils.event.BoardLikeEvent;
@@ -14,19 +15,22 @@ import com.gings.utils.event.GuestBoardUploadEvent;
 import com.gings.utils.event.ReplyLikeEvent;
 import com.gings.utils.event.ReplyUploadEvent;
 
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * {@link com.gings.PushNotification} 관련 로직을 수행하는 이 서비스 클래스에서 
+ *
+ * 
+ * {@link PushNotification} 관련 로직을 수행하는 이 서비스 클래스에서 
  * {@link NotificationEventListener} 클래스를 구현하는 이유는 푸시 알림시 푸시 알림에 대한
- * 정보를 저장해야 하기 때문이다. 이런 점으로 볼때 {@link PushNotificationService}의 클래스
- * 주석에서 말한 "다른 관점"이 더 적절해 보이기도 한다.
+ * 정보를 저장해야 하기 때문이다. 이런 점으로 볼때 위에서 {@link PushNotificationService}의 
+ * 클래스 주석에서 말한 "다른 관점"이 더 적절해 보이기도 한다.
  * 
  * {@code userMapper}를 보면 {@link com.gings.dao.UserMapper}에 대한 참조임을 알 수 있는데
  * 이럴 거면 {@link UserService}에서 push notification을 수행하게 하는 것이 더 나아보일 수도 있으나 
- * 매번 push notification이 수행될 때마다 {@link PushNotification}이 저장되어야 하기 때문에 
- * {@link PushNotification} 관련 처리 로직을 수행하는 이 클래스에서 push notification을 하게 하였다.
+ * 매번 push notification이 수행될 때마다 {@link PushNotificationService}이 저장되어야 하기 때문에 
+ * {@link PushNotificationService} 관련 처리 로직을 수행하는 이 클래스에서 push notification을 하게 하였다.
  * (다른 말로 {@link NotificationEventListener}를 구현하게 하였다.)
  * 
  * 
@@ -36,8 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class PushNotificationServiceImpl implements PushNotificationService, 
-                                                    NotificationEventListener {
+public class PushNotificationServiceImpl implements NotificationEventListener {
 
     private static final String PUSH_DESTINATION = "/queue/notification";
     
@@ -50,7 +53,6 @@ public class PushNotificationServiceImpl implements PushNotificationService,
     private static final String INSPIRATION_REPLY_UPLOAD = "response.event.reply-upload.inspiration";
     private static final String COWORKING_REPLY_UPLOAD = "response.event.reply-upload.coworking";
     private static final String GUEST_BOARD_UPLOAD = "response.event.guest-board-upload";
-             
                
     private final MessageSource messageSource;
     private final SimpMessagingTemplate messagingTemplate;
@@ -80,7 +82,7 @@ public class PushNotificationServiceImpl implements PushNotificationService,
     public void onBoardBannedEvent(BoardBannedEvent event) {
         int userId = event.getWriterId();
         
-        User user = userMapper.findByUserId(userId);
+        User user = userMapper.findByUserId(userId);    
         
         String message = messageSource.getMessage(BOARD_BANNED, null, Locale.getDefault());
         
