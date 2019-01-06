@@ -35,7 +35,6 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 @Slf4j
 @RestController
 @Authentication
-
 public class BoardController {
 
     private final BoardService boardService;
@@ -59,7 +58,6 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            //log.error(e.getMessage());
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
