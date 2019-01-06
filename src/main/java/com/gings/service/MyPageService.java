@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -128,9 +129,9 @@ public class MyPageService implements ApplicationEventPublisherAware{
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<IntroduceModel.IntroduceRes> selectIntroduce(final int id){
-        final IntroduceModel.IntroduceRes introduceRes = userMapper.selectIntroBeforeChange(id);
-        if(introduceRes == null)
+    public DefaultRes<List<IntroduceModel.IntroduceRes>> selectIntroduce(final int id){
+        final List<IntroduceModel.IntroduceRes> introduceRes = userMapper.selectIntroBeforeChange(id);
+        if(introduceRes.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, introduceRes);
     }
@@ -141,52 +142,35 @@ public class MyPageService implements ApplicationEventPublisherAware{
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<IntroduceModel.IntroduceReq> saveIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq){
-        try{
-            userMapper.saveIntroByUserId(id, introduceReq);
-            final int introduceId = introduceReq.getId();
-            System.out.println(introduceId);
+    @Transactional
+    public DefaultRes<IntroduceModel.IntroduceReq> saveIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq) {
+        try {
+            if (userMapper.findIntroduceByUserId(id).size() == 0) {
+                userMapper.saveIntroByUserId(id, introduceReq);
+                final int introduceId = introduceReq.getId();
 
-            List<String> urlList = s3MultipartService.uploadMultipleFiles(introduceReq.getImages());
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(introduceReq.getImages());
 
-            userMapper.saveIntroduceImg(introduceId, urlList);
+                userMapper.saveIntroduceImg(introduceId, urlList);
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
-
-        }catch (Exception e){
+                return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
+            } else {
+                userMapper.updateIntroduce(id, introduceReq);
+                final int introduceId = userMapper.findIntroduceByUserId(id).get(0).getId();
+                s3MultipartService.deleteMultipleFiles(introduceReq.getPrevImagesUrl());
+                for (String url : introduceReq.getPrevImagesUrl()) {
+                    userMapper.deleteIntroduceImg(url);
+                }
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(introduceReq.getImages());
+                userMapper.updateIntroduceImg(introduceId, urlList);
+                return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_INTRODUCE);
+            }
+        } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.FAILED_TO_CREATE_INTRODUCE);
         }
     }
 
-
-    /**
-     *
-     *
-     * @param id
-     * @param introduceReq
-     * @return DefaultRes
-     */
-    public DefaultRes changeUserIntroduce(final int id, IntroduceModel.IntroduceReq introduceReq){
-        try{
-            userMapper.updateIntroduce(id, introduceReq);
-            final int introduceId = introduceReq.getId();
-
-            System.out.println(introduceId);
-            s3MultipartService.deleteMultipleFiles(introduceReq.getPrevImagesUrl());
-            //userMapper.deleteIntroduceImg(introduceId);
-
-            for(String url : introduceReq.getPrevImagesUrl()){
-                userMapper.deleteIntroduceImg(url);
-            }
-            userMapper.updateIntroduceImg(introduceId, introduceReq.getPostImagesUrl());
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATED_INTRODUCE);
-        } catch (Exception e){
-            log.info(e.getMessage());
-            return DefaultRes.res(StatusCode.FAILED, ResponseMessage.FAILED_UPDATING_INTRODUCE);
-        }
-
-    }
 
     /**
      * 프로필 사진 조회

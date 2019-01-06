@@ -63,8 +63,12 @@ public class BoardService implements ApplicationEventPublisherAware {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            log.error("check");
             board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
         }
+
+
+
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
@@ -89,6 +93,8 @@ public class BoardService implements ApplicationEventPublisherAware {
             boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
         }
         board.setReplys(boardReplies);
+
+
 
         if (board == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);

@@ -236,7 +236,7 @@ public class MyPageController {
     public ResponseEntity tryToChangeIntroduce(final Principal principal){
         try{
             final int id = principal.getUserId();
-            DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
+            DefaultRes<List<IntroduceModel.IntroduceRes>> defaultRes = myPageService.selectIntroduce(id);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         }catch (Exception e){
             log.error(e.getMessage());
@@ -261,7 +261,7 @@ public class MyPageController {
 //        }
 //    }
 
-    //설정 - 자기소개 저장
+    //설정 - 자기소개 저장/수정
     @PostMapping("setting/introduce")
     public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
         try {
@@ -273,17 +273,7 @@ public class MyPageController {
         }
     }
 
-    //설정 - 자기소개 수정
-    @PutMapping("/setting/introduce")
-    public ResponseEntity changeIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
-        try {
-            final int id = principal.getUserId();
-            return new ResponseEntity<>(myPageService.changeUserIntroduce(id, introduceReq), HttpStatus.OK);
-        } catch (Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 
     //===============================프로필 사진 변경====================================================
     //프로필 사진 조회
@@ -325,7 +315,7 @@ public class MyPageController {
     
     //프로필 정보 입력
     @PutMapping("setting/info")
-    public ResponseEntity createProfileInfo(final MyPage myPage, final Principal principal){
+    public ResponseEntity createProfileInfo(@RequestBody final MyPage myPage, final Principal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveInformation(id, myPage), HttpStatus.OK);
@@ -337,7 +327,7 @@ public class MyPageController {
 
     //프로필 정보 키워드 입력
     @PostMapping("setting/info/keyword")
-    public ResponseEntity inputInfoKeyword(final MyPage myPage, final Principal principal){
+    public ResponseEntity inputInfoKeyword(@RequestBody final MyPage myPage, final Principal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveKeyword(id, myPage), HttpStatus.OK);
