@@ -15,6 +15,7 @@ import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
+import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +64,28 @@ public class BoardService implements ApplicationEventPublisherAware {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            log.error("check");
             board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
         }
 
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+    }
 
+    /**
+     * 전체 보드 조회
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategory(final BoardCategory category, final Pagination pagination) {
+        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByCategory(category, pagination);
+        for(HomeBoardAllRes board : boards) {
+            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
+            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
 
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);

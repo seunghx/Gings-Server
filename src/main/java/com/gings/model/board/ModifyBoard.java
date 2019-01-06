@@ -22,7 +22,7 @@ public class ModifyBoard {
 
         private String title;
         private String content;
-        private Enum<BoardCategory> category;
+        private BoardCategory category;
 
         private List<String> prevImagesUrl;
         private List<MultipartFile> postImages;

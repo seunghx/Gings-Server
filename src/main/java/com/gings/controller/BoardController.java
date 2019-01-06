@@ -21,6 +21,7 @@ import com.gings.service.BoardService;
 
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
+import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,25 @@ public class BoardController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 모든 보드 조회
+     *
+     * @param pagination 페이지네이션
+     * @return ResponseEntity
+     */
+    @GetMapping("boards/category/{category}")
+    public ResponseEntity getBoardsByCategory(@PathVariable BoardCategory category, final Pagination pagination) {
+        try {
+            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategory(category, pagination);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
 
     /**
      * 보드 고유 번호로 보드 조회
