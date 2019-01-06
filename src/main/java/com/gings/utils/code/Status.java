@@ -1,6 +1,6 @@
 package com.gings.utils.code;
 
 public enum Status {
-   Recruiting, LookingJob, Preparing, Opened, 
-   MainJob, Freelancer, LookingInvestment, None;
+   RECRUITING, LOOKING_JOB, PREPARING, OPENED, 
+   MAIN_JOB, FREELANCER, LOOKING_INVESTMENT, NONE;
 }
