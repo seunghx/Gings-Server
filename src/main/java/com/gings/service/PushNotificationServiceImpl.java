@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class PushNotificationServiceImpl implements NotificationEventListener {
+public class PushNotificationServiceImpl implements PushNotificationService, NotificationEventListener {
 
     private static final String PUSH_DESTINATION = "/queue/notification";
     
