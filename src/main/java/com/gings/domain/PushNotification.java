@@ -11,6 +11,7 @@ import lombok.ToString;
 @ToString
 public class PushNotification {
     
+    public int id;
     public int userId;
     //public NotificationType notificationType;
     public String NotificationType;

@@ -1,6 +1,6 @@
 package com.gings.security;
 
-import com.gings.utils.code.UserRole;
+import com.gings.utils.UserRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

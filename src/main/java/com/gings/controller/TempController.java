@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gings.utils.code.UserRole;
+import com.gings.utils.UserRole;
 
 //import jdk.internal.line.internal.Log;
 import lombok.Getter;

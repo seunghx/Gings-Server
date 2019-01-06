@@ -1,7 +1,7 @@
 package com.gings.security.jwt;
 
 
-import com.gings.utils.code.UserRole;
+import com.gings.utils.UserRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

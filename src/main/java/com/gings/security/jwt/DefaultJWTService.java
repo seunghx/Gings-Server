@@ -8,7 +8,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.gings.utils.code.UserRole;
+import com.gings.utils.UserRole;
 
 import static com.auth0.jwt.JWT.require;
 

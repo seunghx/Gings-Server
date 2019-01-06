@@ -4,8 +4,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
-import com.gings.utils.code.UserRole;
-
+import com.gings.utils.UserRole;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

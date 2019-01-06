@@ -56,6 +56,7 @@ public class StompConnectAuthenticationFilter extends AbstractAuthenticationProc
         super(requiresAuthenticationRequestMatcher);
         this.jwtServiceManager = jwtServiceManager;
         this.userMapper = userMapper;
+       
     }
     
     /**

@@ -1,6 +1,6 @@
 package com.gings.utils.code;
 
 public enum Region {
-    Seoul, Sejong, Pusan, Daegu, Daejeon, Incheon, Ulsan, Gwangju, Jeju,
-    Gangwon, Gyeonggi, ChungNam, ChungBuk, JeonBuk, JeonNam, GyeongNam, GyeongBuk,
+    SEOUL, SEJONG, PUSAN, DAEGU, DAEJEON, INCHEON, ULSAN, GWANGJU, JEJU,
+    GANGWON, GYUNGGI, CHUNG_NAM, CHUNG_BUK, JEON_BUK, JEON_NAM, GYEONG_NAME, GYEONG_BUK, NONE;
 }

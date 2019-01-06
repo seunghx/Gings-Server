@@ -90,7 +90,7 @@ public class S3MultipartService implements MultipartService {
                          throw new RuntimeException(e);
                      }  
                  });
-            
+
             log.info("Upload file succeeded.");
 
             return uploaded;
