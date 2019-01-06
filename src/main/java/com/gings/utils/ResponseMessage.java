@@ -85,6 +85,9 @@ public class ResponseMessage {
     public static final String LIKE_REBOARD = "리보드 추천 성공";
     public static final String CANCEL_LIKE_REBOARD = "리보드 추천 해제 성공";
 
+    public static final String SEARCH_DIRECTORY = "디렉토리 검색 성공";
+    public static final String NO_SEARCH_RESULT = "검색 결과가 없습니다.";
+
     public static final String AUTHORIZED = "인증 성공";
     public static final String UNAUTHORIZED = "인증 실패";
     public static final String FORBIDDEN = "인가 실패";
