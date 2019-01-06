@@ -1,4 +1,9 @@
 package com.gings.service;
+
+import java.util.List;
+
+import com.gings.domain.PushNotification;
+
 /**
  * 
  * 
@@ -20,5 +25,23 @@ package com.gings.service;
  * 
  */
 public interface PushNotificationService {
-
+    
+    /**
+     * @param olderId - 기준이 되는 push notification id.
+     * 
+     * @return - olderId보다 더 나중에 생성된 push notification의 list.
+     */
+    public List<PushNotification> getNewerPushNotifications(int olderId, int userId);
+    
+    /**
+     * @param notificationIds - 현재 깅스 어플리케이션의 notification 확인(읽음)처리는 기획적인 
+     *                          이유로 사용자가 각각의 notification을 클릭해야 가능하다. 
+     *                          위의 이유로 notification 확인은 각각 하나의 {@code notificationId}에 
+     *                          대하여 수행된다.
+     *                          
+     * @param userId - 잘못된 요청이 notification의 상태를 변경시킬 수 있다. 
+     *                 그러므로 예를 들어, RDB의 WHERE 절과 같은 검색 조건을 수행시 {@code notificationId}
+     *                 뿐 아니라 {@code userId}를 전달되어야 한다.              
+     */
+    public void confirmNotifications(int notificationId, int userId);
 }
