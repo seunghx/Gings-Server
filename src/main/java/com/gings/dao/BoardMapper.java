@@ -10,9 +10,11 @@ import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
+import com.gings.utils.code.BoardCategory;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @Mapper
 public interface BoardMapper {
@@ -35,6 +37,26 @@ public interface BoardMapper {
                     one = @One(select = "countRecommendByBoardId"))
     })
     public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
+
+    // 키워드로 보드 전체 조회
+    @Select("SELECT * FROM board WHERE category = #{category} ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+    @Results(value= {
+            @Result(property="boardId", column="board_id", id=true),
+            @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId"))
+    })
+    public List<HomeBoardAllRes> findBoardsByCategory(@Param("category") final BoardCategory category,
+                                                      @Param("pagination") final Pagination pagination);
 
     // 보드 고유 번호로 이미지 전체 조회(findImagesByBoard)
     @Select("SELECT url FROM board_img WHERE board_id = #{boardId}")
