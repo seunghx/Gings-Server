@@ -72,9 +72,9 @@ public class MyPage {
     public static class MyPagePwdRes{
         private static final String INVALID_PWD = "비밀 번호는 7~14 글자의 영문 대소문자 및 숫자로 구성되어야 합니다.";
 
-        @Pattern(regexp = "^(?=.*[a-zA-Z]+)(?=.*[!@#$%^*+=-]|.*[0-9]+).{7,14}$", message = INVALID_PWD)
-        private String pwd;
-
         private String oldPwd;
+        @Pattern(regexp = "^(?=.*[a-zA-Z]+)(?=.*[!@#$%^*+=-]|.*[0-9]+).{7,14}$", message = INVALID_PWD)
+        private String newPwd1;
+        private String newPwd2;
     }
 }

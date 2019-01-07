@@ -290,7 +290,7 @@ public interface UserMapper {
     /*
     비밀번호 변경
      */
-    @Update("UPDATE user SET pwd= #{pwd.pwd} WHERE user_id = #{id}")
+    @Update("UPDATE user SET pwd= #{pwd.newPwd1} WHERE user_id = #{id}")
     void updatePwd(@Param("id") final int id, @Param("pwd") final MyPage.MyPagePwdRes pwd);
 
     @Select("SELECT pwd FROM user WHERE user_id = #{id}")

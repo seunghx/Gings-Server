@@ -259,18 +259,39 @@ public class MyPageService implements ApplicationEventPublisherAware{
         }
     }
 
-    public DefaultRes modifyPwd(final int id, MyPage.MyPagePwdRes myPagePwdRes){
+    /**
+     * 비밀번호 변경 시 비밀번호 일치 확인
+     *
+     * @param id
+     * @param myPagePwdRes
+     * @return
+     */
+    public DefaultRes chkPwd(final int id, MyPage.MyPagePwdRes myPagePwdRes){
         try{
-            if(passwordEncoder.matches(myPagePwdRes.getOldPwd(), userMapper.getPwdByUserId(id))){
-                myPagePwdRes.setPwd(passwordEncoder.encode(myPagePwdRes.getPwd()));
-                userMapper.updatePwd(id, myPagePwdRes);
-                return DefaultRes.res(StatusCode.OK, ResponseMessage.CHANGED_PWD);
-            }else return DefaultRes.res(StatusCode.FAILED, ResponseMessage.OLD_PWD_IS_WRONG);
+            if(passwordEncoder.matches(myPagePwdRes.getOldPwd(), userMapper.getPwdByUserId(id)))
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.PWD_CORRECT);
+            else return DefaultRes.res(StatusCode.FAILED, ResponseMessage.OLD_PWD_IS_WRONG);
         }catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DefaultRes.res(StatusCode.FAILED, ResponseMessage.FAILED_TO_CHANGE_PWD);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.DB_ERROR);
         }
     }
+
+    public DefaultRes modifyPwd(final int id, MyPage.MyPagePwdRes myPagePwdRes){
+        try{
+            if(myPagePwdRes.getNewPwd1().equals(myPagePwdRes.getNewPwd2())){
+                myPagePwdRes.setNewPwd1(passwordEncoder.encode(myPagePwdRes.getNewPwd1()));
+                userMapper.updatePwd(id, myPagePwdRes);
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.CHANGED_PWD);
+            }else
+                return DefaultRes.res(StatusCode.FAILED, ResponseMessage.NOT_SAME_PWD);
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.FAILED, ResponseMessage.OLD_PWD_IS_WRONG);
+        }
+    }
+
+
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {

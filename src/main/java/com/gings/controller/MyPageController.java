@@ -320,6 +320,17 @@ public class MyPageController {
         }
     }
 
+    //========================= 원래 비밀번호 체크 ========================================
+    @GetMapping("setting/modifyPwd")
+    public ResponseEntity checkPassword(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.chkPwd(id, myPagePwdRes), HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     //=========================== 비밀번호 변경 ===================================================
     @PatchMapping("setting/modifyPwd")
     public ResponseEntity changePwd(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
