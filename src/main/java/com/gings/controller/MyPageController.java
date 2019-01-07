@@ -321,7 +321,7 @@ public class MyPageController {
     }
 
     //=========================== 비밀번호 변경 ===================================================
-    @PutMapping("setting/modifyPwd")
+    @PatchMapping("setting/modifyPwd")
     public ResponseEntity changePwd(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
         try{
             final int id = principal.getUserId();
