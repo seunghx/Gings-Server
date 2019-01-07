@@ -58,14 +58,18 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByCategory(@Param("category") final BoardCategory category,
                                                       @Param("pagination") final Pagination pagination);
 
-    // 카테고리로 보드 전체 조회
-    @Select("SELECT * FROM board WHERE title LIKE CONCAT('%',#{keyword},'%') " +
-            "OR content LIKE CONCAT('%',#{keyword},'%') " +
+    // 키워드로 보드 전체 조회
+    /*@Select("SELECT * FROM board WHERE title LIKE CONCAT('%',#{keyword},'%') "+
+            "UNION "+
+            "SELECT * FROM board_keyword WHERE content LIKE CONCAT('%',#{keyword},'%') "+
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+            */
+
+    @Select("SELECT * FROM board JOIN board_keyword ON board_keyword.boardId LIKE CONCAT('%',#{keyword},'%') "+
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
 
     @Results(value= {
-            @Result(property="boardId", column="board_id", id=true),
-            @Result(property="writerId", column="writer_id"),
+            @Result(property="boardId", column="board_id", id=true), @Result(property="writerId", column="writer_id"),
             @Result(property="title", column="title"),  @Result(property="content", column="content"),
             @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
             @Result(property="category", column="category"),
