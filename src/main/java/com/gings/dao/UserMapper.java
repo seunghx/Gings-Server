@@ -272,5 +272,14 @@ public interface UserMapper {
     void saveProfileKeyword(@Param("id") final int id, @Param("keyword") List<String> keyword);
 
 
+    /*
+    비밀번호 변경
+     */
+    @Update("UPDATE user SET pwd= #{pwd.pwd} WHERE user_id = #{id}")
+    void updatePwd(@Param("id") final int id, @Param("pwd") final MyPage.MyPagePwdRes pwd);
+
+    @Select("SELECT pwd FROM user WHERE user_id = #{id}")
+    public String getPwdByUserId(@Param("id") final int id);
+
 
 }

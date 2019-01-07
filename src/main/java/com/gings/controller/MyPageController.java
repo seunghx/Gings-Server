@@ -1,10 +1,7 @@
 package com.gings.controller;
 
 import com.gings.domain.Board;
-import com.gings.model.DefaultRes;
-import com.gings.model.GuestModel;
-import com.gings.model.IntroduceModel;
-import com.gings.model.MyPage;
+import com.gings.model.*;
 import com.gings.security.Principal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.BoardService;
@@ -14,6 +11,7 @@ import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +25,12 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 public class MyPageController {
     private final MyPageService myPageService;
     private final BoardService boardService;
+    private final PasswordEncoder passwordEncoder;
 
-    public MyPageController(MyPageService myPageService, BoardService boardService) {
+    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder) {
         this.myPageService = myPageService;
         this.boardService = boardService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     //====================================== 마이 페이지 ====================================================
@@ -128,7 +128,7 @@ public class MyPageController {
     public ResponseEntity getUserActive(final Principal principal){
         try{
             final int id = principal.getUserId();
-                DefaultRes<List<Board>>defaultRes = boardService.findBoardByUserId(id);
+                DefaultRes<List<MyPageBoard>>defaultRes = boardService.findBoardByUserId(id);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());
@@ -148,10 +148,10 @@ public class MyPageController {
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
-                DefaultRes<List<Board>>defaultRes = boardService.checkBoardByUser(myPageUserId);
+                DefaultRes<List<MyPageBoard>>defaultRes = boardService.checkBoardByUser(myPageUserId);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
             }else {
-                DefaultRes<List<Board>>defaultRes = boardService.findBoardByUserId(id);
+                DefaultRes<List<MyPageBoard>>defaultRes = boardService.findBoardByUserId(id);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
             }
         } catch (Exception e){
@@ -244,23 +244,6 @@ public class MyPageController {
         }
     }
 
-//    @GetMapping("/setting/{myPageUserId}")
-//    public ResponseEntity tryToChangeIntroduce(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
-//        try{
-//            final int id = principal.getUserId();
-//            if(id != myPageUserId){
-//                DefaultRes defaultRes = myPageService.checkUser();
-//                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-//            }else {
-//                DefaultRes<IntroduceModel.IntroduceRes> defaultRes = myPageService.selectIntroduce(id);
-//                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-//            }
-//        }catch (Exception e){
-//            log.error(e.getMessage());
-//            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
     //설정 - 자기소개 저장/수정
     @PostMapping("setting/introduce")
     public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
@@ -331,6 +314,18 @@ public class MyPageController {
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveKeyword(id, myPage), HttpStatus.OK);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //=========================== 비밀번호 변경 ===================================================
+    @PutMapping("setting/modifyPwd")
+    public ResponseEntity changePwd(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
+        try{
+            final int id = principal.getUserId();
+            return new ResponseEntity<>(myPageService.modifyPwd(id, myPagePwdRes), HttpStatus.OK);
         }catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);

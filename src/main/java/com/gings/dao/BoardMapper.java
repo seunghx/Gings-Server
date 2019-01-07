@@ -2,6 +2,7 @@ package com.gings.dao;
 
 import com.gings.domain.Board;
 import com.gings.domain.BoardReply;
+import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
@@ -151,7 +152,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findBoardByUserId(int userId);
+    public List<MyPageBoard> findBoardByUserId(int userId);
 
 
     // 보드 고유 번호로 해당 리보드 조회
