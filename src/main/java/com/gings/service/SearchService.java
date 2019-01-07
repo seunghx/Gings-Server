@@ -47,6 +47,19 @@ public class SearchService {
     }
 
     /**
+     * 디렉토리 검색
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<Directory>> selectUserByWriteTime(final Pagination pagination) {
+        final List<Directory> users = userMapper.findUsersByWriteTime(pagination);
+        if (users.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_DIRECTORY, users);
+    }
+
+    /**
      * 보드 검색
      *
      * @param

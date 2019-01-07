@@ -52,6 +52,23 @@ public class SearchController {
     }
 
     /**
+     * 디렉토리 검색
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("search/directory/new")
+    public ResponseEntity getAllDirectoryByWriteTime(final Pagination pagination) {
+        try {
+            DefaultRes<List<Directory>> defaultRes = searchService.selectUserByWriteTime(pagination);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * 보드 검색
      *
      * @return ResponseEntity

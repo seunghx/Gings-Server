@@ -331,13 +331,8 @@ public class BoardService implements ApplicationEventPublisherAware {
             }
             boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
 
-            HomeBoardOneRes postBoard = boardMapper.findBoardByBoardId(boardId);
-            postBoard.setWriter(userMapper.findByUserId(postBoard.getWriterId()).getName());
-            postBoard.setField(userMapper.findByUserId(postBoard.getWriterId()).getField());
-            postBoard.setCompany(userMapper.findByUserId(postBoard.getWriterId()).getCompany());
-            postBoard.setWriterImage(userMapper.findByUserId(postBoard.getWriterId()).getImage());
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD);
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD, postBoard);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
@@ -364,11 +359,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
             boardMapper.saveReBoardImg(replyId, urlList);
 
-            BoardReply boardReply = boardMapper.findReplyByReplyId(replyId);
-            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
-            boardReply.setWriterImage(userMapper.findByUserId(boardReply.getWriterId()).getImage());
-
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD, boardReply);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
