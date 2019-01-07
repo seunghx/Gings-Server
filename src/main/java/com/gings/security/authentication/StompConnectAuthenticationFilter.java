@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -50,7 +51,7 @@ public class StompConnectAuthenticationFilter extends AbstractAuthenticationProc
     private final UserMapper userMapper;
     private final ModelMapper modelMapper = new ModelMapper();
     
-    protected StompConnectAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
+    public StompConnectAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher,
                                                    JWTServiceManager jwtServiceManager,
                                                    UserMapper userMapper) {
         super(requiresAuthenticationRequestMatcher);
@@ -76,11 +77,16 @@ public class StompConnectAuthenticationFilter extends AbstractAuthenticationProc
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
                                                 throws AuthenticationException, IOException, ServletException {
         
+        log.info("Starting to attempt authentication for stomp connect request.");
+        
         String jwt = request.getHeader(JWTService.AUTHORIZATION);
         
         if(!isValidToken(jwt)) {
+            
             throw new BadCredentialsException("Invalid JWT token.");
         }
+        
+        log.info("Validated jwt token : {}", jwt);
         
         try {
             

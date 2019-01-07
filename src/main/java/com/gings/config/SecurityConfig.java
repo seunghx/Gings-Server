@@ -6,13 +6,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.gings.dao.UserMapper;
+import com.gings.security.authentication.StompConnectAuthenticationFilter;
 import com.gings.security.jwt.DefaultJWTService;
 import com.gings.security.jwt.EmailAuthWTService;
 import com.gings.security.jwt.JWTService;
@@ -26,6 +32,12 @@ import com.gings.security.jwt.JWTServiceManager;
 @Configuration
 //@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    
+    private static final String STOMP_CONNECT = "/connect";
+    
+    @Autowired
+    private UserMapper userMapper;
+   
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -42,9 +54,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            //     .authenticated()
             .and()
             .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilterBefore(stompConnectAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+    }
+    
+    @Bean
+    public StompConnectAuthenticationFilter stompConnectAuthenticationFilter() {
+        return new StompConnectAuthenticationFilter(connectRequestMatcher(), jwtServiceManager(), userMapper);
+    }
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -68,5 +88,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JWTService emailNumberJWTService() {
         return new EmailAuthWTService();
+    }
+    
+    private RequestMatcher connectRequestMatcher() {
+        RequestMatcher reqMatcher = new AntPathRequestMatcher(STOMP_CONNECT, HttpMethod.POST.toString());
+        return reqMatcher;
     }
 }
