@@ -59,7 +59,8 @@ public interface UserMapper {
     @Select("SELECT * FROM user WHERE name LIKE CONCAT('%',#{keyword},'%') OR company LIKE CONCAT('%',#{keyword},'%') OR field LIKE CONCAT('%',#{keyword},'%') OR job LIKE CONCAT('%',#{keyword},'%') ")
     @Results(value = {
             @Result(property = "id", column = "user_id"), @Result(property = "name", column = "name"),
-            @Result(property = "company", column = "company"),
+            @Result(property = "company", column = "company"), @Result(property = "job", column = "job"),
+            @Result(property = "field", column = "field"), @Result(property = "coworkingChk", column = "coworking_chk"),
             @Result(property = "image", column = "image"),
             @Result(property = "introduce", column = "user_id", javaType = List.class,
                     many = @Many(select = "findIntroduceByUserId"))

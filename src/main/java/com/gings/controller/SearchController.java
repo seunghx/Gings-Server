@@ -50,4 +50,21 @@ public class SearchController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 보드 검색
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("search/boards")
+    public ResponseEntity SearchBoards(@RequestParam String keyword, final Pagination pagination) {
+        try {
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeyword(keyword, pagination);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

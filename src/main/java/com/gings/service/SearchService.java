@@ -2,12 +2,13 @@ package com.gings.service;
 
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
+import com.gings.domain.Board;
 import com.gings.domain.Directory;
 import com.gings.domain.User;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
 import com.gings.model.SearchKeyword.SearchKeywordReq;
-import com.gings.model.board.HomeBoard;
+import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +21,16 @@ import java.util.List;
 public class SearchService {
 
     private final UserMapper userMapper;
+    private final BoardMapper boardMapper;
 
     /**
      * 생성자 의존성 주입
      *
      * @param userMapper
      */
-    public SearchService(final UserMapper userMapper){
+    public SearchService(final UserMapper userMapper, final BoardMapper boardMapper){
         this.userMapper = userMapper;
+        this.boardMapper = boardMapper;
     }
 
     /**
@@ -41,6 +44,25 @@ public class SearchService {
         if (users.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_DIRECTORY, users);
+    }
+
+    /**
+     * 보드 검색
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeyword(final String keyword, final Pagination pagination) {
+        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeyword(keyword, pagination);
+        for(HomeBoardAllRes board : boards) {
+            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
+            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 
 }

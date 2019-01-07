@@ -73,7 +73,7 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 전체 보드 조회
+     * 카테고드별 보드 조회
      *
      * @param
      * @return DefaultRes
