@@ -12,6 +12,8 @@ public class Directory {
     private String name;
     private String company;
     private String job;
+    private String field;
+    private boolean coworkingChk;
     private String image;
     private List<Introduce> introduce;
 }
