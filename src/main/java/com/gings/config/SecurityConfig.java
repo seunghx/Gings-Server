@@ -6,10 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,14 +33,13 @@ import com.gings.security.jwt.JWTServiceManager;
  *
  */
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private static final String STOMP_CONNECT = "/connect";
     
     @Autowired
     private UserMapper userMapper;
-   
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -55,19 +56,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            //     .authenticated()
             .and()
             .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .addFilterBefore(stompConnectAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    //        .and()
+     //       .addFilterBefore(stompConnectAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
-    
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
 
-        return super.authenticationManagerBean();
-    }
-    
+    /**
     @Bean
     public StompConnectAuthenticationFilter stompConnectAuthenticationFilter() throws Exception {
         StompConnectAuthenticationFilter filter = 
@@ -77,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
-    }
+    }**/
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -104,8 +99,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new EmailAuthWTService();
     }
     
+    /**
+     * 후에 sockJS 사용시 POST에 대해서도 열어야함.
+     */
     private RequestMatcher connectRequestMatcher() {
-        RequestMatcher reqMatcher = new AntPathRequestMatcher(STOMP_CONNECT, HttpMethod.POST.toString());
+        RequestMatcher reqMatcher = new AntPathRequestMatcher(STOMP_CONNECT, HttpMethod.GET.toString());
+        
         return reqMatcher;
     }
 }
