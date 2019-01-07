@@ -14,6 +14,7 @@ public class Directory {
     private String job;
     private String field;
     private boolean coworkingChk;
+    private String writeTime;
     private String image;
     private List<Introduce> introduce;
 }

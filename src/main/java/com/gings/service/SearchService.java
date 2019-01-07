@@ -14,6 +14,7 @@ import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -55,8 +56,20 @@ public class SearchService {
     public DefaultRes<List<Directory>> selectUserByWriteTime(final Pagination pagination) {
         final List<Directory> users = userMapper.findUsersByWriteTime(pagination);
         if (users.isEmpty())
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_DIRECTORY, users);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
+
+        for(int i = 0; i<users.size(); i++){
+            if(users.get(i).getIntroduce().isEmpty()){
+                users.remove(i);
+            }
+        }
+        for(int i = 0; i<users.size(); i++){
+            if(users.get(i).getIntroduce().isEmpty()){
+                users.remove(i);
+            }
+        }
+
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, users);
     }
 
     /**

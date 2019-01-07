@@ -76,7 +76,7 @@ public interface UserMapper {
             @Result(property = "id", column = "user_id"), @Result(property = "name", column = "name"),
             @Result(property = "company", column = "company"), @Result(property = "job", column = "job"),
             @Result(property = "field", column = "field"), @Result(property = "coworkingChk", column = "coworking_chk"),
-            @Result(property = "image", column = "image"),
+            @Result(property = "image", column = "image"), @Result(property = "writeTime", column = "write_time"),
             @Result(property = "introduce", column = "user_id", javaType = List.class,
                     many = @Many(select = "findIntroduceByUserId"))
     })

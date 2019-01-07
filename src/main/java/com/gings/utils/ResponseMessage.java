@@ -94,6 +94,7 @@ public class ResponseMessage {
     public static final String SEARCH_DIRECTORY = "디렉토리 검색 성공";
     public static final String NO_SEARCH_RESULT = "검색 결과가 없습니다.";
 
+
     public static final String SEARCH_BOARD = "보드 검색 성공";
 
     public static final String AUTHORIZED = "인증 성공";
