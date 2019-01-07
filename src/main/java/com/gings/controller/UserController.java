@@ -163,6 +163,17 @@ public class UserController {
                                     HttpStatus.OK);
     }
     
+    @PostMapping("/signup/minyoung")
+    public ResponseEntity<DefaultRes<Void>> signupMinyoung(@Validated @RequestBody SignUp signUp,
+                                                           HttpServletRequest request) {
+        userService.addNewUser(signUp);
+        
+        String message = msgSource.getMessage("response.sign-up.success", null, request.getLocale());
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
+                                    HttpStatus.OK);
+    }
+    
     private String resolveJWTToken(HttpServletRequest request) {
 
         String jwt = request.getHeader(AUTHORIZATION);
