@@ -12,7 +12,7 @@ import java.util.List;
 public class HomeBoard {
     @Getter
     @Setter
-    public static class HomeBoardAllRes {
+    public static class HomeBoardAllRes implements Comparable<HomeBoardAllRes>{
         private int boardId;
 
         private int writerId;
@@ -34,6 +34,15 @@ public class HomeBoard {
 
         private int recommender;
 
+        @Override
+        public int compareTo(HomeBoardAllRes o) {
+            if (this.recommender < o.getRecommender()) {
+                return 1;
+            } else if (this.recommender > o.getRecommender()) {
+                return -1;
+            }
+            return 0;
+        }
     }
 
     @Getter
@@ -62,4 +71,5 @@ public class HomeBoard {
         private int recommender;
 
     }
+
 }

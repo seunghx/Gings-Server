@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -73,13 +74,13 @@ public class SearchService {
     }
 
     /**
-     * 보드 검색
+     * 보드 검색(최신순)
      *
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeyword(final String keyword, final Pagination pagination) {
-        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeyword(keyword, pagination);
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByWriteTime(final String keyword, final Pagination pagination) {
+        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeywordOrderByWriteTime(keyword, pagination);
         for(HomeBoardAllRes board : boards) {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
@@ -88,6 +89,28 @@ public class SearchService {
         }
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+    }
+
+    /**
+     * 보드 검색(최신순)
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByRecommend(final String keyword, final Pagination pagination) {
+        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeywordOrderByRecommend(keyword, pagination);
+        for(HomeBoardAllRes board : boards) {
+            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
+            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+
+        Collections.sort(boards);
+
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 

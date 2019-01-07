@@ -69,14 +69,14 @@ public class SearchController {
     }
 
     /**
-     * 보드 검색
+     * 보드 검색(최신순)
      *
      * @return ResponseEntity
      */
-    @GetMapping("search/boards")
-    public ResponseEntity SearchBoards(@RequestParam String keyword, final Pagination pagination) {
+    @GetMapping("search/boards/latest")
+    public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination) {
         try {
-            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeyword(keyword, pagination);
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeywordByWriteTime(keyword, pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,4 +84,22 @@ public class SearchController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 보드 검색(추천순)
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("search/boards/recommend")
+    public ResponseEntity SearchBoardsByRecommend(@RequestParam String keyword, final Pagination pagination) {
+        try {
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeywordByRecommend(keyword, pagination);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
