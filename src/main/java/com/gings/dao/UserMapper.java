@@ -7,6 +7,7 @@ import com.gings.domain.*;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
 import com.gings.model.MyPage;
+import com.gings.model.Pagination;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -66,6 +67,20 @@ public interface UserMapper {
                     many = @Many(select = "findIntroduceByUserId"))
     })
     public List<Directory> findUsersByKeyword(String keyword);
+
+    /**
+     * {@link User} 조회
+     */
+    @Select("SELECT * FROM user LEFT JOIN introduce ON user.user_id = introduce.user_id ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"), @Result(property = "name", column = "name"),
+            @Result(property = "company", column = "company"), @Result(property = "job", column = "job"),
+            @Result(property = "field", column = "field"), @Result(property = "coworkingChk", column = "coworking_chk"),
+            @Result(property = "image", column = "image"),
+            @Result(property = "introduce", column = "user_id", javaType = List.class,
+                    many = @Many(select = "findIntroduceByUserId"))
+    })
+    public List<Directory> findUsersByWriteTime(@Param("pagination") final Pagination pagination);
 
     /**
      * {@link Introduce} 조회
