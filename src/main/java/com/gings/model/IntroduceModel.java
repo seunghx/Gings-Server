@@ -19,7 +19,7 @@ public class IntroduceModel {
         private List<MultipartFile> images;
 
         private List<String> prevImagesUrl;
-        private List<String> postImagesUrl;
+        //private List<String> postImagesUrl;
 
     }
 

@@ -7,6 +7,7 @@ import com.gings.domain.*;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
 import com.gings.model.MyPage;
+import com.gings.model.Pagination;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -66,6 +67,20 @@ public interface UserMapper {
                     many = @Many(select = "findIntroduceByUserId"))
     })
     public List<Directory> findUsersByKeyword(String keyword);
+
+    /**
+     * {@link User} 조회
+     */
+    @Select("SELECT * FROM user LEFT JOIN introduce ON user.user_id = introduce.user_id ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+    @Results(value = {
+            @Result(property = "id", column = "user_id"), @Result(property = "name", column = "name"),
+            @Result(property = "company", column = "company"), @Result(property = "job", column = "job"),
+            @Result(property = "field", column = "field"), @Result(property = "coworkingChk", column = "coworking_chk"),
+            @Result(property = "image", column = "image"), @Result(property = "writeTime", column = "write_time"),
+            @Result(property = "introduce", column = "user_id", javaType = List.class,
+                    many = @Many(select = "findIntroduceByUserId"))
+    })
+    public List<Directory> findUsersByWriteTime(@Param("pagination") final Pagination pagination);
 
     /**
      * {@link Introduce} 조회
@@ -271,6 +286,15 @@ public interface UserMapper {
             "item='item' index='index' separator=', '> (#{id}, #{item})</foreach>", "</script>"})
     void saveProfileKeyword(@Param("id") final int id, @Param("keyword") List<String> keyword);
 
+
+    /*
+    비밀번호 변경
+     */
+    @Update("UPDATE user SET pwd= #{pwd.newPwd1} WHERE user_id = #{id}")
+    void updatePwd(@Param("id") final int id, @Param("pwd") final MyPage.MyPagePwdRes pwd);
+
+    @Select("SELECT pwd FROM user WHERE user_id = #{id}")
+    public String getPwdByUserId(@Param("id") final int id);
 
 
 }

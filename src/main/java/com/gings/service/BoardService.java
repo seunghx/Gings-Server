@@ -4,6 +4,7 @@ import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
+import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
@@ -151,14 +152,14 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<List<Board>> findBoardByUserId(final int id) {
-        final List<Board> boards = boardMapper.findBoardByUserId(id);
+    public DefaultRes<List<MyPageBoard>> findBoardByUserId(final int id) {
+        final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
         if (boards==null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
     }
-    public DefaultRes<List<Board>>checkBoardByUser(final int id) {
-        final List<Board> boards = boardMapper.findBoardByUserId(id);
+    public DefaultRes<List<MyPageBoard>>checkBoardByUser(final int id) {
+        final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
         if (boards==null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.UNQUALIFIED, boards);
@@ -330,13 +331,8 @@ public class BoardService implements ApplicationEventPublisherAware {
             }
             boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
 
-            HomeBoardOneRes postBoard = boardMapper.findBoardByBoardId(boardId);
-            postBoard.setWriter(userMapper.findByUserId(postBoard.getWriterId()).getName());
-            postBoard.setField(userMapper.findByUserId(postBoard.getWriterId()).getField());
-            postBoard.setCompany(userMapper.findByUserId(postBoard.getWriterId()).getCompany());
-            postBoard.setWriterImage(userMapper.findByUserId(postBoard.getWriterId()).getImage());
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD);
 
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD, postBoard);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
@@ -363,11 +359,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
             boardMapper.saveReBoardImg(replyId, urlList);
 
-            BoardReply boardReply = boardMapper.findReplyByReplyId(replyId);
-            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
-            boardReply.setWriterImage(userMapper.findByUserId(boardReply.getWriterId()).getImage());
-
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD, boardReply);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
