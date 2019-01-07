@@ -14,6 +14,10 @@ public class ResponseMessage {
     public static final String UPDATE_USER = "회원 정보 수정 성공";
     public static final String FAIL_UPDATE_USER = "회원 정보 수정 실패";
     public static final String DELETE_USER = "회원 탈퇴 성공";
+    public static final String CHANGED_PWD = "비밀번호 변경 성공";
+    public static final String FAILED_TO_CHANGE_PWD = "비밀번호 변경 실패";
+    public static final String OLD_PWD_IS_WRONG = "원래 비밀번호가 잘못 되었습니다.";
+
 
     public static final String UNQUALIFIED = "자격 없음";
 

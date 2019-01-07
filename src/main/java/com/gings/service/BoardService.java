@@ -4,6 +4,7 @@ import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
+import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
@@ -151,14 +152,14 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<List<Board>> findBoardByUserId(final int id) {
-        final List<Board> boards = boardMapper.findBoardByUserId(id);
+    public DefaultRes<List<MyPageBoard>> findBoardByUserId(final int id) {
+        final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
         if (boards==null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
     }
-    public DefaultRes<List<Board>>checkBoardByUser(final int id) {
-        final List<Board> boards = boardMapper.findBoardByUserId(id);
+    public DefaultRes<List<MyPageBoard>>checkBoardByUser(final int id) {
+        final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
         if (boards==null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.UNQUALIFIED, boards);
