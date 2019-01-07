@@ -10,10 +10,12 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gings.security.WebSocketPrincipal;
 import com.gings.utils.UserRole;
 
 //import jdk.internal.line.internal.Log;
@@ -43,7 +45,15 @@ public class TempController {
     @SubscribeMapping("/topic/temp")
     public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {
          
-        log.error("Subscription success.");
+        log.error("Subscription success. principal: {}", principal==null?null:principal.getName());
+        log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
+        
+    }
+    
+    @SubscribeMapping("/topic/temp2")
+    public void stageSubscription(@AuthenticationPrincipal WebSocketPrincipal principal, StompHeaderAccessor accessor) {
+         
+        log.error("Subscription success. principal: {}", principal==null?null:principal.getName());
         log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
         
     }
