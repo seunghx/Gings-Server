@@ -13,7 +13,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class GingsPrincipal implements Principal{
+public class GingsPrincipal{
     
     private Integer userId;
     private UserRole role;
@@ -26,10 +26,5 @@ public class GingsPrincipal implements Principal{
     public GingsPrincipal(Integer userId, UserRole role) {
         this.userId = userId;
         this.role = role;
-    }
-
-    @Override
-    public String getName() {
-        return String.valueOf(userId);
     }
 }

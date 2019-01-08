@@ -1,21 +1,16 @@
 package com.gings.controller;
 
 import java.security.Principal;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gings.security.WebSocketPrincipal;
 import com.gings.utils.UserRole;
 
 //import jdk.internal.line.internal.Log;
@@ -43,16 +38,19 @@ public class TempController {
     }
     
     @SubscribeMapping("/topic/temp")
-    public void stageSubscription(StompHeaderAccessor accessor) {
+    public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {
          
         log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
         
+        log.error("{}", principal);
     }
     
 
-    @MessageMapping("/topic/temp")
+    @MessageMapping("/temp")
     @SendTo("/topic/temp")
-    public ECHO sendStageChatMessage(ECHO echo) {
+    public ECHO sendStageChatMessage(Principal principal, ECHO echo) {
+        log.error("{}", principal.getClass());
+        log.error("{}", principal);
         log.error("Message sending success");
         log.error("Message : {}", echo);
         

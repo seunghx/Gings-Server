@@ -2,6 +2,10 @@ package com.gings.domain;
 
 import java.util.List;
 
+import com.gings.utils.UserRole;
+import com.gings.utils.code.Region;
+import com.gings.utils.code.Status;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,12 +17,12 @@ public class User {
     private String email;
     private String name;
     private String pwd;
-    private String region;
+    private Region region;
     private String job;
     private String company;
     private String field;
-    private String status;
-    private String role;
+    private Status status;
+    private UserRole role;
     private String image;
     private boolean coworkingEnabled;
 

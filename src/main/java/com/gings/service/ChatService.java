@@ -8,12 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gings.controller.ChatController;
 import com.gings.dao.ChatMapper;
-import com.gings.domain.ChatRoom;
+import com.gings.domain.chat.ChatRoom;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq;
-import com.gings.security.WebSocketPrincipal;
 import com.gings.utils.code.ChatCommand;
-import com.gings.utils.code.ChatRoomType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +31,7 @@ public class ChatService {
     
     
     @Transactional
-    public void create(int userId, ChatOpenReq openReq) {
+    public void initChatRoom(int userId, ChatOpenReq openReq) {
                 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setType(openReq.getRoomType());
@@ -46,6 +44,22 @@ public class ChatService {
         sendRoomIdToUser(chatRoom.getId(), openReq.getUsers());
         
         
+    }
+    
+    public void processChatRoomEntrance(int userId, int roomId) {
+        
+        log.info("Processing chat room({}) entrance for user : {}", roomId
+                                                                  , userId);
+        
+        getChatRoomForUser(userId, roomId);
+        
+    }
+    
+    private ChatRoom getChatRoomForUser(int userId, int roomId) {
+        
+        return null;
+       // ChatRoomRes chatRoomRes = 
+        //             chatMapper.findChatRoomInfoByUserIdAndRoomId(userId, roomId);
     }
     
     private void sendRoomIdToUser(int roomId, List<Integer> users) {

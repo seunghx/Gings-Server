@@ -26,20 +26,20 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class StompConnectingAuthentication implements Authentication, Principal {
+public class StompConnectingAuthentication implements Authentication{
     
     private static final long serialVersionUID = 2561946285897548899L;
     
-    private final GingsPrincipal principal;
+    private final WebSocketPrincipal principal;
    
-    public StompConnectingAuthentication(GingsPrincipal principal) {
+    public StompConnectingAuthentication(WebSocketPrincipal principal) {
         
         validate(principal);
         
         this.principal = principal;
     }
     
-    private void validate(GingsPrincipal principal) {
+    private void validate(WebSocketPrincipal principal) {
         if(principal == null || principal.getRole() == null || 
            StringUtils.isEmpty(principal.getEmail()) || principal.getUserId() == 0) {
             
@@ -87,7 +87,7 @@ public class StompConnectingAuthentication implements Authentication, Principal 
     }
 
     @Override
-    public GingsPrincipal getPrincipal() {
+    public WebSocketPrincipal getPrincipal() {
         return principal;
     }
 
