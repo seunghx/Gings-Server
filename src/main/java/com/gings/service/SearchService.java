@@ -113,6 +113,21 @@ public class SearchService {
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 
+    /**
+     * 보드 검색(최신순)
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByCateogryByKeywordByWriteTime(final String keyword, final Pagination pagination, final int userId) {
+        List<HomeBoardAllRes> boards =
+                boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByWriteTime(keyword, pagination), userId);
+        boards = deleteOverlapBoard(boards);
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+    }
+
     public List<HomeBoardAllRes> deleteOverlapBoard(final List<HomeBoardAllRes> boards){
 
         List<HomeBoardAllRes> list = boards;

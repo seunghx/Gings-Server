@@ -107,4 +107,23 @@ public class SearchController {
         }
     }
 
+    /**
+     * 보드 검색(추천순)
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("search/boards/category/recommend")
+    public ResponseEntity SearchBoardsByCategoryByRecommend(@RequestParam String keyword, final Pagination pagination, GingsPrincipal principal) {
+        try {
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
+                    searchService.selectBoardByKeywordByRecommend(keyword, pagination, userId);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
