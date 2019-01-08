@@ -1,5 +1,6 @@
 package com.gings.security;
 
+import java.security.Principal;
 import java.util.Collection;
 
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class StompConnectingAuthentication implements Authentication {
+public class StompConnectingAuthentication implements Authentication, Principal {
     
     private static final long serialVersionUID = 2561946285897548899L;
     
@@ -34,10 +35,11 @@ public class StompConnectingAuthentication implements Authentication {
     public StompConnectingAuthentication(WebSocketPrincipal principal) {
         
         validate(principal);
+        
         this.principal = principal;
     }
     
-    private void validate(Principal principal) {
+    private void validate(WebSocketPrincipal principal) {
         if(principal == null || principal.getRole() == null || 
            StringUtils.isEmpty(principal.getEmail()) || principal.getUserId() == 0) {
             
@@ -85,7 +87,7 @@ public class StompConnectingAuthentication implements Authentication {
     }
 
     @Override
-    public Principal getPrincipal() {
+    public WebSocketPrincipal getPrincipal() {
         return principal;
     }
 

@@ -8,8 +8,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 
 public enum UserRole {
     
-    USER(() -> AuthorityUtils.createAuthorityList("USER")), 
-    ADMIN(() -> AuthorityUtils.createAuthorityList("USER, ADMIN"));
+    USER(() -> AuthorityUtils.createAuthorityList("ROLE_USER")), 
+    ADMIN(() -> AuthorityUtils.createAuthorityList("ROLE_USER, ROLE_ADMIN"));
     
     private Supplier<Collection<GrantedAuthority>> authorityProvider;
     

@@ -1,6 +1,9 @@
 package com.gings.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -19,7 +22,7 @@ import com.gings.security.authentication.StompConnectionInterceptor;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
-    private static final String WS_CONNECT = "/connect";
+    public static final String WS_CONNECT = "/connect";
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -48,13 +51,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     // 후에 웹 채팅 추가할 경우 registrty.withSockJS() 추가 예정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*");
+        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*").withSockJS();
 
-    }
-    
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new StompConnectionInterceptor());
     }
 
 }

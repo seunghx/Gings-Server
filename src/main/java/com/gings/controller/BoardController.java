@@ -14,7 +14,7 @@ import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 
-import com.gings.security.Principal;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 
 import com.gings.service.BoardService;
@@ -113,7 +113,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards")
-    public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final Principal principal) {
+    public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final GingsPrincipal principal) {
         try {
             upBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
@@ -130,7 +130,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards/{boardId}/recommend")
-    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final Principal principal) {
+    public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
             return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
@@ -147,7 +147,7 @@ public class BoardController {
      */
 
     @PostMapping("reboards")
-    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final Principal principal) {
+    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final GingsPrincipal principal) {
         try {
             reBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
@@ -165,7 +165,7 @@ public class BoardController {
      */
     @PostMapping("reboards/{reboardId}/recommend")
     public ResponseEntity likeReBoard(@PathVariable("reboardId") final int reboardId,
-                                      final Principal principal) {
+                                      final GingsPrincipal principal) {
         try {
             return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
@@ -182,7 +182,7 @@ public class BoardController {
      */
     @PutMapping("boards/{boardId}")
     public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq,
-                                      Principal principal) {
+                                      GingsPrincipal principal) {
         try {
             modifyBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
@@ -200,7 +200,7 @@ public class BoardController {
      */
     @PutMapping("reboards/{reboardId}")
     public ResponseEntity updateReBoard(@PathVariable final int reboardId, final ModifyReBoardReq modifyReBoardReq,
-                                      Principal principal) {
+                                      GingsPrincipal principal) {
         try {
             modifyReBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateReBoard(reboardId,modifyReBoardReq), HttpStatus.OK);

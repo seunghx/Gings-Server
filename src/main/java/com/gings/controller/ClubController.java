@@ -4,7 +4,7 @@ import com.gings.domain.Club;
 import com.gings.domain.ClubUser;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
-import com.gings.security.Principal;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.ClubService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class ClubController {
      * @return ResponseEntity
      */
     @GetMapping("clubs/{clubId}")
-    public ResponseEntity getClubByClubId(@PathVariable("clubId") final int clubId, final Principal principal) throws Throwable{
+    public ResponseEntity getClubByClubId(@PathVariable("clubId") final int clubId, final GingsPrincipal principal) throws Throwable{
         try{
             DefaultRes<Club> defaultRes = clubService.findClubByClubId(clubId,principal.getUserId());
             return new ResponseEntity<>(defaultRes,HttpStatus.OK);
@@ -70,7 +70,7 @@ public class ClubController {
      * @return ResponseEntity
      */
     @GetMapping("clubs/{clubId}/{eventId}")
-    public ResponseEntity getEventByEventId(@PathVariable("clubId") final int clubId, @PathVariable("eventId") final int eventId, final Principal principal){
+    public ResponseEntity getEventByEventId(@PathVariable("clubId") final int clubId, @PathVariable("eventId") final int eventId, final GingsPrincipal principal){
         try{
             DefaultRes<Event> defaultRes = clubService.findEventByEvent(clubId,eventId,principal.getUserId());
             return new ResponseEntity<>(defaultRes,HttpStatus.OK);
@@ -86,7 +86,7 @@ public class ClubController {
      * @return ResqponseEntity
      */
     @PostMapping("clubs/{clubId}/join")
-    public ResponseEntity joinClub(@PathVariable("clubId") final int clubId, final Principal principal) {
+    public ResponseEntity joinClub(@PathVariable("clubId") final int clubId, final GingsPrincipal principal) {
         try{
             return new ResponseEntity<>(clubService.joinClub(clubId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception exception){
@@ -100,7 +100,7 @@ public class ClubController {
      * @return ResqponseEntity
      */
     @PostMapping("events/{eventId}/join")
-    public ResponseEntity joinEvent(@PathVariable("eventId") final int eventId, final Principal principal) {
+    public ResponseEntity joinEvent(@PathVariable("eventId") final int eventId, final GingsPrincipal principal) {
         try{
             return new ResponseEntity<>(clubService.joinEvent(eventId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception exception){

@@ -1,8 +1,12 @@
 package com.gings.controller;
 
 import com.gings.domain.Board;
+import com.gings.model.DefaultRes;
+import com.gings.model.GuestModel;
+import com.gings.model.IntroduceModel;
+import com.gings.model.MyPage;
+import com.gings.security.*;
 import com.gings.model.*;
-import com.gings.security.Principal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.BoardService;
 import com.gings.service.MyPageService;
@@ -41,7 +45,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("/mine")
-    public ResponseEntity getMyUser(final Principal principal){
+    public ResponseEntity getMyUser(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             DefaultRes<MyPage> defaultRes = myPageService.findByUserId(id);
@@ -60,7 +64,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("others/{myPageUserId}")
-    public ResponseEntity getOtherUser(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    public ResponseEntity getOtherUser(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
@@ -83,7 +87,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("mine/introduce")
-    public ResponseEntity getMyUserIntro(final Principal principal){
+    public ResponseEntity getMyUserIntro(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             DefaultRes<MyPage.MyPageIntro> defaultRes = myPageService.userIntroduce(id);
@@ -102,7 +106,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("others/introduce/{myPageUserId}")
-    public ResponseEntity getOtherUserIntro(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    public ResponseEntity getOtherUserIntro(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
@@ -125,7 +129,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("mine/active")
-    public ResponseEntity getUserActive(final Principal principal){
+    public ResponseEntity getUserActive(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
                 DefaultRes<List<MyPageBoard>>defaultRes = boardService.findBoardByUserId(id);
@@ -144,7 +148,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("others/active/{myPageUserId}")
-    public ResponseEntity getUserActive(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    public ResponseEntity getUserActive(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             if(id != myPageUserId){
@@ -168,7 +172,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("/mine/guestboard")
-    public ResponseEntity findGuestBoards(final Principal principal){
+    public ResponseEntity findGuestBoards(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.checkfindGuestBoard(id);
@@ -187,7 +191,7 @@ public class MyPageController {
      * @return ResponseEntity
      */
     @GetMapping("others/guestboard/{myPageUserId}")
-    public ResponseEntity findGuestBoards(@PathVariable("myPageUserId") final int myPageUserId, final Principal principal){
+    public ResponseEntity findGuestBoards(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             if(id == myPageUserId){
@@ -212,7 +216,7 @@ public class MyPageController {
      * @return
      */
     @PostMapping("/guestboard/{myPageUserId}")
-    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final Principal principal){
+    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             if(id == myPageUserId){
@@ -233,7 +237,7 @@ public class MyPageController {
 
     //설정 - 자기소개 조회
     @GetMapping("/setting/introduce")
-    public ResponseEntity tryToChangeIntroduce(final Principal principal){
+    public ResponseEntity tryToChangeIntroduce(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             DefaultRes<List<IntroduceModel.IntroduceRes>> defaultRes = myPageService.selectIntroduce(id);
@@ -246,7 +250,7 @@ public class MyPageController {
 
     //설정 - 자기소개 저장/수정
     @PostMapping("setting/introduce")
-    public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final Principal principal){
+    public ResponseEntity inputIntroduce(final IntroduceModel.IntroduceReq introduceReq,final GingsPrincipal principal){
         try {
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveIntroduce(id, introduceReq), HttpStatus.OK);
@@ -261,7 +265,7 @@ public class MyPageController {
     //===============================프로필 사진 변경====================================================
     //프로필 사진 조회
     @GetMapping("setting/image")
-    public ResponseEntity selectProfile(final Principal principal){
+    public ResponseEntity selectProfile(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.selectImg(id), HttpStatus.OK);
@@ -273,7 +277,7 @@ public class MyPageController {
 
     //프로필 사진 저장
     @PutMapping("setting/image")
-    public ResponseEntity inputProfile(final MyPage myPage, final Principal principal){
+    public ResponseEntity inputProfile(final MyPage myPage, final GingsPrincipal principal){
         try {
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveProfileImg(id, myPage), HttpStatus.OK);
@@ -286,7 +290,7 @@ public class MyPageController {
     //===============================프로필 정보 수정====================================================
     //프로필 정보 조회
     @GetMapping("setting/info")
-    public ResponseEntity selectProfileInfo(final Principal principal){
+    public ResponseEntity selectProfileInfo(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.selectInformation(id), HttpStatus.OK);
@@ -298,7 +302,7 @@ public class MyPageController {
     
     //프로필 정보 입력
     @PutMapping("setting/info")
-    public ResponseEntity createProfileInfo(@RequestBody final MyPage myPage, final Principal principal){
+    public ResponseEntity createProfileInfo(@RequestBody final MyPage myPage, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveInformation(id, myPage), HttpStatus.OK);
@@ -310,7 +314,7 @@ public class MyPageController {
 
     //프로필 정보 키워드 입력
     @PostMapping("setting/info/keyword")
-    public ResponseEntity inputInfoKeyword(@RequestBody final MyPage myPage, final Principal principal){
+    public ResponseEntity inputInfoKeyword(@RequestBody final MyPage myPage, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.saveKeyword(id, myPage), HttpStatus.OK);
@@ -322,7 +326,7 @@ public class MyPageController {
 
     //========================= 원래 비밀번호 체크 ========================================
     @GetMapping("setting/modifyPwd")
-    public ResponseEntity checkPassword(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
+    public ResponseEntity checkPassword(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.chkPwd(id, myPagePwdRes), HttpStatus.OK);
@@ -333,7 +337,7 @@ public class MyPageController {
     }
     //=========================== 비밀번호 변경 ===================================================
     @PatchMapping("setting/modifyPwd")
-    public ResponseEntity changePwd(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final Principal principal){
+    public ResponseEntity changePwd(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
             return new ResponseEntity<>(myPageService.modifyPwd(id, myPagePwdRes), HttpStatus.OK);

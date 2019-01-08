@@ -21,7 +21,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import com.gings.model.ApiError;
-import com.gings.security.Principal;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.jwt.JWTService;
 import com.gings.security.jwt.JWTServiceManager;
 import com.gings.security.jwt.UserAuthTokenInfo;
@@ -97,11 +97,11 @@ public class AuthAspect {
             UserAuthTokenInfo token = 
                         (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
             
-            Principal principal = new Principal(token.getUid(), token.getUserRole());
+            GingsPrincipal principal = new GingsPrincipal(token.getUid(), token.getUserRole());
           
             Object[] args = Arrays.stream(pjp.getArgs())
                                   .map(arg -> {
-                                     return (arg instanceof Principal)? principal : arg;
+                                     return (arg instanceof GingsPrincipal)? principal : arg;
                                   })
                                   .toArray();
 

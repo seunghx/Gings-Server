@@ -164,7 +164,7 @@ public class UserController {
     }
     
     @PostMapping("/signup/minyoung")
-    public ResponseEntity<DefaultRes<Void>> signupMinyoung(@Validated @RequestBody SignUp signUp,
+    public ResponseEntity<DefaultRes<Void>> signupMinyoung(@RequestBody SignUp signUp,
                                                            HttpServletRequest request) {
         userService.addNewUser(signUp);
         

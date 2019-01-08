@@ -1,21 +1,25 @@
 package com.gings.security;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import com.gings.security.authentication.Authentication;
 import com.gings.utils.UserRole;
 
+import java.security.Principal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
-public class WebSocketPrincipal extends Principal{
+public class WebSocketPrincipal implements Principal{
     
     /**
+     * 
      * {@link SimpMessagingTemplate} 를 이용할 때 전달하는 유저의 id 정보는 unique한 문자열 타입이어야함.
      * 
      * 정수값의 id를 문자열로 바꿔 사용해도 되나(현재 gings rdb user table은 user의 auto increment id 사용) 
@@ -31,13 +35,15 @@ public class WebSocketPrincipal extends Principal{
      * 
      * 
      */
+    private Integer userId;
     private String email;
     private String name;
+    private UserRole role;
     
-    public WebSocketPrincipal(int userId, UserRole role, String email, String name) {
-        super(userId, role);
+    public WebSocketPrincipal(Integer userId, UserRole role, String email, String name) {
         this.email = email;
         this.name = name;
-                
+        this.role = role;
+        this.userId = userId;
     }
 }
