@@ -8,6 +8,7 @@ import com.gings.domain.User;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
 import com.gings.model.SearchKeyword.SearchKeywordReq;
+import com.gings.model.board.HomeBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -24,15 +25,18 @@ public class SearchService {
 
     private final UserMapper userMapper;
     private final BoardMapper boardMapper;
+    private final BoardService boardService;
 
     /**
      * 생성자 의존성 주입
      *
      * @param userMapper
      */
-    public SearchService(final UserMapper userMapper, final BoardMapper boardMapper){
+    public SearchService(final UserMapper userMapper, final BoardMapper boardMapper,
+                         final BoardService boardService){
         this.userMapper = userMapper;
         this.boardMapper = boardMapper;
+        this.boardService = boardService;
     }
 
     /**
@@ -79,14 +83,9 @@ public class SearchService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByWriteTime(final String keyword, final Pagination pagination) {
-        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeywordOrderByWriteTime(keyword, pagination);
-        for(HomeBoardAllRes board : boards) {
-            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
-        }
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByWriteTime(final String keyword, final Pagination pagination, final int userId) {
+        final List<HomeBoardAllRes> boards =
+                boardService.setUserInfoInAllRes(boardMapper.findBoardsByKeywordOrderByWriteTime(keyword, pagination),userId);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
@@ -98,14 +97,10 @@ public class SearchService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByRecommend(final String keyword, final Pagination pagination) {
-        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByKeywordOrderByRecommend(keyword, pagination);
-        for(HomeBoardAllRes board : boards) {
-            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
-        }
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByRecommend(final String keyword, final Pagination pagination,
+                                                                             final int userId) {
+        final List<HomeBoardAllRes> boards =
+                boardService.setUserInfoInAllRes(boardMapper.findBoardsByKeywordOrderByRecommend(keyword, pagination),userId);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
 

@@ -25,7 +25,6 @@ public class BoardReply {
 
     private int recommender;
 
-
-
+    private boolean likeChk;
 
 }

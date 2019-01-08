@@ -54,9 +54,10 @@ public class BoardController {
      * @return ResponseEntity
      */
     @GetMapping("boards")
-    public ResponseEntity getAllBoards(final Pagination pagination) {
+    public ResponseEntity getAllBoards(final Pagination pagination, final Principal principal) {
         try {
-            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination);
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,15 +67,17 @@ public class BoardController {
     }
 
     /**
-     * 모든 보드 조회
+     * 카테고리별 모든 보드 조회
      *
      * @param pagination 페이지네이션
      * @return ResponseEntity
      */
     @GetMapping("boards/category/{category}")
-    public ResponseEntity getBoardsByCategory(@PathVariable BoardCategory category, final Pagination pagination) {
+    public ResponseEntity getBoardsByCategory(@PathVariable BoardCategory category, final Pagination pagination,
+                                              final Principal principal) {
         try {
-            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategory(category, pagination);
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategory(category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,9 +94,10 @@ public class BoardController {
      * @return ResponseEntity
      */
     @GetMapping("boards/{boardId}")
-    public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId) {
+    public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId, final Principal principal) {
         try {
-            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId);
+            final int userId = principal.getUserId();
+            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e.getMessage());

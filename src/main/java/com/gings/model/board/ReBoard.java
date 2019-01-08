@@ -24,6 +24,7 @@ public class ReBoard {
         private List<MultipartFile> images;
 
         private int recommender;
+
     }
 
     @Getter
@@ -50,5 +51,6 @@ public class ReBoard {
         private String name;
         private String content;
         private LocalDateTime writeTime;
+        private boolean likeChk;
     }
 }

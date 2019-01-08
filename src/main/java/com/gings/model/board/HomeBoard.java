@@ -2,6 +2,7 @@ package com.gings.model.board;
 
 import com.gings.domain.BoardReply;
 import com.gings.utils.code.BoardCategory;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,8 @@ public class HomeBoard {
         private int numOfReply;
 
         private int recommender;
+
+        private boolean likeChk;
 
         @Override
         public int compareTo(HomeBoardAllRes o) {
@@ -69,6 +72,8 @@ public class HomeBoard {
 
         private int numOfReply;
         private int recommender;
+
+        private boolean likeChk;
 
     }
 
