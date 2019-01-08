@@ -1,6 +1,9 @@
 package com.gings.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gings.model.chat.ChatOpenReq;
@@ -49,6 +52,11 @@ public class ChatController {
         chatService.create(principal.getUserId(), openReq);
         
         log.info("Creation chat room succeeded");
+    }
+    
+    @SubscribeMapping("/topic/chatRoom/{roomId}")
+    public void onSubscribe(@AuthenticationPrincipal WebSocketPrincipal principal, StompHeaderAccessor accessor) {
+        
     }
     
 }
