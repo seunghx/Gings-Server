@@ -43,20 +43,12 @@ public class TempController {
     }
     
     @SubscribeMapping("/topic/temp")
-    public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {
+    public void stageSubscription(StompHeaderAccessor accessor) {
          
-        log.error("Subscription success. principal: {}", principal==null?null:principal.getName());
         log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
         
     }
     
-    @SubscribeMapping("/topic/temp2")
-    public void stageSubscription(@AuthenticationPrincipal WebSocketPrincipal principal, StompHeaderAccessor accessor) {
-         
-        log.error("Subscription success. principal: {}", principal==null?null:principal.toString());
-        log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
-        
-    }
 
     @MessageMapping("/topic/temp")
     @SendTo("/topic/temp")

@@ -51,7 +51,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     // 후에 웹 채팅 추가할 경우 registrty.withSockJS() 추가 예정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*");
 
     }
 
