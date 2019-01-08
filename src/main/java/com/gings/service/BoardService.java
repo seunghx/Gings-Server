@@ -69,7 +69,7 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 카테고드별 보드 조회(최신순)
+     * 카테고드별 보드 조회
      *
      * @param
      * @return DefaultRes
@@ -84,7 +84,7 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 카테고드별 보드 조회
+     * 카테고드별 보드 조회(최신순)
      *
      * @param
      * @return DefaultRes
