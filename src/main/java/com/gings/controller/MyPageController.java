@@ -325,7 +325,7 @@ public class MyPageController {
     }
 
     //========================= 원래 비밀번호 체크 ========================================
-    @GetMapping("setting/modifyPwd")
+    @PostMapping("setting/modifyPwd")
     public ResponseEntity checkPassword(@RequestBody final MyPage.MyPagePwdRes myPagePwdRes, final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();

@@ -14,6 +14,7 @@ import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.model.board.UpBoard;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
+import com.gings.security.GingsPrincipal;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,9 +39,9 @@ public class BoardService implements ApplicationEventPublisherAware {
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
-    
+
     private ApplicationEventPublisher eventPublisher;
-    
+
     /**
      * 생성자 의존성 주입
      *
@@ -59,14 +61,22 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination) {
-        final List<HomeBoardAllRes> boards = boardMapper.findAllBoard(pagination);
-        for(HomeBoardAllRes board : boards) {
-            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
-        }
+    public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination, final int userId) {
+        final List<HomeBoardAllRes> boards = setUserInfoInAllRes(boardMapper.findAllBoard(pagination), userId);
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+    }
+
+    /**
+     * 카테고드별 보드 조회(최신순)
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByWriteTime(final BoardCategory category, final Pagination pagination, final int userId) {
+        final List<HomeBoardAllRes> boards =
+                setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
 
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
@@ -79,41 +89,29 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategory(final BoardCategory category, final Pagination pagination) {
-        final List<HomeBoardAllRes> boards = boardMapper.findBoardsByCategory(category, pagination);
-        for(HomeBoardAllRes board : boards) {
-            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
-        }
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByRecommend(final BoardCategory category, final Pagination pagination, final int userId) {
+        final List<HomeBoardAllRes> boards =
+                setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
 
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+        Collections.sort(boards);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
     }
 
     /**
      * 보드 고유 번호로 보드 조회
      *
-     * @param id 보드 고유 번호
+     * @param boardId 보드 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int id) {
-        final HomeBoardOneRes board = boardMapper.findBoardByBoardId(id);
-        board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-        board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-        board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-        board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+    public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int boardId, final int userId) {
+        HomeBoardOneRes board = setUserInfoInOneRes(boardMapper.findBoardByBoardId(boardId), userId);
 
-        List<BoardReply> boardReplies = boardMapper.findReplyByBoardId(id);
-        for(BoardReply boardReply : boardReplies){
-            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
-            boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
-        }
+        List<BoardReply> boardReplies = setUserInfoInReplyRes(boardMapper.findReplyByBoardId(boardId), userId);
+
         board.setReplys(boardReplies);
-
-
 
         if (board == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
@@ -154,13 +152,14 @@ public class BoardService implements ApplicationEventPublisherAware {
      */
     public DefaultRes<List<MyPageBoard>> findBoardByUserId(final int id) {
         final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
-        if (boards==null)
+        if (boards == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, boards);
     }
-    public DefaultRes<List<MyPageBoard>>checkBoardByUser(final int id) {
+
+    public DefaultRes<List<MyPageBoard>> checkBoardByUser(final int id) {
         final List<MyPageBoard> boards = boardMapper.findBoardByUserId(id);
-        if (boards==null)
+        if (boards == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.UNQUALIFIED, boards);
     }
@@ -227,21 +226,21 @@ public class BoardService implements ApplicationEventPublisherAware {
     /**
      * 보드 좋아요 & 좋아요 취소
      *
-     * @param boardId    보드
-     * @param userId    회원 고유 번호
+     * @param boardId 보드
+     * @param userId  회원 고유 번호
      * @return DefaultRes
      */
 
     public DefaultRes BoardLikes(final int boardId, final int userId) {
         try {
-            if(boardMapper.findBoardByBoardId(boardId) == null)
+            if (boardMapper.findBoardByBoardId(boardId) == null)
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
             List<Integer> boardIdList = boardMapper.findRecommendBoardsByUserId(userId);
 
             Board.BoardRecommend boardLike = new Board.BoardRecommend();
 
-            for(int id : boardIdList) {
+            for (int id : boardIdList) {
                 if (id == boardId) {
                     boardMapper.deleteBoardRecommender(boardId, userId);
                     boardLike.setRecommendBoardIdList(boardMapper.findBoardIdByRecommenderId(userId));
@@ -284,17 +283,17 @@ public class BoardService implements ApplicationEventPublisherAware {
     /**
      * 리보드 좋아요 & 좋아요 취소
      *
-     * @param replyId    보드
-     * @param userId    회원 고유 번호
+     * @param replyId 보드
+     * @param userId  회원 고유 번호
      * @return DefaultRes
      */
 
     public DefaultRes ReBoardLikes(final int replyId, final int userId) {
         try {
             List<Integer> reBoardIdList = boardMapper.findRecommendReBoardsByUserId(userId);
-            for(int id : reBoardIdList){
-                if(id == replyId){
-                    boardMapper.deleteReBoardRecommender(replyId,userId);
+            for (int id : reBoardIdList) {
+                if (id == replyId) {
+                    boardMapper.deleteReBoardRecommender(replyId, userId);
                     return DefaultRes.res(StatusCode.OK, ResponseMessage.CANCEL_LIKE_REBOARD);
                 }
             }
@@ -309,12 +308,12 @@ public class BoardService implements ApplicationEventPublisherAware {
     /**
      * 보드 수정
      *
-     * @param boardId 보드 데이터
+     * @param boardId        보드 데이터
      * @param modifyBoardReq 보드 데이터
      * @return DefaultRes
      */
 
-    public DefaultRes updateBoard(final int boardId, final ModifyBoardReq modifyBoardReq){
+    public DefaultRes updateBoard(final int boardId, final ModifyBoardReq modifyBoardReq) {
         try {
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
@@ -326,7 +325,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
             boardMapper.saveBoardImg(boardId, urlList);
 
-            for(String keywords : modifyBoardReq.getPrevKeywords()){
+            for (String keywords : modifyBoardReq.getPrevKeywords()) {
                 boardMapper.deleteBoardKeyword(keywords);
             }
             boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
@@ -342,12 +341,12 @@ public class BoardService implements ApplicationEventPublisherAware {
     /**
      * 리보드 수정
      *
-     * @param replyId 보드 데이터
+     * @param replyId          보드 데이터
      * @param modifyReBoardReq 보드 데이터
      * @return DefaultRes
      */
 
-    public DefaultRes updateReBoard(final int replyId, final ModifyReBoardReq modifyReBoardReq){
+    public DefaultRes updateReBoard(final int replyId, final ModifyReBoardReq modifyReBoardReq) {
         try {
             boardMapper.updateReBoard(replyId, modifyReBoardReq);
 
@@ -366,11 +365,64 @@ public class BoardService implements ApplicationEventPublisherAware {
         }
     }
 
+    public List<HomeBoardAllRes> setUserInfoInAllRes(List<HomeBoardAllRes> boards, int userId) {
+        List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
+
+        for (HomeBoardAllRes board : boards) {
+            for (int likedBoardId : likedBoardIdList) {
+                if (board.isLikeChk()) break;
+
+                if (board.getBoardId() == likedBoardId){ board.setLikeChk(true); }
+                else { board.setLikeChk(false); }
+            }
+            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
+            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
+        return boards;
+    }
+
+    public HomeBoardOneRes setUserInfoInOneRes(HomeBoardOneRes board, int userId) {
+        List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
+
+        for(int likedBoardId : likedBoardIdList) {
+            if (board.isLikeChk()) break;
+
+            if (board.getBoardId() == likedBoardId) { board.setLikeChk(true); }
+            else { board.setLikeChk(false); }
+
+            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
+            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
+            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
+        return board;
+    }
+
+    public List<BoardReply> setUserInfoInReplyRes(List<BoardReply> boardReplies, int userId) {
+
+
+        List<Integer> likedReBoardIdList = boardMapper.findRecommendReBoardsByUserId(userId);
+
+        for (BoardReply boardReply : boardReplies) {
+            for (int likedReBoardId : likedReBoardIdList) {
+                if (boardReply.isLikeChk()) break;
+
+                if (boardReply.getReplyId() == likedReBoardId){ boardReply.setLikeChk(true); }
+                else { boardReply.setLikeChk(false); }
+            }
+            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
+            boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
+        }
+        return boardReplies;
+    }
+
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
-        
+
     }
 }
 

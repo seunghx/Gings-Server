@@ -35,7 +35,7 @@ public interface BoardMapper {
             @Result(property = "numOfReply", column = "board_id", javaType = int.class,
                     one=@One(select="countReply")),
             @Result(property = "recommender", column = "board_id", javaType = int.class,
-                    one = @One(select = "countRecommendByBoardId"))
+                    one = @One(select = "countRecommendByBoardId")),
     })
     public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
 
@@ -77,7 +77,7 @@ public interface BoardMapper {
             @Result(property = "numOfReply", column = "board_id", javaType = int.class,
                     one=@One(select="countReply")),
             @Result(property = "recommender", column = "board_id", javaType = int.class,
-                    one = @One(select = "countRecommendByBoardId"))
+                    one = @One(select = "countRecommendByBoardId")),
     })
     public List<HomeBoardAllRes> findBoardsByKeywordOrderByWriteTime(String keyword, Pagination pagination);
 
@@ -132,7 +132,6 @@ public interface BoardMapper {
     // 회원 고유 번호로 좋아요 한 보드 조회
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
-
 
     // 보드 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE board_id = #{boardId}")
@@ -222,6 +221,7 @@ public interface BoardMapper {
 
 
 
+
      /*
     INSERT(CREATE) 하기
     UpBoard
@@ -278,7 +278,7 @@ public interface BoardMapper {
     UpBoard
      */
 
-    //업보드 수정하기
+    //업보드 수정
     @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content}, category=#{ModifyBoardReq.category}, write_time = now() WHERE board_id = #{boardId}")
     void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
@@ -290,7 +290,7 @@ public interface BoardMapper {
     /*
     ReBoard
      */
-
+    // 리보드 수정
     @Update("UPDATE board_reply SET content=#{ModifyReBoardReq.content}, write_time = now() WHERE reply_id = #{replyId}")
     void updateReBoard(@Param("replyId") final int replyId, @Param("ModifyReBoardReq") final ModifyReBoardReq modifyReBoardReq);
 

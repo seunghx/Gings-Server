@@ -7,6 +7,7 @@ import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
 import com.gings.model.SearchKeyword.SearchKeywordReq;
 import com.gings.model.board.HomeBoard;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.SearchService;
 import com.gings.service.UserService;
@@ -52,7 +53,7 @@ public class SearchController {
     }
 
     /**
-     * 디렉토리 검색
+     * 최신순 디렉토리 목록
      *
      * @return ResponseEntity
      */
@@ -74,9 +75,11 @@ public class SearchController {
      * @return ResponseEntity
      */
     @GetMapping("search/boards/latest")
-    public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination) {
+    public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination, final GingsPrincipal principal) {
         try {
-            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeywordByWriteTime(keyword, pagination);
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
+                    searchService.selectBoardByKeywordByWriteTime(keyword, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,9 +94,11 @@ public class SearchController {
      * @return ResponseEntity
      */
     @GetMapping("search/boards/recommend")
-    public ResponseEntity SearchBoardsByRecommend(@RequestParam String keyword, final Pagination pagination) {
+    public ResponseEntity SearchBoardsByRecommend(@RequestParam String keyword, final Pagination pagination, GingsPrincipal principal) {
         try {
-            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes = searchService.selectBoardByKeywordByRecommend(keyword, pagination);
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
+                    searchService.selectBoardByKeywordByRecommend(keyword, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
