@@ -1,7 +1,6 @@
 package com.gings.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 
@@ -15,8 +14,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
-        messages.simpDestMatchers(WebSocketConfig.WS_CONNECT).permitAll()
-                .anyMessage().authenticated();
+        messages.anyMessage().permitAll();
     }
     
     @Override
