@@ -17,7 +17,6 @@ public class ChatMessage {
     private int roomId;
     private int writerId;
     private String message;
-    private int count;
     private LocalDateTime writeAt;
     private MessageType type;
     

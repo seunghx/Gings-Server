@@ -2,11 +2,19 @@ package com.gings.controller;
 
 import java.security.Principal;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
+import com.gings.domain.chat.ChatRoom;
+import com.gings.model.DefaultRes;
 import com.gings.model.chat.ChatOpenReq;
 import com.gings.security.WebSocketPrincipal;
 import com.gings.service.ChatService;
@@ -55,6 +63,7 @@ public class ChatController {
     }
     
     @SubscribeMapping("/topic/chatRoom/{roomId}")
+    @SendTo("/queue/")
     public void onSubscribe(Principal principal, @DestinationVariable int roomId) {
         
         if(log.isInfoEnabled()) {
@@ -62,8 +71,7 @@ public class ChatController {
                                                             roomId, principal.getName());
         }
         
-        chatService.processChatRoomEntrance(Integer.valueOf(principal.getName()), 
-                                                            roomId);
+        chatService.processChatRoomEntrance(Integer.valueOf(principal.getName()), roomId);
         
     }
     

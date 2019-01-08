@@ -2,6 +2,7 @@ package com.gings.domain.chat;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gings.domain.User;
 import com.gings.utils.code.ChatRoomType;
 
@@ -16,6 +17,7 @@ import lombok.ToString;
 public class ChatRoom {
     
     private int id;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ChatMessage> messages;
     private List<ChatRoomUser> users;
     private ChatRoomType type;
@@ -30,7 +32,7 @@ public class ChatRoom {
         private String job;
         
         private int lastReadMessageId;
-        private int latestReceivedMessageId;
+        private int latestReceiveMessageId;
         
     }
 }

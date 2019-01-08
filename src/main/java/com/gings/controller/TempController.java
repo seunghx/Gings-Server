@@ -27,15 +27,8 @@ public class TempController {
     @Setter
     @ToString
     public static class Temp {
-        private UserRole role;
     }
     
-    @GetMapping("temp")
-    public ResponseEntity<Temp> temp(Temp temp){
-        log.error("{}", temp.getRole());
-        
-        return new ResponseEntity<>(temp, HttpStatus.OK);
-    }
     
     @SubscribeMapping("/topic/temp")
     public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {

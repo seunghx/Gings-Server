@@ -4,6 +4,7 @@ import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
 import com.gings.domain.*;
 import com.gings.model.DefaultRes;
+import com.gings.model.MyPage.MyPageProfile;
 import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
@@ -375,10 +376,14 @@ public class BoardService implements ApplicationEventPublisherAware {
                 if (board.getBoardId() == likedBoardId){ board.setLikeChk(true); }
                 else { board.setLikeChk(false); }
             }
+            
+            MyPageProfile profile = userMapper.selectProfileImg(board.getWriterId());
+            String image = profile == null? null : profile.getImage();
+            
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+            board.setWriterImage(image);
         }
         return boards;
     }

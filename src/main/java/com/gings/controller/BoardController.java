@@ -56,6 +56,8 @@ public class BoardController {
      */
     @GetMapping("boards")
     public ResponseEntity getAllBoards(final Pagination pagination, final GingsPrincipal principal) {
+        
+        log.info("User - {}", principal.getUserId());
         try {
             final int userId = principal.getUserId();
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination, userId);

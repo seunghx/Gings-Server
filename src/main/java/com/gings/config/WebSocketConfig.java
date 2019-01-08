@@ -1,11 +1,16 @@
 package com.gings.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+import com.gings.security.authentication.StompConnectionInterceptor;
+import com.gings.security.authentication.StompUserInfoInterceptor;
 
 
 /**
@@ -19,6 +24,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     public static final String WS_CONNECT = "/connect";
+    
+    @Autowired
+    private StompConnectionInterceptor connectInterceptor;
+    @Autowired
+    private StompUserInfoInterceptor userInfoInterceptor;
+        
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+       registration.interceptors(connectInterceptor,userInfoInterceptor);
+    }
     
     /*
      * 우선 rabbitmq 사용 안함.

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gings.controller.ChatController;
 import com.gings.dao.ChatMapper;
 import com.gings.domain.chat.ChatRoom;
+import com.gings.domain.chat.ChatRoom.ChatRoomUser;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq;
 import com.gings.utils.code.ChatCommand;
@@ -51,15 +52,32 @@ public class ChatService {
         log.info("Processing chat room({}) entrance for user : {}", roomId
                                                                   , userId);
         
-        getChatRoomForUser(userId, roomId);
+        ChatRoom chatRoom = getChatRoomForUser(userId, roomId);
+        
+        messagingTemplate.convertAndSendToUser(String.valueOf(userId), 
+                                               ChatController.CHAT_NOTIFICATION_TOPIC, chatRoom);
         
     }
     
     private ChatRoom getChatRoomForUser(int userId, int roomId) {
+        ChatRoom chatRoom = chatMapper.findChatRoomByRoomId(roomId);
         
-        return null;
-       // ChatRoomRes chatRoomRes = 
-        //             chatMapper.findChatRoomInfoByUserIdAndRoomId(userId, roomId);
+        validateRoomForUser(chatRoom.getUsers(), userId, roomId);
+        
+        return chatRoom;
+        
+    }
+    
+    private void validateRoomForUser(List<ChatRoomUser> users, int userId, int roomId) {
+        if(users.stream().anyMatch(user -> user.getId() == userId)) {
+            log.info("Room entrance request validated successfully");
+            return;
+        }
+        
+        log.warn("Requesting user {} does not exist in chat room {}", userId, roomId);
+        
+        // Websocket session 저장해두었다가(hash형태로) connection close()하기.
+        throw new IllegalStateException();
     }
     
     private void sendRoomIdToUser(int roomId, List<Integer> users) {
