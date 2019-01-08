@@ -7,7 +7,7 @@ import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
 import com.gings.model.SearchKeyword.SearchKeywordReq;
 import com.gings.model.board.HomeBoard;
-import com.gings.security.Principal;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.SearchService;
 import com.gings.service.UserService;
@@ -75,7 +75,7 @@ public class SearchController {
      * @return ResponseEntity
      */
     @GetMapping("search/boards/latest")
-    public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination, final Principal principal) {
+    public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination, final GingsPrincipal principal) {
         try {
             final int userId = principal.getUserId();
             DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
@@ -94,7 +94,7 @@ public class SearchController {
      * @return ResponseEntity
      */
     @GetMapping("search/boards/recommend")
-    public ResponseEntity SearchBoardsByRecommend(@RequestParam String keyword, final Pagination pagination, Principal principal) {
+    public ResponseEntity SearchBoardsByRecommend(@RequestParam String keyword, final Pagination pagination, GingsPrincipal principal) {
         try {
             final int userId = principal.getUserId();
             DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =

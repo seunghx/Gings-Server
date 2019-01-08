@@ -14,7 +14,7 @@ import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.model.board.UpBoard;
 import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
-import com.gings.security.Principal;
+import com.gings.security.GingsPrincipal;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,17 +69,34 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
-     * 카테고드별 보드 조회
+     * 카테고드별 보드 조회(최신순)
      *
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategory(final BoardCategory category, final Pagination pagination, final int userId) {
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByWriteTime(final BoardCategory category, final Pagination pagination, final int userId) {
         final List<HomeBoardAllRes> boards =
                 setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
 
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+    }
+
+    /**
+     * 카테고드별 보드 조회
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByRecommend(final BoardCategory category, final Pagination pagination, final int userId) {
+        final List<HomeBoardAllRes> boards =
+                setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
+
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+        Collections.sort(boards);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
     }
 
