@@ -1,9 +1,10 @@
 package com.gings.controller;
 
+import java.security.Principal;
+
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gings.model.chat.ChatOpenReq;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 public class ChatController {
-    
     
     public static final String CHAT_NOTIFICATION_TOPIC = "/queue/chat/notice";
     
@@ -49,13 +49,21 @@ public class ChatController {
 
         log.info("Starting to create new chat room.");
         
-        chatService.create(principal.getUserId(), openReq);
+        chatService.initChatRoom(principal.getUserId(), openReq);
         
         log.info("Creation chat room succeeded");
     }
     
     @SubscribeMapping("/topic/chatRoom/{roomId}")
-    public void onSubscribe(@AuthenticationPrincipal WebSocketPrincipal principal, StompHeaderAccessor accessor) {
+    public void onSubscribe(Principal principal, @DestinationVariable int roomId) {
+        
+        if(log.isInfoEnabled()) {
+            log.info("Received subscription message for chatRoom : {} from user : {}", 
+                                                            roomId, principal.getName());
+        }
+        
+        chatService.processChatRoomEntrance(Integer.valueOf(principal.getName()), 
+                                                            roomId);
         
     }
     

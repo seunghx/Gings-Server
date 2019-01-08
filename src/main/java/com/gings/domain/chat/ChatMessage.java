@@ -1,4 +1,4 @@
-package com.gings.domain;
+package com.gings.domain.chat;
 
 import java.time.LocalDateTime;
 

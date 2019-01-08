@@ -19,6 +19,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.dao.UserMapper;
 import com.gings.security.GingsPrincipal;
 import com.gings.security.StompConnectingAuthentication;
+import com.gings.security.WebSocketPrincipal;
 import com.gings.security.jwt.JWTService;
 import com.gings.security.jwt.JWTServiceManager;
 import com.gings.security.jwt.UserAuthTokenInfo;
@@ -71,9 +72,9 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                 
                 UserAuthTokenInfo tokenInfo = authenticateInternal(jwt);
 
-                GingsPrincipal principal = 
+                WebSocketPrincipal principal = 
                         modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
-                                                                GingsPrincipal.class);
+                                                                WebSocketPrincipal.class);
                 
                 accessor.setUser(principal);
 

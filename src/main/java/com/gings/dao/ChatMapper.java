@@ -6,8 +6,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-import com.gings.domain.ChatRoom;
+import com.gings.domain.chat.ChatRoom;
 
 @Mapper
 public interface ChatMapper {
@@ -23,4 +24,10 @@ public interface ChatMapper {
             "</foreach>",
             "</script>"})
     public void saveUsersToRoom(@Param("roomId") int roomId, @Param("users")List<Integer> users);
+
+    
+    @Select("SELECT * FROM 2")
+    public void findChatRoomByUserIdAndRoomId(@Param("userId") int userId, @Param("roomId") int roomid);
+        
+    
 }
