@@ -85,29 +85,42 @@ public class SearchService {
      * @return DefaultRes
      */
     public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByWriteTime(final String keyword, final Pagination pagination, final int userId) {
-        final List<HomeBoardAllRes> boards =
+        List<HomeBoardAllRes> boards =
                 boardService.setUserInfoInAllRes(boardMapper.findBoardsByKeywordOrderByWriteTime(keyword, pagination),userId);
+        boards = deleteOverlapBoard(boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 
     /**
-     * 보드 검색(최신순)
+     * 보드 검색(추천순)
      *
      * @param
      * @return DefaultRes
      */
     public DefaultRes<List<HomeBoardAllRes>> selectBoardByKeywordByRecommend(final String keyword, final Pagination pagination,
                                                                              final int userId) {
-        final List<HomeBoardAllRes> boards =
+        List<HomeBoardAllRes> boards =
                 boardService.setUserInfoInAllRes(boardMapper.findBoardsByKeywordOrderByRecommend(keyword, pagination),userId);
+        boards = deleteOverlapBoard(boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
 
         Collections.sort(boards);
 
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+    }
+
+    public List<HomeBoardAllRes> deleteOverlapBoard(final List<HomeBoardAllRes> boards){
+        int prevId = - 1;
+        for(HomeBoardAllRes board : boards){
+            if(board.getBoardId() == prevId){
+                boards.remove(board);
+            }
+            prevId = board.getBoardId();
+        }
+        return boards;
     }
 
 }
