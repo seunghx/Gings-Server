@@ -287,7 +287,7 @@ public class MyPageService implements ApplicationEventPublisherAware{
                 return DefaultRes.res(StatusCode.FAILED, ResponseMessage.NOT_SAME_PWD);
         }catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DefaultRes.res(StatusCode.FAILED, ResponseMessage.OLD_PWD_IS_WRONG);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.DB_ERROR);
         }
     }
 
