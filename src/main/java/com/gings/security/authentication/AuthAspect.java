@@ -97,6 +97,8 @@ public class AuthAspect {
             UserAuthTokenInfo token = 
                         (UserAuthTokenInfo)jwtService.decode(new UserAuthTokenInfo(jwt));
             
+            log.info("JWT Authentication succeeded for user : {}", token.getUid());
+            
             GingsPrincipal principal = new GingsPrincipal(token.getUid(), token.getUserRole());
           
             Object[] args = Arrays.stream(pjp.getArgs())

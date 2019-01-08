@@ -18,10 +18,13 @@ public class StompUserInfoInterceptor implements ChannelInterceptor{
     
     @Override
     public Message<?> postReceive(Message<?> message, MessageChannel channel) {
+        
+        log.info("postReceive called");
+        
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
         
-        if(command == StompCommand.CONNECTED) {
+        if(command == StompCommand.CONNECT) {
             log.error("Header check for connected frame.");
             
             log.error("SimpUser header : {}", accessor.getUser());
