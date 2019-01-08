@@ -53,7 +53,7 @@ public class SearchController {
     }
 
     /**
-     * 디렉토리 검색
+     * 최신순 디렉토리 목록
      *
      * @return ResponseEntity
      */

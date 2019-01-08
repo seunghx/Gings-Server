@@ -53,7 +53,7 @@ public class SearchService {
     }
 
     /**
-     * 디렉토리 검색
+     * 최신순 디렉토리 조회
      *
      * @param
      * @return DefaultRes
@@ -63,15 +63,16 @@ public class SearchService {
         if (users.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_INTRODUCE);
 
-        for(int i = 0; i<users.size(); i++){
-            if(users.get(i).getIntroduce().isEmpty()){
-                users.remove(i);
+        boolean deletedChk = false;
+        while(true) {
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getIntroduce().isEmpty()) {
+                    users.remove(i);
+                    deletedChk = true;
+                }
             }
-        }
-        for(int i = 0; i<users.size(); i++){
-            if(users.get(i).getIntroduce().isEmpty()){
-                users.remove(i);
-            }
+            if (deletedChk == false) break;
+            else deletedChk = false;
         }
 
         return DefaultRes.res(StatusCode.OK, ResponseMessage.YES_INTRODUCE, users);
