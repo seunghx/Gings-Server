@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -113,12 +114,18 @@ public class SearchService {
     }
 
     public List<HomeBoardAllRes> deleteOverlapBoard(final List<HomeBoardAllRes> boards){
-        int prevId = - 1;
-        for(HomeBoardAllRes board : boards){
+
+        List<HomeBoardAllRes> list = boards;
+        int prevId = -1;
+        int saveId = 0;
+        for( Iterator<HomeBoardAllRes> itr = list.iterator(); itr.hasNext(); )
+        {
+            HomeBoardAllRes board = itr.next();
+            saveId = board.getBoardId();
             if(board.getBoardId() == prevId){
-                boards.remove(board);
+                itr.remove();
             }
-            prevId = board.getBoardId();
+            prevId = saveId;
         }
         return boards;
     }
