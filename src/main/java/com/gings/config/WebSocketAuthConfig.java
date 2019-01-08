@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.gings.security.authentication.StompConnectionInterceptor;
+import com.gings.security.authentication.StompUserInfoInterceptor;
 
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Configuration
@@ -15,9 +16,11 @@ public class WebSocketAuthConfig implements WebSocketMessageBrokerConfigurer{
     
     @Autowired
     private StompConnectionInterceptor connectInterceptor;
+    @Autowired
+    private StompUserInfoInterceptor userInfoInterceptor;
         
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-       registration.interceptors(connectInterceptor);
+       registration.interceptors(connectInterceptor, userInfoInterceptor);
     }
 }

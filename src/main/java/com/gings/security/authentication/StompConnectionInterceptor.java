@@ -73,7 +73,8 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                         modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
                                                                 WebSocketPrincipal.class);
                 
-                // @AuthenticationPrincipal 가능할 경우 WebSocketPrincipal이 java.security.Principal 구현안하게.
+                // @AuthenticationPrincipal 가능할 경우 WebSocketPrincipal이 
+                // java.security.Principal 구현안하게.
                 accessor.setUser(new StompConnectingAuthentication(principal));
                 
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -99,7 +100,6 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
 
     }
     
-
     private UserAuthTokenInfo authenticateInternal(String jwt) {
         
         UserAuthTokenInfo tokenInfo = new UserAuthTokenInfo(jwt);
@@ -107,6 +107,7 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
         return (UserAuthTokenInfo)jwtServiceManager.resolve(tokenInfo.getClass())
                                                    .decode(tokenInfo);
     }
+   
    /* 
     private Message<?> onConnectionAuthenticationFailed(Message<?> message){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);

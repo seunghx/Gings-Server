@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DuplicateKeyException;
@@ -165,10 +166,10 @@ public class UserController {
     
     @PostMapping("/signup/minyoung")
     public ResponseEntity<DefaultRes<Void>> signupMinyoung(@RequestBody SignUp signUp,
-                                                           HttpServletRequest request) {
+                                                           Locale locale) {
         userService.addNewUser(signUp);
         
-        String message = msgSource.getMessage("response.sign-up.success", null, request.getLocale());
+        String message = msgSource.getMessage("response.sign-up.success", null, locale);
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
                                     HttpStatus.OK);
