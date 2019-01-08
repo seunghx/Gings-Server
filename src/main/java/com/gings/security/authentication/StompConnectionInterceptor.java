@@ -7,8 +7,8 @@ import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,8 +17,8 @@ import org.springframework.util.StringUtils;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.dao.UserMapper;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.StompConnectingAuthentication;
-import com.gings.security.WebSocketPrincipal;
 import com.gings.security.jwt.JWTService;
 import com.gings.security.jwt.JWTServiceManager;
 import com.gings.security.jwt.UserAuthTokenInfo;
@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class StompConnectionInterceptor implements ChannelInterceptor {
+    
+    private static final String ERROR_MESSAGE = "인증 실패";
     
     private final UserMapper userMapper;
     private final JWTServiceManager jwtServiceManager;
@@ -49,16 +51,16 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
      */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        StompCommand command = accessor.getCommand();
-                
-        if(command == StompCommand.CONNECT) {
+        StompHeaderAccessor accessor = 
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class); 
+        
+        if(accessor.getCommand() == StompCommand.CONNECT) {
             String jwt = accessor.getFirstNativeHeader(JWTService.AUTHORIZATION);
 
             if(!isValidToken(jwt)) {
-                log.warn("Authentication for connect request failed.");     
+                log.error("Authentication for connect request failed. Invalid jwt : {}");   
                 
-                throw new BadCredentialsException("Received invalid jwt");
+                onConnectionAuthenticationFailed(message);
             }
             
             jwt = jwt.replace(JWTService.BEARER_SCHEME,  "");
@@ -69,14 +71,12 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                 
                 UserAuthTokenInfo tokenInfo = authenticateInternal(jwt);
 
-                WebSocketPrincipal principal = 
+                GingsPrincipal principal = 
                         modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
-                                                                WebSocketPrincipal.class);
+                                                                GingsPrincipal.class);
                 
-                // @AuthenticationPrincipal 가능할 경우 WebSocketPrincipal이 
-                // java.security.Principal 구현안하게.
-                accessor.setUser(new StompConnectingAuthentication(principal));
-                
+                accessor.setUser(principal);
+
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 context.setAuthentication(new StompConnectingAuthentication(principal));
                 SecurityContextHolder.setContext(context);
@@ -84,21 +84,23 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                 return message;
                 
             }catch(TokenExpiredException e){
-                log.info("Request user token expired.");
+                log.info("Request user token expired.", e);
                 
-                throw new CredentialsExpiredException("JWT token expired.", e);
+                onConnectionAuthenticationFailed(message);
+
             } catch(JWTVerificationException e) {
                 
-                log.warn("Invalid jwt token detected.");
+                log.error("Invalid jwt token detected.", e);
                 log.warn("It might be illegal access!! Requesting remote user ip : {}", accessor.getHost());
                 
-                throw new BadCredentialsException("Invalid JWT token.", e);
+                onConnectionAuthenticationFailed(message);
             }
         }
         
        return message;
 
     }
+    
     
     private UserAuthTokenInfo authenticateInternal(String jwt) {
         
@@ -108,22 +110,22 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                                                    .decode(tokenInfo);
     }
    
-   /* 
+   
     private Message<?> onConnectionAuthenticationFailed(Message<?> message){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         
         StompHeaderAccessor newHeaderAccessor = 
-                                        StompHeaderAccessor.create(StompCommand.MESSAGE);
+                                        StompHeaderAccessor.create(StompCommand.ERROR);
         
         newHeaderAccessor.setSessionId(accessor.getSessionId());
         newHeaderAccessor.setSessionAttributes(accessor.getSessionAttributes());
         newHeaderAccessor.setDestination(accessor.getDestination());
         newHeaderAccessor.setContentLength(0);
         
-        return MessageBuilder.createMessage(new byte[0]
+        return MessageBuilder.createMessage(ERROR_MESSAGE
                                           , newHeaderAccessor.getMessageHeaders());
     }
-    */
+    
     
     private boolean isValidToken(String jwt) {
 
@@ -141,5 +143,4 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
         
         return true;
     }
-    
 }

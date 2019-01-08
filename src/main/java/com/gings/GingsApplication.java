@@ -1,3 +1,4 @@
+
 package com.gings;
 
 import org.springframework.boot.SpringApplication;

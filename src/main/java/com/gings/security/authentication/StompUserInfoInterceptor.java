@@ -7,7 +7,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import com.gings.security.jwt.UserAuthTokenInfo;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +16,19 @@ import lombok.extern.slf4j.Slf4j;
 public class StompUserInfoInterceptor implements ChannelInterceptor{
     
     @Override
-    public Message<?> postReceive(Message<?> message, MessageChannel channel) {
-        
-        log.info("postReceive called");
+    public Message<?> preSend(Message<?> message, MessageChannel channel){
+        log.info("pre send called");
         
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
-        
+                
         if(command == StompCommand.CONNECT) {
-            log.error("Header check for connected frame.");
-            
-            log.error("SimpUser header : {}", accessor.getUser());
+           log.debug("Stomp Connect message reached here. so just return this.");
+           return message;
+        }else {
+            log.error("Request command : {} and user : {}", accessor.getCommand(), accessor.getUser());
+            return message;
         }
         
-        return message;
     }
-    
 }

@@ -24,6 +24,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.dao.UserMapper;
+import com.gings.security.GingsPrincipal;
 import com.gings.security.StompConnectingAuthentication;
 import com.gings.security.WebSocketPrincipal;
 import com.gings.security.jwt.JWTService;
@@ -92,8 +93,8 @@ public class StompConnectAuthenticationFilter extends AbstractAuthenticationProc
             
             UserAuthTokenInfo tokenInfo = authenticateInternal(jwt);
 
-            WebSocketPrincipal principal = modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
-                                                           WebSocketPrincipal.class);
+            GingsPrincipal principal = modelMapper.map(userMapper.findByUserId(tokenInfo.getUid()), 
+                                                           GingsPrincipal.class);
             
             return new StompConnectingAuthentication(principal);
             

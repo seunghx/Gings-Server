@@ -30,16 +30,16 @@ public class StompConnectingAuthentication implements Authentication, Principal 
     
     private static final long serialVersionUID = 2561946285897548899L;
     
-    private final WebSocketPrincipal principal;
+    private final GingsPrincipal principal;
    
-    public StompConnectingAuthentication(WebSocketPrincipal principal) {
+    public StompConnectingAuthentication(GingsPrincipal principal) {
         
         validate(principal);
         
         this.principal = principal;
     }
     
-    private void validate(WebSocketPrincipal principal) {
+    private void validate(GingsPrincipal principal) {
         if(principal == null || principal.getRole() == null || 
            StringUtils.isEmpty(principal.getEmail()) || principal.getUserId() == 0) {
             
@@ -51,7 +51,7 @@ public class StompConnectingAuthentication implements Authentication, Principal 
     
     @Override
     public String getName() {
-        return principal.getEmail();
+        return principal.getName();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class StompConnectingAuthentication implements Authentication, Principal 
     }
 
     @Override
-    public WebSocketPrincipal getPrincipal() {
+    public GingsPrincipal getPrincipal() {
         return principal;
     }
 
