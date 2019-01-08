@@ -63,7 +63,7 @@ public class BoardController {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);g
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
 
