@@ -119,9 +119,6 @@ public class SearchController {
     public ResponseEntity SearchBoardsByCategoryByWriteTime(@RequestParam String keyword, @PathVariable BoardCategory category,
                                                             final Pagination pagination, GingsPrincipal principal) {
         try {
-
-            log.error("keyword : " + keyword + "category : " + category.toString() + "userid : " + principal.getUserId());
-
             final int userId = principal.getUserId();
 
             DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =

@@ -127,9 +127,6 @@ public class SearchService {
             boards = deleteOverlapBoard(boards);
             if (boards.isEmpty())
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
-
-
-
             return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 
