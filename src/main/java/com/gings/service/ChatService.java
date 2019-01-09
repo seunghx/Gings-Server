@@ -3,6 +3,7 @@ package com.gings.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +15,10 @@ import com.gings.domain.chat.ChatRoom;
 import com.gings.domain.chat.ChatRoom.ChatRoomUser;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq;
-import com.gings.model.chat.SimpleMessage;
+import com.gings.model.chat.IncomingMessage;
 import com.gings.model.chat.ChatNotification.ChatOpenedNotification;
+import com.gings.model.chat.MessageConfirm.LastReadConfirm;
+import com.gings.model.chat.MessageConfirm.LatestReceivedConfirm;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +29,9 @@ public class ChatService {
     
     private final ChatMapper chatMapper;
     private final SimpMessagingTemplate messagingTemplate;
+    
+    @Value("${gings.message.admin-sender-id}")
+    private String GINGS_ADMIN;
 
     
     public ChatService(ChatMapper chatMapper, SimpMessagingTemplate messagingTemplate) {
@@ -92,7 +98,7 @@ public class ChatService {
     }
     
     
-    public ChatMessage addMeesageToChatRoomAndGet(int userId, int roomId, SimpleMessage message) {
+    public ChatMessage addMeesageToChatRoomAndGet(int userId, int roomId, IncomingMessage message) {
         
         log.info("Starting to save new chat message.");
         
@@ -105,7 +111,7 @@ public class ChatService {
         return chatMessage;
     }
     
-    private ChatMessage getChatMessage(int userId, int roomId, SimpleMessage message) {
+    private ChatMessage getChatMessage(int userId, int roomId, IncomingMessage message) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setWriterId(userId);
         chatMessage.setRoomId(roomId);
@@ -116,5 +122,28 @@ public class ChatService {
         return chatMessage;
     }
     
+    
+    public void confirmLastRead(int userId, int roomId, LastReadConfirm messageConfirm) {
+        
+        int messageId = messageConfirm.getMessageId();
+        
+        log.info("Starting to confirm last read message for message : {}", messageId);
+        
+        chatMapper.updateLastReadMessage(userId, roomId, messageId);
+        
+        log.info("Confirming message succeeded.");
+    }
+    
+    public void confirmLatestReceive(int userId, int roomId, LatestReceivedConfirm messageConfirm) {
+        
+        int messageId = messageConfirm.getMessageId();
+
+        log.info("Starting to confirm latest receive message for message : {}", messageId);
+        
+        chatMapper.updateLatestReceived(userId, roomId, messageId);
+        
+        log.info("Confirming message id succeeded.");
+
+    }
 }
    

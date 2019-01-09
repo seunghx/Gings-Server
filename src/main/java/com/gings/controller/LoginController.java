@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import static com.gings.security.jwt.JWTService.AUTHORIZATION;
@@ -137,16 +136,27 @@ public class LoginController {
         }
     }
 
-    private LoginRes onLoginSuccess(LoginUser user) {
-
+    /**
+     * 
+     * 사정이 생겨 우선 JWT token은 헤더와 바디에 모두 넘기고 후에 변경 예정.
+     * 
+     * @param user
+     */
+    private LoginRes onLoginSuccess(LoginUser user){
         setTokenToResponse(user);
 
-        if (user.isFirstLogin()) {
+        TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
+        
+        JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
+        String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
+        
+        if(user.isFirstLogin()) {
             userMapper.setFalseToFirstLogin(user.getUserId());
         }
-
-        return new LoginRes(user.firstLogin);
+        
+        return new LoginRes(user.getUserId(), user.firstLogin, jwt);
     }
+    
 
     private void setTokenToResponse(LoginUser user) {
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
@@ -155,10 +165,9 @@ public class LoginController {
         String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
 
         ServletRequestAttributes requestAttr = (ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes();
+                                            RequestContextHolder.getRequestAttributes();
 
-        requestAttr.getResponse()
-                .setHeader(AUTHORIZATION, jwt);
+        requestAttr.getResponse().setHeader(AUTHORIZATION, jwt);
     }
 
     @Setter

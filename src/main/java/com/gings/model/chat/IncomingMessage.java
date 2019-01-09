@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+
 @Getter
 @Setter
 @ToString
-public class SimpleMessage {
+public class IncomingMessage {
     private MessageType type;
     private String message;
 }
-

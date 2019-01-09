@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.gings.domain.chat.ChatMessage;
 import com.gings.domain.chat.ChatRoom;
@@ -47,8 +48,7 @@ public interface ChatMapper {
         @Result(property = "id", column = "user_id"),
         @Result(property = "name", column = "name"),
         @Result(property = "job", column = "job"),
-        @Result(property = "lastReadMessageId", column = "last_read_message"),
-        @Result(property = "latestReceiveMessageId", column = "latest_receive_message")
+        @Result(property = "image", column = "image")
     })
     public List<ChatRoomUser> findChatRoomUserByRoomId(int roomId);    
 
@@ -65,11 +65,25 @@ public interface ChatMapper {
     public List<ChatMessage> findChatMessageByRoomId(@Param("roomId") int roomId, 
                                                      @Param("lastMessageId") int lastMessageId);
 
+    
     @Select("SELECT count(*)>0 FROM chat_user WHERE room_id = #{roomId} AND user_id = #{userId}")
     boolean existByUserIdAndRoomId(@Param("roomId")int roomId, @Param("userId")int userId);
+    
     
     @Insert("INSERT INTO chat_message(room_id, writer_id, write_at, type, message) "
           + "VALUES(#{roomId}, #{writerId}, #{writeAt}, #{type}, #{message})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     public void saveMessage(ChatMessage chatMessage);
+    
+    
+    @Update("UPDATE chat_user SET latest_receive_message = #{messageId} "
+          + "WHERE user_id = #{userId} AND room_id = #{roomId}")
+    public void updateLastReadMessage(@Param("userId") int userId, @Param("roomId") int roomId, 
+                                      @Param("messageId")int messageId);
+    
+    
+    @Update("UPDATE chat_user SET last_read_message = #{messageId} "
+            + "WHERE user_id = #{userId} AND room_id = #{roomId}")
+    public void updateLatestReceived(@Param("userId") int userId, @Param("roomId") int roomId,  
+                                     @Param("messageId") int messageId);
 }

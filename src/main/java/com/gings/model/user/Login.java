@@ -30,7 +30,8 @@ public class Login {
     @Setter
     @AllArgsConstructor
     public static class LoginRes {
-        
+        private int userId;
         private boolean firstLogin;
+        private String jwt;
     }
 }
