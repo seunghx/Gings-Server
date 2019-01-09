@@ -1,16 +1,13 @@
 package com.gings.controller;
 
 import com.gings.dao.BoardMapper;
-import com.gings.domain.Board;
 
 import com.gings.model.DefaultRes;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
-
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.board.ReBoard.ModifyReBoardReq;
-import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
 
@@ -29,10 +26,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.security.Principal;
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
+
+/**
+ * Created by YW
+ */
 
 @Slf4j
 @RestController
@@ -47,23 +47,39 @@ public class BoardController {
         this.boardMapper = boardMapper;
     }
 
-
     /**
      * 모든 보드 조회
      *
      * @param pagination 페이지네이션
+     * @param principal jwt
      * @return ResponseEntity
      */
     @GetMapping("boards")
     public ResponseEntity getAllBoards(final Pagination pagination, final GingsPrincipal principal) {
-        
-        log.info("User - {}", principal.getUserId());
         try {
             final int userId = principal.getUserId();
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 보드 고유 번호로 보드 조회
+     *
+     * @param boardId 보드 고유 번호
+     * @param principal jwt
+     * @return ResponseEntity
+     */
+    @GetMapping("boards/{boardId}")
+    public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
+        try {
+            final int userId = principal.getUserId();
+            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId, userId);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
@@ -72,7 +88,9 @@ public class BoardController {
     /**
      * 카테고리별 모든 보드 조회(최신순)
      *
+     * @param category 보드 카테고리
      * @param pagination 페이지네이션
+     * @param principal jwt
      * @return ResponseEntity
      */
     @GetMapping("boards/category/{category}/latest")
@@ -83,7 +101,6 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategoryByWriteTime(category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
@@ -92,7 +109,9 @@ public class BoardController {
     /**
      * 카테고리별 모든 보드 조회(추천순)
      *
+     * @param category 보드 카테고리
      * @param pagination 페이지네이션
+     * @param principal jwt
      * @return ResponseEntity
      */
     @GetMapping("boards/category/{category}/recommend")
@@ -103,29 +122,7 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategoryByRecommend(category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-    /**
-     * 보드 고유 번호로 보드 조회
-     *
-     * @param boardId 보드 고유 번호
-     * @return ResponseEntity
-     */
-    @GetMapping("boards/{boardId}")
-    public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
-        try {
-            log.info("User - {}", principal.getUserId());
-            log.info("Board ID - {}", boardId);
-            final int userId = principal.getUserId();
-            DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId, userId);
-            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -133,8 +130,8 @@ public class BoardController {
     /**
      * 보드 저장
      *
-     * @param upBoardReq 보드 데이터
-     * @param  principal jwt
+     * @param upBoardReq 업보드 데이터
+     * @param principal jwt
      * @return ResponseEntity
      */
     @PostMapping("boards")
@@ -152,11 +149,11 @@ public class BoardController {
      * 보드 추천
      *
      * @param boardId 보드 고유 번호
+     * @param principal jwt
      * @return ResponseEntity
      */
     @PostMapping("boards/{boardId}/recommend")
     public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
-        log.error("{}", principal);
         try {
             return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
@@ -184,7 +181,8 @@ public class BoardController {
     /**
      * 리보드 저장
      *
-     * @param reBoardReq 보드 데이터
+     * @param reBoardReq 리보드 데이터
+     * @param principal jwt
      * @return ResponseEntity
      */
 
@@ -203,6 +201,7 @@ public class BoardController {
      * 리보드 추천
      *
      * @param reboardId 보드 고유 번호
+     * @param principal jwt
      * @return ResponseEntity
      */
     @PostMapping("reboards/{reboardId}/recommend")
@@ -219,7 +218,8 @@ public class BoardController {
     /**
      * 보드 수정
      *
-     * @param modifyBoardReq 수정할 보드
+     * @param modifyBoardReq 수정할 보드 데이터
+     * @param principal jwt
      * @return ResponseEntity
      */
     @PutMapping("boards/{boardId}")
@@ -237,7 +237,9 @@ public class BoardController {
     /**
      * 리보드 수정
      *
+     * @param reboardId 리보드 고유 번호
      * @param modifyReBoardReq 수정할 보드
+     * @param principal jwt
      * @return ResponseEntity
      */
     @PutMapping("reboards/{reboardId}")
@@ -255,6 +257,7 @@ public class BoardController {
     /**
      * 보드 삭제
      *
+     * @param boardId 보드 고유 번호
      * @return ResponseEntity
      */
     @DeleteMapping("boards/{boardId}")
@@ -272,6 +275,7 @@ public class BoardController {
     /**
      * 리보드 삭제
      *
+     * @param reboardId 리보드 고유 번호
      * @return ResponseEntity
      */
     @DeleteMapping("reboards/{reboardId}")

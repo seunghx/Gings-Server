@@ -2,7 +2,9 @@ package com.gings.service;
 
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
+
 import com.gings.domain.*;
+
 import com.gings.model.DefaultRes;
 import com.gings.model.MyPage.MyPageProfile;
 import com.gings.model.MyPageBoard;
@@ -12,26 +14,24 @@ import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
-import com.gings.model.board.UpBoard;
-import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
-import com.gings.security.GingsPrincipal;
+
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
+
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Created by YW
+ */
 
 @Slf4j
 @Service
@@ -41,13 +41,6 @@ public class BoardService implements ApplicationEventPublisherAware {
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
 
-    private ApplicationEventPublisher eventPublisher;
-
-    /**
-     * 생성자 의존성 주입
-     *
-     * @param boardMapper
-     */
     public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
                         final S3MultipartService s3MultipartService) {
         this.boardMapper = boardMapper;
@@ -55,11 +48,11 @@ public class BoardService implements ApplicationEventPublisherAware {
         this.s3MultipartService = s3MultipartService;
     }
 
-
     /**
      * 전체 보드 조회
      *
-     * @param
+     * @param pagination 페이지네이션
+     * @param userId 회원 고유 번호
      * @return DefaultRes
      */
     public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination, final int userId) {
