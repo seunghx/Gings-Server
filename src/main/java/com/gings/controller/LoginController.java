@@ -61,7 +61,7 @@ public class LoginController {
     private final MessageSource msgSource;
 
     public LoginController(UserMapper userMapper, PasswordEncoder passwordEncoder,
-                             JWTServiceManager jwtServiceManager, MessageSource msgSource) {
+                           JWTServiceManager jwtServiceManager, MessageSource msgSource) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtServiceManager = jwtServiceManager;
@@ -70,14 +70,14 @@ public class LoginController {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<DefaultRes<Void>> onUsernameNotFound(UsernameNotFoundException ex, WebRequest request) {
-        
+
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                                              null, request.getLocale());
+                null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.UNAUTHORIZED);
+                HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -85,10 +85,10 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                                              null, request.getLocale());
+                null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.UNAUTHORIZED);
+                HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -98,10 +98,10 @@ public class LoginController {
     public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) throws Throwable {
 
         LoginUser user =
-                 Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
+                Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
                         .orElseThrow(() -> {
 
-                            if(log.isInfoEnabled()) {
+                            if (log.isInfoEnabled()) {
                                 log.info("Login failed for user email : {}", loginReq.getEmail());
                             }
 
@@ -119,44 +119,45 @@ public class LoginController {
 
         String email = req.getEmail();
 
-        if(passwordEncoder.matches(req.getPwd(), user.getPwd())){
+        if (passwordEncoder.matches(req.getPwd(), user.getPwd())) {
 
             log.info("Login succeeded for user email : {}", email);
+            userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,
-                                                                             onLoginSuccess(user)),
-                                         HttpStatus.OK);
-        }else {
+                    onLoginSuccess(user)),
+                    HttpStatus.OK);
+        } else {
             log.info("Login failed because of invalid password for user email : {}", email);
 
             throw new BadCredentialsException("Invalid password for user :" + email);
         }
     }
 
-    private LoginRes onLoginSuccess(LoginUser user){
-        
+    private LoginRes onLoginSuccess(LoginUser user) {
+
         setTokenToResponse(user);
-        
-        if(user.isFirstLogin()) {
+
+        if (user.isFirstLogin()) {
             userMapper.setFalseToFirstLogin(user.getUserId());
         }
-        
+
         return new LoginRes(user.firstLogin);
     }
-    
+
     private void setTokenToResponse(LoginUser user) {
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
-        
+
         JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
         String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
-        
+
         ServletRequestAttributes requestAttr = (ServletRequestAttributes)
-                                                    RequestContextHolder.getRequestAttributes();
+                RequestContextHolder.getRequestAttributes();
 
         requestAttr.getResponse()
-                   .setHeader(AUTHORIZATION, jwt);
+                .setHeader(AUTHORIZATION, jwt);
     }
-    
+
     @Setter
     @Getter
     @ToString

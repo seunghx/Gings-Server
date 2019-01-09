@@ -296,5 +296,12 @@ public interface UserMapper {
     @Select("SELECT pwd FROM user WHERE user_id = #{id}")
     public String getPwdByUserId(@Param("id") final int id);
 
+    //=============================================================================================================
+    @Select("SELECT fcm FROM user WHERE user_id = #{id}")
+    public String getTokenOfFcm(@Param("id")final int id);
+
+    @Update("UPDATE user SET fcm=#{fcm}")
+    void saveFcmToken(@Param("id")final int id, @Param("fcm") final String fcm);
+
 
 }
