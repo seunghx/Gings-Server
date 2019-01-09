@@ -10,26 +10,69 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gings.domain.chat.ChatMessage;
-import com.gings.model.chat.ChatOpenReq;
+import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
+import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
 import com.gings.model.chat.IncomingMessage;
-import com.gings.model.chat.MessageConfirm.LastReadConfirm;
-import com.gings.model.chat.MessageConfirm.LatestReceivedConfirm;
 import com.gings.service.ChatService;
 import com.gings.utils.InvalidChatRoomCapacityException;
+import com.gings.utils.WebSocketSessionManager;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 
+ * {@link User}의 {@code id}로 사용하였는데, int 타입과 String 타입 간의 변환이 많아 불편.
+ * 
+ * 후에 email로 변경 예정.
+ * 
+ * @author seunghyun
+ *
+ */
 @Slf4j
 @RestController
 public class ChatController {
-    
+        
     public static final String CHAT_NOTIFICATION_TOPIC = "/queue/chat-notice";
-    
+
     private final ChatService chatService;
+    private final WebSocketSessionManager sessionManager;
     
-    public ChatController(ChatService chatService) {
+    public ChatController(ChatService chatService, WebSocketSessionManager sessionManager) {
         this.chatService = chatService;
+        this.sessionManager = sessionManager;
     }
+    
+    
+    // @SubscribeMapping
+    // ==============================================================================================
+    
+    
+    @SubscribeMapping(CHAT_NOTIFICATION_TOPIC)
+    public void logChatNotificationSubscription(Principal principal) {
+        int userId = Integer.valueOf(principal.getName());
+        
+        log.info("User {} subscribe to chat notification queue.", userId);
+            
+    }
+    
+    @SubscribeMapping("/topic/room/{roomId}")
+    public void logChatRoomSubscription(Principal principal, @DestinationVariable("roomId") int roomId) {
+        int userId = Integer.valueOf(principal.getName());
+        
+        if(chatService.isUserExistInChatRoom(userId, roomId)) {
+            log.info("User {} subscribe to chat room {}", userId, roomId);
+        }else {
+            log.warn("Invalid access detected. User {} subscribe to chat room {}", userId, roomId);
+            
+            sessionManager.close(String.valueOf(userId));
+        }
+    }
+
+    
+    // @MessageMapping
+    // ==============================================================================================
+    
     
     /**
      * 
@@ -41,8 +84,21 @@ public class ChatController {
      * </pre>
      * 
      */
-    @MessageMapping("/chat/create")
-    public void createChat(Principal principal, ChatOpenReq openReq) {
+    @MessageMapping("/normal-chat/create")
+    public void createOneToOneChat(Principal principal, @Validated OneToOneChatOpenReq openReq) {
+                
+        log.info("Starting to create new chat room.");
+        
+        int roomId = chatService.initOneToOneChatRoom(Integer.valueOf(principal.getName()), openReq);
+        
+        chatService.notifyChatRoomOpening(roomId);
+      
+    }
+    
+    @MessageMapping("/group-chat/create")
+    public void createGroupChat(Principal principal, @Validated GroupChatOpenReq openReq) {
+        
+        log.error("{}", openReq);
         
         if(openReq.getRoomType().isCapable(openReq.getUsers().size() + 1)) {
             
@@ -50,38 +106,27 @@ public class ChatController {
             log.info("Chat room type : {}, User number in request : {}", openReq.getRoomType()
                                                                        , openReq.getUsers().size() + 1);
             
-            // 후에 AOP 이용해서 ERROR 메세지 혹은 connection 끊을 예정.
+            sessionManager.close(principal.getName());
+            
             throw new InvalidChatRoomCapacityException("Invalid chat room capacity.");
         }
 
         log.info("Starting to create new chat room.");
         
-        int roomId = chatService.initChatRoom(Integer.valueOf(principal.getName()), openReq);
+        int roomId = chatService.initGroupChatRoom(Integer.valueOf(principal.getName()), openReq);
+        
         chatService.notifyChatRoomOpening(roomId);
       
     }
-    
-    @SubscribeMapping("/topic/room/{roomId}")
-    public void logSubscription(Principal principal, @DestinationVariable("roomId") int roomId) {
-        int userId = Integer.valueOf(principal.getName());
         
-        if(chatService.isUserExistInChatRoom(userId, roomId)) {
-            log.info("User {} subscribe to chat room {}", userId, roomId);
-        }else {
-            log.warn("Invalid access detected. User {} subscribe to chat room {}", userId, roomId);
-            
-            // 후에 connection 종료 로직 추가.
-        }
-    }
-    
     @MessageMapping("/room/{roomId}")
     @SendTo("/topic/room/{roomId}")
     public ChatMessage routeChatMessage(Principal principal, @DestinationVariable("roomId") int roomId, 
                                         IncomingMessage message) {
         
-        log.info("Received new message from {} to {}.");
-        
         int userId = Integer.valueOf(principal.getName());
+        
+        log.info("Received new message from {} to chat room {}.", userId, roomId);
         
         ChatMessage newMessage = chatService.addMeesageToChatRoomAndGet(userId, roomId, message);
         
@@ -93,29 +138,28 @@ public class ChatController {
     @MessageMapping("/room/{roomId}/last-read")
     public void confirmLastRead(Principal principal, 
                                 @DestinationVariable("roomId") int roomId,
-                                @Validated LastReadConfirm messageConfirm) {
+                                int lastRead) {
         
         int userId = Integer.valueOf(principal.getName());
         
         log.info("Received message for confirming last read message. room : {}, user :{}", 
                   roomId, userId);
         
-        
-        chatService.confirmLastRead(userId, roomId, messageConfirm);
+        chatService.confirmLastRead(roomId, userId, lastRead);
         
     }
     
     @MessageMapping("/room/{roomId}/latest-receive")
     public void confirmLatestReceive(Principal principal,
                                      @DestinationVariable("roomId") int roomId,
-                                     @Validated LatestReceivedConfirm messageConfirm) {
+                                     int latestReceive) {
         
         int userId = Integer.valueOf(principal.getName());
         
         log.info("Received message for confirming latest received message. room : {}, user :{}", 
                   roomId, userId);
         
-        chatService.confirmLatestReceive(userId, roomId, messageConfirm);
+        chatService.confirmLatestReceive(roomId, userId, latestReceive);
 
     }
     
