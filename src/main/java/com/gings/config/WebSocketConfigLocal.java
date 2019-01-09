@@ -10,7 +10,6 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.gings.security.authentication.StompConnectionInterceptor;
-import com.gings.security.authentication.StompUserInfoInterceptor;
 
 
 @Profile("local")
@@ -22,8 +21,6 @@ public class WebSocketConfigLocal implements WebSocketMessageBrokerConfigurer{
     
     @Autowired
     private StompConnectionInterceptor connectInterceptor;
-    @Autowired
-    private StompUserInfoInterceptor userInfoInterceptor;
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -57,6 +54,6 @@ public class WebSocketConfigLocal implements WebSocketMessageBrokerConfigurer{
     
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(connectInterceptor,userInfoInterceptor);
+        registration.interceptors(connectInterceptor);
     }
 }

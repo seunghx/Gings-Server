@@ -19,6 +19,7 @@ public class Event {
     private String time;
     private String title;
     private int limit;
+    private String price;
     private String place;
     private String eventImg;
     private String detailImg;

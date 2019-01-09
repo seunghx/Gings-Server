@@ -22,6 +22,8 @@ public class Login {
         private String email;
         @NotBlank(message = MSG_PASSWORD_BLANK)
         private String pwd;
+
+        private String fcm;
     }
     
     @Getter

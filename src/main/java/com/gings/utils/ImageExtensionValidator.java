@@ -61,6 +61,8 @@ public class ImageExtensionValidator implements ConstraintValidator<ImageExtensi
                 log.debug("Invalid file name : {}", ex.getFileName());
             }
             return false;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
 
         log.debug("Validating image file name succeeded.");

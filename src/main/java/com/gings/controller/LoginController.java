@@ -60,7 +60,7 @@ public class LoginController {
     private final MessageSource msgSource;
 
     public LoginController(UserMapper userMapper, PasswordEncoder passwordEncoder,
-                             JWTServiceManager jwtServiceManager, MessageSource msgSource) {
+                           JWTServiceManager jwtServiceManager, MessageSource msgSource) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtServiceManager = jwtServiceManager;
@@ -69,14 +69,14 @@ public class LoginController {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<DefaultRes<Void>> onUsernameNotFound(UsernameNotFoundException ex, WebRequest request) {
-        
+
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                                              null, request.getLocale());
+                null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.UNAUTHORIZED);
+                HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -84,10 +84,10 @@ public class LoginController {
         log.error("Exception occurred while trying to log in user. Exception : ", ex);
 
         String message = msgSource.getMessage("response.authentication.invalid-email-password",
-                                              null, request.getLocale());
+                null, request.getLocale());
 
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), message),
-                                    HttpStatus.UNAUTHORIZED);
+                HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -97,10 +97,10 @@ public class LoginController {
     public ResponseEntity<DefaultRes<LoginRes>> login(@Validated @RequestBody final LoginReq loginReq) throws Throwable {
 
         LoginUser user =
-                 Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
+                Optional.ofNullable(userMapper.findByEmail(loginReq.getEmail()))
                         .orElseThrow(() -> {
 
-                            if(log.isInfoEnabled()) {
+                            if (log.isInfoEnabled()) {
                                 log.info("Login failed for user email : {}", loginReq.getEmail());
                             }
 
@@ -118,22 +118,32 @@ public class LoginController {
 
         String email = req.getEmail();
 
-        if(passwordEncoder.matches(req.getPwd(), user.getPwd())){
+        if (passwordEncoder.matches(req.getPwd(), user.getPwd())) {
 
             log.info("Login succeeded for user email : {}", email);
+            userMapper.findByEmail(email);
+            System.out.println("이메일: " + email);
+            System.out.println("아이디: " + user.getUserId());
+            userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,
-                                                                             onLoginSuccess(user)),
-                                         HttpStatus.OK);
-        }else {
+                    onLoginSuccess(user)),
+                    HttpStatus.OK);
+        } else {
             log.info("Login failed because of invalid password for user email : {}", email);
 
             throw new BadCredentialsException("Invalid password for user :" + email);
         }
     }
 
+    /**
+     * 
+     * 사정이 생겨 우선 JWT token은 헤더와 바디에 모두 넘기고 후에 변경 예정.
+     * 
+     * @param user
+     */
     private LoginRes onLoginSuccess(LoginUser user){
-        //setTokenToResponse(user);
+        setTokenToResponse(user);
 
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
         
@@ -147,27 +157,19 @@ public class LoginController {
         return new LoginRes(user.getUserId(), user.firstLogin, jwt);
     }
     
-    /**
-     * 
-     * 사정이 생겨 우선 JWT token은 아래 메서드를 사용하지 않고 응답 바디에 담아 전달 중.
-     * 
-     * 후에 변경 예정.
-     * 
-     * @param user
-     */
+
     private void setTokenToResponse(LoginUser user) {
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
-        
+
         JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
         String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
-        
-        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
-                                                    RequestContextHolder.getRequestAttributes();
 
-        requestAttr.getResponse()
-                   .setHeader(AUTHORIZATION, jwt);
+        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
+                                            RequestContextHolder.getRequestAttributes();
+
+        requestAttr.getResponse().setHeader(AUTHORIZATION, jwt);
     }
-    
+
     @Setter
     @Getter
     @ToString

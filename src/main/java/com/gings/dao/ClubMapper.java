@@ -43,7 +43,7 @@ public interface ClubMapper {
             @Result(property = "eventImg",column = "event_img"),
             @Result(property = "detailImg",column = "detail_img"),
             @Result(property = "users",column = "event_id",javaType = List.class,
-            many = @Many(select = "findStatusByEvent"))
+                    many = @Many(select = "findStatusByEvent"))
     })
     public List<Event> findEventByClubId(int clubId);
 
@@ -55,12 +55,13 @@ public interface ClubMapper {
             @Result(property = "title",column = "title"),
             @Result(property = "limit",column = "limit_person"),
             @Result(property = "place",column = "place"),
+            @Result(property = "price", column = "price"),
             @Result(property = "eventImg",column = "event_img"),
             @Result(property = "detailImg",column = "detail_img"),
             @Result(property = "users",column = "event_id",javaType = List.class,
                     many = @Many(select = "findStatusByEvent"))
     })
-    public Event findEventByEvent(int clubId, int eventId);
+    public Event findEventByEvent(@Param("clubId")int clubId, @Param("eventId")int eventId);
 
     //클럽 고유 번호로 가입여부 조회(findStatusByClub)
     @Select("SELECT user_id as userId, status as users FROM club_user WHERE club_id = #{clubId}")
@@ -73,9 +74,9 @@ public interface ClubMapper {
 
     //클럽 가입
     @Insert("INSERT INTO club_user(club_id,user_id,status) VALUES(#{clubId},#{userId},#{clubStatus})")
-    void joinClub(int clubId, int userId, String clubStatus);
+    void joinClub(@Param("clubId")int clubId, @Param("userId")int userId, @Param("clubStatus")String clubStatus);
 
     //이벤트 가입
     @Insert("INSERT INTO event_user(event_id,user_id,status) VALUES(#{eventId}, #{userId}, #{eventStatus})")
-    void joinEvent(int eventId, int userId, String eventStatus);
+    void joinEvent(@Param("eventId") int eventId, @Param("userId") int userId, @Param("eventStatus") String eventStatus);
 }

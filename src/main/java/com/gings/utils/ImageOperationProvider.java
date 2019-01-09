@@ -59,7 +59,7 @@ public class ImageOperationProvider {
 
     private static final String IMAGE_FIELD = "image";
 
-    public static void validateImage(String filename) {
+    public static void validateImage(String filename) throws Throwable {
 
         logger.debug("Starting image file name validation.");
 

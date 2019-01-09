@@ -2,7 +2,9 @@ package com.gings.service;
 
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
+
 import com.gings.domain.*;
+
 import com.gings.model.DefaultRes;
 import com.gings.model.MyPage.MyPageProfile;
 import com.gings.model.MyPageBoard;
@@ -12,26 +14,24 @@ import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
-import com.gings.model.board.UpBoard;
-import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
-import com.gings.security.GingsPrincipal;
+
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
+
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Created by YW
+ */
 
 @Slf4j
 @Service
@@ -43,11 +43,6 @@ public class BoardService implements ApplicationEventPublisherAware {
 
     private ApplicationEventPublisher eventPublisher;
 
-    /**
-     * 생성자 의존성 주입
-     *
-     * @param boardMapper
-     */
     public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
                         final S3MultipartService s3MultipartService) {
         this.boardMapper = boardMapper;
@@ -254,6 +249,61 @@ public class BoardService implements ApplicationEventPublisherAware {
             return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD, boardLike);
 
         } catch (Exception e) {
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 보드 차단 & 차단 취소
+     *
+     * @param boardId 보드
+     * @param userId  회원 고유 번호
+     * @return DefaultRes
+     */
+
+    public DefaultRes BoardBlocks(final int boardId, final int userId) {
+        try {
+            if (boardMapper.findBoardByBoardId(boardId) == null)
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+            List<Integer> boardIdList = boardMapper.findBlockBoardsByUserId(userId);
+
+            Board.BoardBlock boardBlock = new Board.BoardBlock();
+
+            for (int id : boardIdList) {
+                if (id == boardId) {
+                    boardMapper.deleteBoardBlockUser(boardId, userId);
+                    boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
+                    return DefaultRes.res(StatusCode.OK, ResponseMessage.CANCEL_BLOCK_BOARD, boardBlock);
+                }
+            }
+            boardMapper.saveBoardBlockUser(boardId, userId);
+            boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, boardBlock);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 보드 공유 개수 증가
+     *
+     * @param boardId 보드
+     * @return DefaultRes
+     */
+
+    public DefaultRes increaseBoardShare(final int boardId) {
+        try {
+            if (boardMapper.findBoardByBoardId(boardId) == null)
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+            boardMapper.updateBoardShare(boardId);
+
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.SHARE_BOARD);
+
+        } catch (Exception e){
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }

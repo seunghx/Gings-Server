@@ -299,5 +299,9 @@ public class MyPageService implements ApplicationEventPublisherAware{
         
     }
 
+    public String getFcm(final int id){
+        return userMapper.getTokenOfFcm(id);
+    }
+
 
 }
