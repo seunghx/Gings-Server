@@ -2,6 +2,7 @@ package com.gings.dao;
 
 import com.gings.domain.Board;
 import com.gings.domain.BoardReply;
+import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
 import com.gings.model.board.ModifyBoard.ModifyBoardReq;
@@ -34,11 +35,11 @@ public interface BoardMapper {
             @Result(property = "numOfReply", column = "board_id", javaType = int.class,
                     one=@One(select="countReply")),
             @Result(property = "recommender", column = "board_id", javaType = int.class,
-                    one = @One(select = "countRecommendByBoardId"))
+                    one = @One(select = "countRecommendByBoardId")),
     })
     public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
 
-    // 키워드로 보드 전체 조회
+    // 카테고리로 보드 전체 조회
     @Select("SELECT * FROM board WHERE category = #{category} ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id", id=true),
@@ -57,6 +58,96 @@ public interface BoardMapper {
     })
     public List<HomeBoardAllRes> findBoardsByCategory(@Param("category") final BoardCategory category,
                                                       @Param("pagination") final Pagination pagination);
+
+    // 키워드로 보드 전체 조회(최신순)
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE title LIKE CONCAT('%',#{keyword},'%') "+
+            "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+
+    @Results(value= {
+            @Result(property="boardId", column="board_id", id=true), @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId")),
+    })
+    public List<HomeBoardAllRes> findBoardsByKeywordOrderByWriteTime(String keyword, Pagination pagination);
+
+    // 키워드로 보드 전체 조회(추천순)
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE title LIKE CONCAT('%',#{keyword},'%') "+
+            "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+
+    @Results(value= {
+            @Result(property="boardId", column="board_id", id=true), @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId"))
+    })
+    public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(String keyword, Pagination pagination);
+
+    // 카테고리별로 키워드로 보드 전체 조회(최신순)
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} AND title LIKE CONCAT('%',#{keyword},'%') "+
+            "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+
+    @Results(value= {
+            @Result(property="boardId", column="board_id", id=true), @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId")),
+    })
+    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByWriteTime(String keyword, BoardCategory category, Pagination pagination);
+
+    // 카테고리별로 키워드로 보드 전체 조회(추천순)
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} OR title LIKE CONCAT('%',#{keyword},'%') "+
+            "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+
+    @Results(value= {
+            @Result(property="boardId", column="board_id", id=true), @Result(property="writerId", column="writer_id"),
+            @Result(property="title", column="title"),  @Result(property="content", column="content"),
+            @Result(property="share", column="share_cnt"), @Result(property="time", column="write_time"),
+            @Result(property="category", column="category"),
+            @Result(property="images", column="board_id", javaType= List.class,
+                    many=@Many(select="findImagesByBoardId")),
+            @Result(property = "keywords", column = "board_id", javaType = List.class,
+                    many=@Many(select="findKeywordsByBoardId")),
+            @Result(property = "numOfReply", column = "board_id", javaType = int.class,
+                    one=@One(select="countReply")),
+            @Result(property = "recommender", column = "board_id", javaType = int.class,
+                    one = @One(select = "countRecommendByBoardId")),
+    })
+    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByRecommend(String keyword, BoardCategory category, Pagination pagination);
+
+
 
     // 보드 고유 번호로 이미지 전체 조회(findImagesByBoard)
     @Select("SELECT url FROM board_img WHERE board_id = #{boardId}")
@@ -85,7 +176,6 @@ public interface BoardMapper {
     // 회원 고유 번호로 좋아요 한 보드 조회
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
-
 
     // 보드 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE board_id = #{boardId}")
@@ -125,8 +215,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<Board> findBoardByUserId(int userId);
-
+    public List<MyPageBoard> findBoardByUserId(int userId);
 
     // 보드 고유 번호로 해당 리보드 조회
     @Select("SELECT * FROM board_reply WHERE board_id = #{boardId} ORDER BY write_time DESC")
@@ -172,6 +261,7 @@ public interface BoardMapper {
     // 회원 고유 번호로 좋아요 한 리보드 조회
     @Select("SELECT reply_id FROM reply_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendReBoardsByUserId(int userId);
+
 
 
 
@@ -231,19 +321,19 @@ public interface BoardMapper {
     UpBoard
      */
 
-    //업보드 수정하기
+    //업보드 수정
     @Update("UPDATE board SET title=#{ModifyBoardReq.title}, content=#{ModifyBoardReq.content}, category=#{ModifyBoardReq.category}, write_time = now() WHERE board_id = #{boardId}")
     void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
     //업보드 공유 갯수 업데이트
-    @Update("UPDATE board SET share_cnt=#{UpBoardReq.share} WHERE board_id=#{boardId}")
-    void updateBoardShare(@Param("boardId") final int boardId, @Param("UpBoardReq") final UpBoardReq upBoardReq);
+    @Update("UPDATE board SET share_cnt = share_cnt + 1 WHERE board_id=#{boardId}")
+    void updateBoardShare(@Param("boardId") final int boardId);
 
 
     /*
     ReBoard
      */
-
+    // 리보드 수정
     @Update("UPDATE board_reply SET content=#{ModifyReBoardReq.content}, write_time = now() WHERE reply_id = #{replyId}")
     void updateReBoard(@Param("replyId") final int replyId, @Param("ModifyReBoardReq") final ModifyReBoardReq modifyReBoardReq);
 

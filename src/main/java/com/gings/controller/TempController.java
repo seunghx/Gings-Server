@@ -1,16 +1,13 @@
 package com.gings.controller;
 
 import java.security.Principal;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,27 +27,23 @@ public class TempController {
     @Setter
     @ToString
     public static class Temp {
-        private UserRole role;
     }
     
-    @GetMapping("temp")
-    public ResponseEntity<Temp> temp(Temp temp){
-        log.error("{}", temp.getRole());
-        
-        return new ResponseEntity<>(temp, HttpStatus.OK);
-    }
     
     @SubscribeMapping("/topic/temp")
     public void stageSubscription(Principal principal, StompHeaderAccessor accessor) {
          
-        log.error("Subscription success.");
         log.error("Succeeded subscription id : {}", accessor.getSubscriptionId());
         
+        log.error("{}", principal);
     }
+    
 
-    @MessageMapping("/topic/temp")
+    @MessageMapping("/temp")
     @SendTo("/topic/temp")
-    public ECHO sendStageChatMessage(ECHO echo) {
+    public ECHO sendStageChatMessage(Principal principal, ECHO echo) {
+        log.error("{}", principal.getClass());
+        log.error("{}", principal);
         log.error("Message sending success");
         log.error("Message : {}", echo);
         

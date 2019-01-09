@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,9 +25,9 @@ import com.gings.security.jwt.JWTServiceManager;
  *
  */
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    
+        
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     }
@@ -35,16 +36,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf()
                 .disable()
-                .authorizeRequests()
+            .authorizeRequests()
                 .anyRequest()
                 .permitAll()
-           //     .antMatchers(WS_CONNECT)
-           //     .authenticated()
-            .and()
+                .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -69,4 +68,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public JWTService emailNumberJWTService() {
         return new EmailAuthWTService();
     }
+  
 }

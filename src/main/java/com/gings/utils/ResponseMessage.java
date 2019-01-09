@@ -14,6 +14,12 @@ public class ResponseMessage {
     public static final String UPDATE_USER = "회원 정보 수정 성공";
     public static final String FAIL_UPDATE_USER = "회원 정보 수정 실패";
     public static final String DELETE_USER = "회원 탈퇴 성공";
+    public static final String CHANGED_PWD = "비밀번호 변경 성공";
+    //public static final String FAILED_TO_CHANGE_PWD = "비밀번호 변경 실패";
+    public static final String OLD_PWD_IS_WRONG = "현재 비밀번호가 잘못 되었습니다.";
+    public static final String PWD_CORRECT = "비밀번호가 일치합니다.";
+    public static final String NOT_SAME_PWD = "두 비밀번호가 일치하지 않습니다.";
+
 
     public static final String UNQUALIFIED = "자격 없음";
 
@@ -55,6 +61,8 @@ public class ResponseMessage {
     public static final String DELETE_BOARD = "보드 삭제 성공";
     public static final String LIKE_BOARD = "보드 추천 성공";
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
+    public static final String SHARE_BOARD = "보드 공유 성공";
+
 
     public static final String JOIN_CLUB = "클럽 가입 승인 신청 성공";
     public static final String JOIN_EVENT = "이벤트 참여 승인 신청 성공";
@@ -87,6 +95,9 @@ public class ResponseMessage {
 
     public static final String SEARCH_DIRECTORY = "디렉토리 검색 성공";
     public static final String NO_SEARCH_RESULT = "검색 결과가 없습니다.";
+
+
+    public static final String SEARCH_BOARD = "보드 검색 성공";
 
     public static final String AUTHORIZED = "인증 성공";
     public static final String UNAUTHORIZED = "인증 실패";

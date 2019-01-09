@@ -1,5 +1,7 @@
 package com.gings.security;
 
+import java.security.Principal;
+
 import com.gings.utils.UserRole;
 
 import lombok.AllArgsConstructor;
@@ -11,16 +13,17 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Principal {
-    public Integer userId;
-    public UserRole role;
-    public String email;
+public class GingsPrincipal{
     
-    public Principal() {
+    private Integer userId;
+    private UserRole role;
+    private String email;
+    
+    public GingsPrincipal() {
         
     }
     
-    public Principal(Integer userId, UserRole role) {
+    public GingsPrincipal(Integer userId, UserRole role) {
         this.userId = userId;
         this.role = role;
     }

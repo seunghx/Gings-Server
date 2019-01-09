@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -28,13 +29,15 @@ public class MyPageService implements ApplicationEventPublisherAware{
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
+    private final PasswordEncoder passwordEncoder;
 
     private ApplicationEventPublisher eventPublisher;
 
-    public MyPageService(BoardMapper boardMapper, UserMapper userMapper, S3MultipartService s3MultipartService) {
+    public MyPageService(BoardMapper boardMapper, UserMapper userMapper, S3MultipartService s3MultipartService, PasswordEncoder passwordEncoder) {
         this.boardMapper = boardMapper;
         this.userMapper = userMapper;
         this.s3MultipartService = s3MultipartService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -256,10 +259,49 @@ public class MyPageService implements ApplicationEventPublisherAware{
         }
     }
 
+    /**
+     * 비밀번호 변경 시 비밀번호 일치 확인
+     *
+     * @param id
+     * @param myPagePwdRes
+     * @return
+     */
+    public DefaultRes chkPwd(final int id, MyPage.MyPagePwdRes myPagePwdRes){
+        try{
+            if(passwordEncoder.matches(myPagePwdRes.getOldPwd(), userMapper.getPwdByUserId(id)))
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.PWD_CORRECT);
+            else return DefaultRes.res(StatusCode.FAILED, ResponseMessage.OLD_PWD_IS_WRONG);
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    public DefaultRes modifyPwd(final int id, MyPage.MyPagePwdRes myPagePwdRes){
+        try{
+            if(myPagePwdRes.getNewPwd1().equals(myPagePwdRes.getNewPwd2())){
+                myPagePwdRes.setNewPwd1(passwordEncoder.encode(myPagePwdRes.getNewPwd1()));
+                userMapper.updatePwd(id, myPagePwdRes);
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.CHANGED_PWD);
+            }else
+                return DefaultRes.res(StatusCode.FAILED, ResponseMessage.NOT_SAME_PWD);
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.DB_ERROR);
+        }
+    }
+
+
+
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
         
     }
+
+    public String getFcm(final int id){
+        return userMapper.getTokenOfFcm(id);
+    }
+
 
 }

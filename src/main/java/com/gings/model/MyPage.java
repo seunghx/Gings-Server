@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gings.domain.UserKeyword;
 import com.gings.model.board.UpBoard;
 
+import com.gings.utils.code.Region;
+import com.gings.utils.code.Status;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +23,11 @@ import java.util.List;
 public class MyPage {
     private int id;
     private String name;
-    private String region;
+    private Region region;
     private String job;
     private String company;
     private String field;
-    private String status;
+    private Status status;
     private String image;   //프로필
     private boolean coworkingEnabled;
     private List<String> keywords;
@@ -61,5 +65,16 @@ public class MyPage {
     @Setter
     public static class MyPageProfile{
         private String image;
+    }
+
+    @Getter
+    @Setter
+    public static class MyPagePwdRes{
+        private static final String INVALID_PWD = "비밀 번호는 7~14 글자의 영문 대소문자 및 숫자로 구성되어야 합니다.";
+
+        private String oldPwd;
+        @Pattern(regexp = "^(?=.*[a-zA-Z]+)(?=.*[!@#$%^*+=-]|.*[0-9]+).{7,14}$", message = INVALID_PWD)
+        private String newPwd1;
+        private String newPwd2;
     }
 }

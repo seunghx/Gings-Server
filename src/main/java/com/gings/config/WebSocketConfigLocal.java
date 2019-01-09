@@ -13,15 +13,10 @@ import com.gings.security.authentication.StompConnectionInterceptor;
 import com.gings.security.authentication.StompUserInfoInterceptor;
 
 
-/**
- * 
- * @author seunghyun
- *
- */
-@Profile("production")
+@Profile("local")
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
+public class WebSocketConfigLocal implements WebSocketMessageBrokerConfigurer{
 
     public static final String WS_CONNECT = "/connect";
     
@@ -57,8 +52,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     // 후에 웹 채팅 추가할 경우 registrty.withSockJS() 추가 예정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*");
-
+        registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*").withSockJS();
     }
     
     @Override

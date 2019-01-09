@@ -30,6 +30,8 @@ public class UpBoard {
         private int recommender;
         private int share;
 
+        private boolean likeChk;
+
     }
 
     @Getter
@@ -75,6 +77,8 @@ public class UpBoard {
         private List<BoardReply> replys;
 
         private int recommender;
+
+        private boolean likeChk;
 
     }
 }

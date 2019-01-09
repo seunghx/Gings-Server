@@ -2,6 +2,7 @@ package com.gings.model.board;
 
 import com.gings.domain.BoardReply;
 import com.gings.utils.code.BoardCategory;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,7 @@ import java.util.List;
 public class HomeBoard {
     @Getter
     @Setter
-    public static class HomeBoardAllRes {
+    public static class HomeBoardAllRes implements Comparable<HomeBoardAllRes>{
         private int boardId;
 
         private int writerId;
@@ -34,6 +35,17 @@ public class HomeBoard {
 
         private int recommender;
 
+        private boolean likeChk;
+
+        @Override
+        public int compareTo(HomeBoardAllRes o) {
+            if (this.recommender < o.getRecommender()) {
+                return 1;
+            } else if (this.recommender > o.getRecommender()) {
+                return -1;
+            }
+            return 0;
+        }
     }
 
     @Getter
@@ -61,5 +73,8 @@ public class HomeBoard {
         private int numOfReply;
         private int recommender;
 
+        private boolean likeChk;
+
     }
+
 }
