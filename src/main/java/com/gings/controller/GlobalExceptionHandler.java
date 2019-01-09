@@ -20,6 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.gings.model.ApiError;
+import com.gings.utils.UnsupportedImageFormatException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -176,6 +177,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, headers, status, request);
     }
 
+    @ExceptionHandler(UnsupportedImageFormatException.class)
+    public ResponseEntity<ApiError> handleUnsupportedImageFormatException(UnsupportedImageFormatException ex,
+            WebRequest request) {
+        logger.error("An Exception to be processed", ex);
+
+        StringBuilder builder = new StringBuilder();
+        ex.getSupportedExtensions().stream()
+                                   .forEach(ext -> builder.append(", ").append(ext));
+
+        ApiError apiError = 
+                new ApiError(HttpStatus.BAD_REQUEST.value(),
+                             msgSource.getMessage("response.exception.UnsupportedImageFormatException",
+                                                  new String[] { builder.substring(2) }, request.getLocale()));
+
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
 
     /**
      * 
@@ -193,4 +211,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
+    
 }

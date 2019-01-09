@@ -65,4 +65,11 @@ public interface ChatMapper {
     public List<ChatMessage> findChatMessageByRoomId(@Param("roomId") int roomId, 
                                                      @Param("lastMessageId") int lastMessageId);
 
+    @Select("SELECT count(*)>0 FROM chat_user WHERE room_id = #{roomId} AND user_id = #{userId}")
+    boolean existByUserIdAndRoomId(@Param("roomId")int roomId, @Param("userId")int userId);
+    
+    @Insert("INSERT INTO chat_message(room_id, writer_id, write_at, type, message) "
+          + "VALUES(#{roomId}, #{writerId}, #{writeAt}, #{type}, #{message})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    public void saveMessage(ChatMessage chatMessage);
 }

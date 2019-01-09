@@ -1,5 +1,6 @@
 package com.gings.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -8,11 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gings.controller.ChatController;
 import com.gings.dao.ChatMapper;
+import com.gings.domain.chat.ChatMessage;
 import com.gings.domain.chat.ChatRoom;
 import com.gings.domain.chat.ChatRoom.ChatRoomUser;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq;
-import com.gings.utils.code.ChatCommand;
+import com.gings.model.chat.SimpleMessage;
+import com.gings.model.chat.ChatNotification.ChatOpenedNotification;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,62 +33,87 @@ public class ChatService {
         this.messagingTemplate = messagingTemplate;
     }
     
-    
+    /**
+     * {@link Transactional} 때문에 notification을 메서드 밖에서 수행.
+     * 
+     * @return created chat room id;
+     */
     @Transactional
-    public void initChatRoom(int userId, ChatOpenReq openReq) {
+    public int initChatRoom(int userId, ChatOpenReq openReq) {
                 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setType(openReq.getRoomType());
-        
         chatMapper.saveChatRoom(chatRoom);
         
         openReq.getUsers().add(userId);
         chatMapper.saveUsersToRoom(chatRoom.getId(), openReq.getUsers());
         
-        sendRoomIdToUser(chatRoom.getId(), openReq.getUsers());
+        log.info("Creating chat room succeeded.");
         
-        
-    }
-    
-    public void processChatRoomEntrance(int userId, int roomId) {
-        
-        log.info("Processing chat room({}) entrance for user : {}", roomId
-                                                                  , userId);
-        
-        ChatRoom chatRoom = getChatRoomForUser(userId, roomId);
-        
-        messagingTemplate.convertAndSendToUser(String.valueOf(userId), 
-                                               ChatController.CHAT_NOTIFICATION_TOPIC, chatRoom);
+        return chatRoom.getId();
         
     }
     
-    private ChatRoom getChatRoomForUser(int userId, int roomId) {
+    /**
+     * {@link Transactional}의 영향 받지 않기 위해 분리.
+     */
+    public void notifyChatRoomOpening(int roomId) {
+        
+        log.info("Starting to notify chat room opening for room : {}", roomId);
+        
         ChatRoom chatRoom = chatMapper.findChatRoomByRoomId(roomId);
         
-        validateRoomForUser(chatRoom.getUsers(), userId, roomId);
-        
-        return chatRoom;
-        
+        sendRoomToUser(chatRoom);
     }
     
-    private void validateRoomForUser(List<ChatRoomUser> users, int userId, int roomId) {
-        if(users.stream().anyMatch(user -> user.getId() == userId)) {
-            log.info("Room entrance request validated successfully");
+    private void sendRoomToUser(ChatRoom room) {
+        
+        ChatNotification notification = new ChatOpenedNotification(room);
+        
+        List<ChatRoomUser> users = room.getUsers();
+        
+        if(users.size() == 0) {
+            log.error("Illegal state detected. Chat room has no user.");
             return;
         }
         
-        log.warn("Requesting user {} does not exist in chat room {}", userId, roomId);
-        
-        // Websocket session 저장해두었다가(hash형태로) connection close()하기.
-        throw new IllegalStateException();
-    }
-    
-    private void sendRoomIdToUser(int roomId, List<Integer> users) {
         users.forEach(user -> {
-            ChatNotification notification = new ChatNotification(ChatCommand.ROOM_OPENED, roomId);
-            messagingTemplate.convertAndSendToUser(user.toString(), ChatController.CHAT_NOTIFICATION_TOPIC, 
+            messagingTemplate.convertAndSendToUser(String.valueOf(user.getId()), 
+                                                   ChatController.CHAT_NOTIFICATION_TOPIC, 
                                                    notification);
         });
+    }
+    
+    public boolean isUserExistInChatRoom(int userId, int roomId) {
+        
+        log.info("Checking existence for user {} with room {}", userId, roomId);
+        
+        return chatMapper.existByUserIdAndRoomId(userId, roomId);
+    }
+    
+    
+    public ChatMessage addMeesageToChatRoomAndGet(int userId, int roomId, SimpleMessage message) {
+        
+        log.info("Starting to save new chat message.");
+        
+        ChatMessage chatMessage = getChatMessage(userId, roomId, message);
+        
+        chatMapper.saveMessage(chatMessage);
+        
+        log.info("New message creation succeeded.");
+        
+        return chatMessage;
+    }
+    
+    private ChatMessage getChatMessage(int userId, int roomId, SimpleMessage message) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setWriterId(userId);
+        chatMessage.setRoomId(roomId);
+        chatMessage.setType(message.getType());
+        chatMessage.setMessage(message.getMessage());
+        chatMessage.setWriteAt(LocalDateTime.now());
+        
+        return chatMessage;
     }
     
 }

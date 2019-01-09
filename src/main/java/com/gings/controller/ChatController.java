@@ -2,21 +2,18 @@ package com.gings.controller;
 
 import java.security.Principal;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
 
-import com.gings.domain.chat.ChatRoom;
-import com.gings.model.DefaultRes;
+import com.gings.domain.chat.ChatMessage;
 import com.gings.model.chat.ChatOpenReq;
-import com.gings.security.WebSocketPrincipal;
+import com.gings.model.chat.SimpleMessage;
+import com.gings.model.chat.MessageConfirm.LastReadConfirm;
+import com.gings.model.chat.MessageConfirm.LatestReceiveConfirm;
 import com.gings.service.ChatService;
 import com.gings.utils.InvalidChatRoomCapacityException;
 
@@ -44,8 +41,8 @@ public class ChatController {
      * </pre>
      * 
      */
-    @MessageMapping("/chat/create")
-    public void createChat(WebSocketPrincipal principal, ChatOpenReq openReq) {
+    @MessageMapping("/topic/chat/create")
+    public void createChat(Principal principal, ChatOpenReq openReq) {
         
         if(openReq.getRoomType().isCapable(openReq.getUsers().size() + 1)) {
             
@@ -57,22 +54,44 @@ public class ChatController {
 
         log.info("Starting to create new chat room.");
         
-        chatService.initChatRoom(principal.getUserId(), openReq);
-        
-        log.info("Creation chat room succeeded");
+        int roomId = chatService.initChatRoom(Integer.valueOf(principal.getName()), openReq);
+        chatService.notifyChatRoomOpening(roomId);
+      
     }
     
-    @SubscribeMapping("/topic/chatRoom/{roomId}")
-    @SendTo("/queue/")
-    public void onSubscribe(Principal principal, @DestinationVariable int roomId) {
+    @SubscribeMapping("/topic/room/{roomId}")
+    public void logSubscription(Principal principal, @DestinationVariable("roomId") int roomId) {
+        int userId = Integer.valueOf(principal.getName());
         
-        if(log.isInfoEnabled()) {
-            log.info("Received subscription message for chatRoom : {} from user : {}", 
-                                                            roomId, principal.getName());
+        if(chatService.isUserExistInChatRoom(userId, roomId)) {
+            log.info("User {} subscribe to chat room {}", userId, roomId);
+        }else {
+            log.warn("Invalid access detected. User {} subscribe to chat room {}", userId, roomId);
+            
+            // 후에 connection 종료 로직 추가.
         }
-        
-        chatService.processChatRoomEntrance(Integer.valueOf(principal.getName()), roomId);
-        
     }
     
+    @MessageMapping("/topic/room/{roomId}")
+    @SendTo("/topic/room/{roomId}")
+    public ChatMessage routeChatMessage(Principal principal, @DestinationVariable("roomId") int roomId, 
+                                        SimpleMessage message) {
+        
+        log.info("Received new message from {} to {}.");
+        
+        int userId = Integer.valueOf(principal.getName());
+        
+        ChatMessage newMessage = chatService.addMeesageToChatRoomAndGet(userId, roomId, message);
+        
+        log.info("Now, routing new message {} to chat room {}", newMessage, roomId);
+        
+        return newMessage;
+    }
+    
+    @MessageMapping("/topic/room/{roomId}/message/last-read")
+    public void confirmLastRead(Principal principal, 
+                                @DestinationVariable("roomId") int roomId,
+                                @Validated LastReadConfirm messageConfirm) {
+        
+    }
 }

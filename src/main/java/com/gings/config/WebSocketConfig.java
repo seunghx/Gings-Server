@@ -29,11 +29,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     private StompConnectionInterceptor connectInterceptor;
     @Autowired
     private StompUserInfoInterceptor userInfoInterceptor;
-        
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-       registration.interceptors(connectInterceptor,userInfoInterceptor);
-    }
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -65,5 +60,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
         registry.addEndpoint(WS_CONNECT).setAllowedOrigins("*");
 
     }
-
+    
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(connectInterceptor,userInfoInterceptor);
+    }
 }
