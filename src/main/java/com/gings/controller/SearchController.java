@@ -11,10 +11,12 @@ import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.SearchService;
 import com.gings.service.UserService;
+import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,6 +80,7 @@ public class SearchController {
     public ResponseEntity SearchBoardsByLatest(@RequestParam String keyword, final Pagination pagination, final GingsPrincipal principal) {
         try {
             final int userId = principal.getUserId();
+            log.error("userid : " + userId);
             DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
                     searchService.selectBoardByKeywordByWriteTime(keyword, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
@@ -108,16 +111,18 @@ public class SearchController {
     }
 
     /**
-     * 보드 검색(추천순)
+     * 카테고리별 보드 검색(최신순)
      *
      * @return ResponseEntity
      */
-    @GetMapping("search/boards/category/recommend")
-    public ResponseEntity SearchBoardsByCategoryByRecommend(@RequestParam String keyword, final Pagination pagination, GingsPrincipal principal) {
+    @GetMapping("search/boards/category/{category}/latest")
+    public ResponseEntity SearchBoardsByCategoryByWriteTime(@RequestParam String keyword, @PathVariable BoardCategory category,
+                                                            final Pagination pagination, GingsPrincipal principal) {
         try {
             final int userId = principal.getUserId();
+
             DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
-                    searchService.selectBoardByKeywordByRecommend(keyword, pagination, userId);
+                    searchService.selectBoardByCategoryByKeywordByWriteTime(keyword, category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,4 +131,23 @@ public class SearchController {
         }
     }
 
+    /**
+     * 카테고리별 보드 검색(추천순)
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("search/boards/category/{category}/recommend")
+    public ResponseEntity SearchBoardsByCategoryByRecommend(@RequestParam String keyword, @PathVariable BoardCategory category,
+                                                            final Pagination pagination, GingsPrincipal principal) {
+        try {
+            final int userId = principal.getUserId();
+            DefaultRes<List<HomeBoard.HomeBoardAllRes>> defaultRes =
+                    searchService.selectBoardByCategoryByKeywordByRecommend(keyword, category, pagination, userId);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

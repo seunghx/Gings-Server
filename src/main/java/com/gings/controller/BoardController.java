@@ -154,10 +154,11 @@ public class BoardController {
      */
     @PostMapping("boards/{boardId}/recommend")
     public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
+        log.error("{}", principal);
         try {
             return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }

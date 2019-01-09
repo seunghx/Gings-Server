@@ -12,6 +12,7 @@ import com.gings.model.board.HomeBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
+import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -114,17 +115,37 @@ public class SearchService {
     }
 
     /**
-     * 보드 검색(최신순)
+         * 카테고리별 보드 검색(최신순)
+         *
+         * @param
+         * @return DefaultRes
+         */
+        public DefaultRes<List<HomeBoardAllRes>> selectBoardByCategoryByKeywordByWriteTime(final String keyword, final BoardCategory boardCategory,
+                                                                                           final Pagination pagination, final int userId) {
+            List<HomeBoardAllRes> boards =
+                    boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByWriteTime(keyword, boardCategory, pagination), userId);
+            boards = deleteOverlapBoard(boards);
+            if (boards.isEmpty())
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+    }
+
+    /**
+     * 카테고리별 보드 검색(추천순)
      *
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> selectBoardByCateogryByKeywordByWriteTime(final String keyword, final Pagination pagination, final int userId) {
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByCategoryByKeywordByRecommend(final String keyword, final BoardCategory boardCategory,
+                                                                                       final Pagination pagination, final int userId) {
         List<HomeBoardAllRes> boards =
-                boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByWriteTime(keyword, pagination), userId);
+                boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByRecommend(keyword, boardCategory, pagination), userId);
         boards = deleteOverlapBoard(boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+
+        Collections.sort(boards);
+
         return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
     }
 
