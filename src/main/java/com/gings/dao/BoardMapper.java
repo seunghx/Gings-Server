@@ -104,7 +104,7 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(String keyword, Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(최신순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} OR title LIKE CONCAT('%',#{keyword},'%') "+
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} AND title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
             "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
@@ -216,7 +216,6 @@ public interface BoardMapper {
                     one = @One(select = "countRecommendByBoardId"))
     })
     public List<MyPageBoard> findBoardByUserId(int userId);
-
 
     // 보드 고유 번호로 해당 리보드 조회
     @Select("SELECT * FROM board_reply WHERE board_id = #{boardId} ORDER BY write_time DESC")
