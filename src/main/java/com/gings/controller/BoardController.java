@@ -163,6 +163,23 @@ public class BoardController {
     }
 
     /**
+     * 보드 가리기
+     *
+     * @param boardId 보드 고유 번호
+     * @param principal jwt
+     * @return ResponseEntity
+     */
+    @PostMapping("boards/{boardId}/block")
+    public ResponseEntity blockBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
+        try {
+            return new ResponseEntity<>(boardService.BoardBlocks(boardId, principal.getUserId()), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * 보드 공유
      *
      * @param boardId 보드 고유 번호

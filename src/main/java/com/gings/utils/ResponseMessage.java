@@ -62,6 +62,9 @@ public class ResponseMessage {
     public static final String LIKE_BOARD = "보드 추천 성공";
     public static final String CANCEL_LIKE_BOARD = "보드 추천 해제 성공";
     public static final String SHARE_BOARD = "보드 공유 성공";
+    public static final String BLOCK_BOARD = "보드 가리기 성공";
+    public static final String CANCEL_BLOCK_BOARD = "보드 가리기 해제 성공";
+
 
 
     public static final String JOIN_CLUB = "클럽 가입 승인 신청 성공";

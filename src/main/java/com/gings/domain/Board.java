@@ -31,10 +31,18 @@ public class Board {
 
 
 
+
     @Getter
     @Setter
     @ToString
     public static class BoardRecommend {
         private List<Integer> recommendBoardIdList;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class BoardBlock {
+        private List<Integer> blockBoardIdList;
     }
 }

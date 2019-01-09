@@ -21,7 +21,8 @@ import java.util.Locale;
 public interface BoardMapper {
 
     // 보드 전체 조회 (findAllBoard)
-    @Select("SELECT * FROM board ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+    @Select("SELECT * FROM board LEFT JOIN board_block ON board.board_id = board_block.board_id WHERE board_block.board_id IS NULL " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id", id=true),
             @Result(property="writerId", column="writer_id"),
@@ -40,7 +41,8 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
 
     // 카테고리로 보드 전체 조회
-    @Select("SELECT * FROM board WHERE category = #{category} ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
+    @Select("SELECT * FROM board LEFT JOIN board_block ON board.board_id = board_block.board_id WHERE board_block.board_id IS NULL AND board.category = #{category} " +
+            "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id", id=true),
             @Result(property="writerId", column="writer_id"),
@@ -60,9 +62,12 @@ public interface BoardMapper {
                                                       @Param("pagination") final Pagination pagination);
 
     // 키워드로 보드 전체 조회(최신순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE title LIKE CONCAT('%',#{keyword},'%') "+
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
+            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
+            "WHERE board_block.board_id IS NULL "+
+            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
-            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
 
     @Results(value= {
@@ -82,9 +87,12 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByKeywordOrderByWriteTime(String keyword, Pagination pagination);
 
     // 키워드로 보드 전체 조회(추천순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE title LIKE CONCAT('%',#{keyword},'%') "+
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
+            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
+            "WHERE board_block.board_id IS NULL "+
+            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
-            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
 
     @Results(value= {
@@ -104,9 +112,13 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(String keyword, Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(최신순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} AND title LIKE CONCAT('%',#{keyword},'%') "+
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
+            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
+            "WHERE board_block.board_id IS NULL "+
+            "AND category = #{category}" +
+            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
-            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
 
     @Results(value= {
@@ -126,9 +138,13 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByWriteTime(String keyword, BoardCategory category, Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(추천순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id WHERE category = #{category} OR title LIKE CONCAT('%',#{keyword},'%') "+
+    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
+            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
+            "WHERE board_block.board_id IS NULL "+
+            "AND category = #{category}" +
+            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
-            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%') " +
+            "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
 
     @Results(value= {
@@ -169,13 +185,17 @@ public interface BoardMapper {
     @Select("SELECT COUNT(recommender_id) FROM board_recommend WHERE board_id = #{boardId}")
     public int countRecommendByBoardId(int boardId);
 
-    // 보드 고유 번호로 보드 좋아요 한 회원 고유 번호 조회
+    // 보드 고유 번호로 보드 좋아요한 회원 고유 번호 조회
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{recommenderId}")
     public List<Integer> findBoardIdByRecommenderId(int recommenderId);
 
-    // 회원 고유 번호로 좋아요 한 보드 조회
+    // 회원 고유 번호로 좋아요한 보드 조회
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
+
+    // 회원 고유 번호로 차단한 보드 조회
+    @Select("SELECT board_id FROM board_block WHERE block_user_id = #{userId}")
+    public List<Integer> findBlockBoardsByUserId(int userId);
 
     // 보드 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE board_id = #{boardId}")
@@ -294,6 +314,10 @@ public interface BoardMapper {
     @Insert("INSERT INTO board_recommend(board_id, recommender_id) VALUES(#{boardId}, #{userId})")
     void saveBoardRecommender(@Param("boardId") int boardId, @Param("userId") int userId);
 
+    // 업보드 차단한 사람 저장
+    @Insert("INSERT INTO board_block(board_id, block_user_id) VALUES(#{boardId}, #{userId})")
+    void saveBoardBlockUser(@Param("boardId") int boardId, @Param("userId") int userId);
+
 
     /*
     ReBoard
@@ -371,4 +395,8 @@ public interface BoardMapper {
     //회원 고유 번호와 리보드 고유 번호로 추천 취소하기
     @Delete("DELETE FROM reply_recommend WHERE reply_id = #{replyId} AND recommender_id = #{userId}")
     void deleteReBoardRecommender(@Param("replyId") final int replyId, @Param("userId") final int userId);
+
+    //회원 고유 번호와 보드 고유 번호로 차단 취소하기
+    @Delete("DELETE FROM board_block WHERE board_id = #{boardId} AND block_user_id = #{userId}")
+    void deleteBoardBlockUser(@Param("boardId") final int boardId, @Param("userId") final int userId);
 }
