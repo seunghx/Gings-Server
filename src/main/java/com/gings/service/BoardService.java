@@ -41,6 +41,8 @@ public class BoardService implements ApplicationEventPublisherAware {
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
 
+    private ApplicationEventPublisher eventPublisher;
+
     public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
                         final S3MultipartService s3MultipartService) {
         this.boardMapper = boardMapper;
@@ -48,11 +50,11 @@ public class BoardService implements ApplicationEventPublisherAware {
         this.s3MultipartService = s3MultipartService;
     }
 
+
     /**
      * 전체 보드 조회
      *
-     * @param pagination 페이지네이션
-     * @param userId 회원 고유 번호
+     * @param
      * @return DefaultRes
      */
     public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination, final int userId) {
