@@ -119,11 +119,13 @@ public class BoardController {
     @GetMapping("boards/{boardId}")
     public ResponseEntity getBoardByBoardId(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
+            log.info("User - {}", principal.getUserId());
+            log.info("Board ID - {}", boardId);
             final int userId = principal.getUserId();
             DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -174,7 +176,7 @@ public class BoardController {
         try {
             return new ResponseEntity<>(boardService.increaseBoardShare(boardId), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("{}", e);
+            log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
