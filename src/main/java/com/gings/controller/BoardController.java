@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -170,7 +171,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards/{boardId}/block")
-    public ResponseEntity blockBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
+    public ResponseEntity blockBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal, HttpServletRequest request) {
         try {
             return new ResponseEntity<>(boardService.BoardBlocks(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
