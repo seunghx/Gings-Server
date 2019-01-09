@@ -55,6 +55,7 @@ public interface ClubMapper {
             @Result(property = "title",column = "title"),
             @Result(property = "limit",column = "limit_person"),
             @Result(property = "place",column = "place"),
+            @Result(property = "price", column = "price"),
             @Result(property = "eventImg",column = "event_img"),
             @Result(property = "detailImg",column = "detail_img"),
             @Result(property = "users",column = "event_id",javaType = List.class,
