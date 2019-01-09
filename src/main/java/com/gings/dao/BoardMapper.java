@@ -84,7 +84,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId")),
     })
-    public List<HomeBoardAllRes> findBoardsByKeywordOrderByWriteTime(String keyword, Pagination pagination);
+    public List<HomeBoardAllRes> findBoardsByKeywordOrderByWriteTime(@Param("keyword") String keyword, @Param("pagination") Pagination pagination);
 
     // 키워드로 보드 전체 조회(추천순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
@@ -109,7 +109,7 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId"))
     })
-    public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(String keyword, Pagination pagination);
+    public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(@Param("keyword")String keyword, @Param("pagination")Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(최신순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
@@ -135,7 +135,9 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId")),
     })
-    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByWriteTime(String keyword, BoardCategory category, Pagination pagination);
+    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByWriteTime(@Param("keyword")String keyword,
+                                                                               @Param("category")BoardCategory category,
+                                                                               @Param("pagination")Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(추천순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
@@ -161,7 +163,8 @@ public interface BoardMapper {
             @Result(property = "recommender", column = "board_id", javaType = int.class,
                     one = @One(select = "countRecommendByBoardId")),
     })
-    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByRecommend(String keyword, BoardCategory category, Pagination pagination);
+    public List<HomeBoardAllRes> findBoardsByCategoryByKeywordOrderByRecommend(@Param("keyword") String keyword, @Param("category")BoardCategory category,
+                                                                               @Param("pagination") Pagination pagination);
 
 
 

@@ -57,32 +57,32 @@ public class ClubService {
      */
     public DefaultRes<Club> findClubByClubId(final int clubId,final int userId) throws Throwable{
         final Club club = Optional.ofNullable(clubMapper.findClubByClubId(clubId))
-                                  .orElseThrow(() -> {
-                                      log.info("Club does not exist for clubId : {}", clubId);
+                .orElseThrow(() -> {
+                    log.info("Club does not exist for clubId : {}", clubId);
 
-                                      throw new NoSuchClubException("Club does not exist.");
-                                  });
+                    throw new NoSuchClubException("Club does not exist.");
+                });
 
         List<ClubUser> clubUsers = club.getUsers();
         String status = clubUsers.stream()
-                                 .filter(user -> user.getUserId() == userId)
-                                 .findAny()
-                                 .map(user -> user.getStatus())
-                                 .orElse("가입하기");
+                .filter(user -> user.getUserId() == userId)
+                .findAny()
+                .map(user -> user.getStatus())
+                .orElse("가입하기");
         club.setUserStatus(status);
 
         club.getEvent()
                 .stream()
                 .forEach(event -> {
                     String eventStatus =  event.getUsers()
-                                               .stream()
-                                               .filter(user -> user.getUserId() == userId)
-                                               .findAny()
-                                               .map(user -> user.getStatus())
-                                               .orElse("참여하기");
+                            .stream()
+                            .filter(user -> user.getUserId() == userId)
+                            .findAny()
+                            .map(user -> user.getStatus())
+                            .orElse("참여하기");
 
-           event.setEventStatus(eventStatus);
-        });
+                    event.setEventStatus(eventStatus);
+                });
 
         log.error("Find Club info success. club info : {}",club);
 
