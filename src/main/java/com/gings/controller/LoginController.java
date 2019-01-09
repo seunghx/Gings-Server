@@ -122,6 +122,7 @@ public class LoginController {
         if (passwordEncoder.matches(req.getPwd(), user.getPwd())) {
 
             log.info("Login succeeded for user email : {}", email);
+            userMapper.findByEmail(email);
             userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,
