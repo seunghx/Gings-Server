@@ -1,6 +1,7 @@
 package com.gings.controller;
 
 import com.gings.domain.Board;
+import com.gings.domain.FCM;
 import com.gings.model.DefaultRes;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
@@ -10,6 +11,7 @@ import com.gings.model.*;
 import com.gings.security.authentication.Authentication;
 import com.gings.service.AndroidPushNotificationsService;
 import com.gings.service.BoardService;
+import com.gings.service.FCMService;
 import com.gings.service.MyPageService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -38,14 +40,16 @@ public class MyPageController {
     private final MyPageService myPageService;
     private final BoardService boardService;
     private final PasswordEncoder passwordEncoder;
+    private final FCMService fcmService;
 
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
 
-    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder) {
+    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
         this.myPageService = myPageService;
         this.boardService = boardService;
         this.passwordEncoder = passwordEncoder;
+        this.fcmService = fcmService;
     }
 
     //====================================== 마이 페이지 ====================================================
@@ -236,39 +240,13 @@ public class MyPageController {
             } else {
                 System.out.println("확인하자 : " + guestModelReq.getContent());
                 myPageService.createGuest(guestModelReq, myPageUserId, id);
-                //sendMessageOfGuestBoard(id);
-                //return new ResponseEntity<>(sendMessageOfGuestBoard(id), HttpStatus.OK);
-                JSONObject body = new JSONObject();
-                String fcm = myPageService.getFcm(myPageUserId);
-                System.out.println("서버 토큰: "+fcm);
-                body.put("to", fcm);
-
-                JSONObject notification = new JSONObject();
-                notification.put("title", "FCM Test App");
-                notification.put("body", "So so so sleepy");
-
-                body.put("notification", notification);
-                System.out.println(body.toString());
-
-                HttpEntity<String> request = new HttpEntity<>(body.toString());
-
-                CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
-                CompletableFuture.allOf(pushNotification).join();
-                try {
-                    String firebaseResponse = pushNotification.get();
-                    log.info(firebaseResponse);
-                    return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
-                 } catch (InterruptedException e) {
-                     e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                 }
+                final String fireBaseResponse =  fcmService.createFcm(myPageUserId, "title", "body");
+                return new ResponseEntity<>(fireBaseResponse, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
     }
 
 //    public ResponseEntity<String> sendMessageOfGuestBoard(final int id){
