@@ -15,11 +15,10 @@ import lombok.ToString;
 public class ChatMessage {
     
     private int id;
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private int roomId;
     private int writerId;
     private String message;
     private LocalDateTime writeAt;
     private MessageType type;
-    
+   
 }

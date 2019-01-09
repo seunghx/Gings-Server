@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import static com.gings.security.jwt.JWTService.AUTHORIZATION;
@@ -134,16 +133,28 @@ public class LoginController {
     }
 
     private LoginRes onLoginSuccess(LoginUser user){
+        //setTokenToResponse(user);
+
+        TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
         
-        setTokenToResponse(user);
+        JWTService jwtService = jwtServiceManager.resolve(USING_TOKEN_INFO);
+        String jwt = BEARER_SCHEME + jwtService.create(tokenInfo);
         
         if(user.isFirstLogin()) {
             userMapper.setFalseToFirstLogin(user.getUserId());
         }
         
-        return new LoginRes(user.firstLogin);
+        return new LoginRes(user.getUserId(), user.firstLogin, jwt);
     }
     
+    /**
+     * 
+     * 사정이 생겨 우선 JWT token은 아래 메서드를 사용하지 않고 응답 바디에 담아 전달 중.
+     * 
+     * 후에 변경 예정.
+     * 
+     * @param user
+     */
     private void setTokenToResponse(LoginUser user) {
         TokenInfo tokenInfo = new UserAuthTokenInfo(user.getUserId(), user.getRole());
         
