@@ -255,6 +255,39 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
+     * 보드 차단 & 차단 취소
+     *
+     * @param boardId 보드
+     * @param userId  회원 고유 번호
+     * @return DefaultRes
+     */
+
+    public DefaultRes BoardBlocks(final int boardId, final int userId) {
+        try {
+            if (boardMapper.findBoardByBoardId(boardId) == null)
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+            List<Integer> boardIdList = boardMapper.findBlockBoardsByUserId(userId);
+
+            Board.BoardBlock boardBlock = new Board.BoardBlock();
+
+            for (int id : boardIdList) {
+                if (id == boardId) {
+                    boardMapper.deleteBoardBlockUser(boardId, userId);
+                    boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
+                    return DefaultRes.res(StatusCode.OK, ResponseMessage.CANCEL_BLOCK_BOARD, boardBlock);
+                }
+            }
+            boardMapper.saveBoardBlockUser(boardId, userId);
+            boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, boardBlock);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
      * 보드 공유 개수 증가
      *
      * @param boardId 보드
