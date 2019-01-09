@@ -300,7 +300,7 @@ public interface UserMapper {
     @Select("SELECT fcm FROM user WHERE user_id = #{id}")
     public String getTokenOfFcm(@Param("id")final int id);
 
-    @Update("UPDATE user SET fcm=#{fcm}")
+    @Update("UPDATE user SET fcm=#{fcm} WHERE user_id = #{id}")
     void saveFcmToken(@Param("id")final int id, @Param("fcm") final String fcm);
 
 

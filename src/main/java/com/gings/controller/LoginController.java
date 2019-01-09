@@ -123,6 +123,8 @@ public class LoginController {
 
             log.info("Login succeeded for user email : {}", email);
             userMapper.findByEmail(email);
+            System.out.println("이메일: " + email);
+            System.out.println("아이디: " + user.getUserId());
             userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,

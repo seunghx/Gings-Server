@@ -14,7 +14,9 @@ import com.gings.service.MyPageService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -235,7 +237,23 @@ public class MyPageController {
                 System.out.println("확인하자 : " + guestModelReq.getContent());
                 myPageService.createGuest(guestModelReq, myPageUserId, id);
                 //sendMessageOfGuestBoard(id);
-                return new ResponseEntity<>(sendMessageOfGuestBoard(id), HttpStatus.OK);
+                //return new ResponseEntity<>(sendMessageOfGuestBoard(id), HttpStatus.OK);
+                JSONObject body = new JSONObject();
+                String fcm = myPageService.getFcm(id);
+                body.put("to", fcm);
+
+                JSONObject notification = new JSONObject();
+                notification.put("title", "FCM Test App");
+                notification.put("body", "So so so sleepy");
+
+                body.put("notification", notification);
+
+                HttpEntity<String> request = new HttpEntity<>(body.toString());
+
+                CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
+                CompletableFuture.allOf(pushNotification).join();
+                String firebaseResponse = pushNotification.get();
+                return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -243,38 +261,36 @@ public class MyPageController {
         }
     }
 
-    public ResponseEntity sendMessageOfGuestBoard(final int id){
-        //FCM 메시지 전송//
-        JSONObject body = new JSONObject();
-
-        //DB에 저장된 여러개의 토큰(수신자)을 가져와서 설정할 수 있다.//
-        //List<String> tokenlist = new ArrayList<String>();
-        String fcm = myPageService.getFcm(id);
-
-        body.put("to", fcm);
-
-        JSONObject notification = new JSONObject();
-        notification.put("title", "FCM Test App");
-        notification.put("body", "So so so sleepy");
-
-        body.put("notification", notification);
-
-        HttpEntity<String> request = new HttpEntity<>(body.toString());
-
-        CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
-        CompletableFuture.allOf(pushNotification).join();
-
-        try {
-            String firebaseResponse = pushNotification.get();
-            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
-
-    }
+//    public ResponseEntity<String> sendMessageOfGuestBoard(final int id){
+//        //FCM 메시지 전송//
+//        JSONObject body = new JSONObject();
+//
+//        //DB에 저장된 여러개의 토큰(수신자)을 가져와서 설정할 수 있다.//
+//        //List<String> tokenlist = new ArrayList<String>();
+//        String fcm = myPageService.getFcm(id);
+//        body.put("to", fcm);
+//
+//        JSONObject notification = new JSONObject();
+//        notification.put("title", "FCM Test App");
+//        notification.put("body", "So so so sleepy");
+//
+//        body.put("notification", notification);
+//
+//        HttpEntity<String> request = new HttpEntity<>(body.toString());
+//
+//        CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
+//        CompletableFuture.allOf(pushNotification).join();
+//        try {
+//            String firebaseResponse = pushNotification.get();
+//            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
+//
+//    }
 
     //====================================== 설정 설정 설정 설정 설정 설정 ==================================================
  //============================================ 설정 - 자기소개 조회/저장/수정========================================================
