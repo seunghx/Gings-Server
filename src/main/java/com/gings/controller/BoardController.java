@@ -164,6 +164,22 @@ public class BoardController {
     }
 
     /**
+     * 보드 공유
+     *
+     * @param boardId 보드 고유 번호
+     * @return ResponseEntity
+     */
+    @PostMapping("boards/{boardId}/share")
+    public ResponseEntity shareBoard(@PathVariable("boardId") final int boardId) {
+        try {
+            return new ResponseEntity<>(boardService.increaseBoardShare(boardId), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * 리보드 저장
      *
      * @param reBoardReq 보드 데이터

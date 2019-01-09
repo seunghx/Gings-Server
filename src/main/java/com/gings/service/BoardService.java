@@ -260,6 +260,28 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
+     * 보드 공유 개수 증가
+     *
+     * @param boardId 보드
+     * @return DefaultRes
+     */
+
+    public DefaultRes increaseBoardShare(final int boardId) {
+        try {
+            if (boardMapper.findBoardByBoardId(boardId) == null)
+                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+            boardMapper.updateBoardShare(boardId);
+
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.SHARE_BOARD);
+
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
      * 리보드 저장
      *
      * @param reBoardReq 보드 데이터

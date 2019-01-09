@@ -327,8 +327,8 @@ public interface BoardMapper {
     void updateBoard(@Param("boardId") final int boardId, @Param("ModifyBoardReq") final ModifyBoardReq modifyBoardReq);
 
     //업보드 공유 갯수 업데이트
-    @Update("UPDATE board SET share_cnt=#{UpBoardReq.share} WHERE board_id=#{boardId}")
-    void updateBoardShare(@Param("boardId") final int boardId, @Param("UpBoardReq") final UpBoardReq upBoardReq);
+    @Update("UPDATE board SET share_cnt = share_cnt + 1 WHERE board_id=#{boardId}")
+    void updateBoardShare(@Param("boardId") final int boardId);
 
 
     /*
