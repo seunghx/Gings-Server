@@ -31,7 +31,7 @@ public class Config {
         templateEngine.addDialect(new LayoutDialect());
     }
     
-    @Bean
+    @Bean("taskExecutor")
     public Executor threadPoolTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }

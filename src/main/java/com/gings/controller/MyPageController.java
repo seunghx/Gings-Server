@@ -239,7 +239,8 @@ public class MyPageController {
                 //sendMessageOfGuestBoard(id);
                 //return new ResponseEntity<>(sendMessageOfGuestBoard(id), HttpStatus.OK);
                 JSONObject body = new JSONObject();
-                String fcm = myPageService.getFcm(id);
+                String fcm = myPageService.getFcm(myPageUserId);
+                System.out.println("서버 토큰: "+fcm);
                 body.put("to", fcm);
 
                 JSONObject notification = new JSONObject();
@@ -247,18 +248,27 @@ public class MyPageController {
                 notification.put("body", "So so so sleepy");
 
                 body.put("notification", notification);
+                System.out.println(body.toString());
 
                 HttpEntity<String> request = new HttpEntity<>(body.toString());
 
                 CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
                 CompletableFuture.allOf(pushNotification).join();
-                String firebaseResponse = pushNotification.get();
-                return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+                try {
+                    String firebaseResponse = pushNotification.get();
+                    log.info(firebaseResponse);
+                    return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+                 } catch (InterruptedException e) {
+                     e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                 }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
     }
 
 //    public ResponseEntity<String> sendMessageOfGuestBoard(final int id){
