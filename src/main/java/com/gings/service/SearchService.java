@@ -87,7 +87,9 @@ public class SearchService {
         boards = deleteOverlapBoard(boards);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+        boardService.removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
     }
 
     /**
@@ -104,9 +106,10 @@ public class SearchService {
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
 
+        boardService.removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
         Collections.sort(boards);
-
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
     }
 
     /**
@@ -122,7 +125,9 @@ public class SearchService {
             boards = deleteOverlapBoard(boards);
             if (boards.isEmpty())
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+            boardService.removeBlockedBoards(boards, userId);
+            final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
     }
 
     /**
@@ -139,9 +144,10 @@ public class SearchService {
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
 
-        Collections.sort(boards);
-
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, boards);
+        boardService.removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
+        Collections.sort(filteredBoards);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
     }
 
     public List<HomeBoardAllRes> deleteOverlapBoard(final List<HomeBoardAllRes> boards){

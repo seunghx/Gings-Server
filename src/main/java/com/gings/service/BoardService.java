@@ -25,9 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by YW
@@ -61,7 +62,10 @@ public class BoardService implements ApplicationEventPublisherAware {
         final List<HomeBoardAllRes> boards = setUserInfoInAllRes(boardMapper.findAllBoard(pagination), userId);
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+
+        removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
 
     /**
@@ -92,10 +96,12 @@ public class BoardService implements ApplicationEventPublisherAware {
     public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByWriteTime(final BoardCategory category, final Pagination pagination, final int userId) {
         final List<HomeBoardAllRes> boards =
                 setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
-
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+
+        removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
 
     /**
@@ -111,8 +117,10 @@ public class BoardService implements ApplicationEventPublisherAware {
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
-        Collections.sort(boards);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
+        removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        Collections.sort(filteredBoards);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
 
     /**
@@ -230,7 +238,7 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @return DefaultRes
      */
 
-    public DefaultRes BoardLikes(final int boardId, final int userId) {
+    public DefaultRes boardLikes(final int boardId, final int userId) {
         try {
             if (boardMapper.findBoardByBoardId(boardId) == null)
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
@@ -265,7 +273,7 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @return DefaultRes
      */
 
-    public DefaultRes BoardBlocks(final int boardId, final int userId) {
+    public DefaultRes boardBlocks(final int boardId, final int userId) {
         try {
             if (boardMapper.findBoardByBoardId(boardId) == null)
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
@@ -298,25 +306,25 @@ public class BoardService implements ApplicationEventPublisherAware {
      * @return DefaultRes
      */
 
-    /*
+
     public DefaultRes addBlackList(final int boardId, final int userId) {
         try {
             if (boardMapper.findBoardByBoardId(boardId) == null)
                 return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
-            List<Integer> blackListUserList = boardMapper.findBlackListUsersByUserId(userId);
-
             Board.Black black = new Board.Black();
 
-            boardMapper.saveBoardBlockUser(boardId, userId);
-            boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, boardBlock);
+            final int blockUserId = boardMapper.findBoardByBoardId(boardId).getWriterId();
+            boardMapper.saveBlackListUser(userId, blockUserId);
+
+            black.setBlackList(boardMapper.findBlackListUsersByUserId(userId));
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, black);
         } catch (Exception e) {
             log.error(e.getMessage());
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
-    */
+
 
     /**
      * 보드 공유 개수 증가
@@ -435,22 +443,19 @@ public class BoardService implements ApplicationEventPublisherAware {
 
             List<String> imgUrl = modifyReBoardReq.getPrevImagesUrl();
 
-            boolean isImgUrl = false;
-            for(String url : imgUrl){
-                if(url != null && url.equals("")){
-                    isImgUrl = true;
-                }
-            }
-
-            if(isImgUrl){
+            if(imgUrl != null){
                 for (String url : modifyReBoardReq.getPrevImagesUrl()) {
                     boardMapper.deleteReBoardImg(url);
                 }
                 s3MultipartService.deleteMultipleFiles(modifyReBoardReq.getPrevImagesUrl());
             }
 
-            List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
-            boardMapper.saveReBoardImg(replyId, urlList);
+            List<MultipartFile> img = modifyReBoardReq.getPostImages();
+
+            if(img != null) {
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
+                boardMapper.saveReBoardImg(replyId, urlList);
+            }
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD);
         } catch (Exception e) {
@@ -500,7 +505,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
             board.setWriterImage(image);
-            
+
             String imgUrl = userMapper.selectProfileImg(board.getWriterId()).getImage();
             if(imgUrl != null && imgUrl.equals("") ) {
                 board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
@@ -541,6 +546,39 @@ public class BoardService implements ApplicationEventPublisherAware {
         }
         return boardReplies;
     }
+
+    public List<HomeBoardAllRes> removeBlockedBoards(List<HomeBoardAllRes> boards, int userId) {
+
+        List<Integer> blockBoardIdList = boardMapper.findBlockBoardsByUserId(userId);
+        for(int i = 0; i< boards.size(); i++){
+            for(int blockBoardId : blockBoardIdList){
+                if(boards.get(i).getBoardId() == blockBoardId){
+                    boards.remove(boards.get(i));
+                }
+            }
+        }
+        return boards;
+    }
+
+    public List<HomeBoardAllRes> removeBlackListBoards(List<HomeBoardAllRes> boards, int userId) {
+
+        List<Integer> blackListUserList = boardMapper.findBlackListUsersByUserId(userId);
+        List<Integer> blockBoardIdList = new ArrayList<>();
+
+        for(int blackListUserId : blackListUserList){
+            for(int boardId : boardMapper.findBoardIdByUserId(blackListUserId)){
+                blockBoardIdList.add(boardId);
+                log.error("boardId : " + boardId);
+            }
+        }
+
+
+        return boards.stream()
+                     .filter(board -> !blockBoardIdList.contains(board.getBoardId())).collect(Collectors.toList());
+
+    }
+
+
 
 
     @Override
