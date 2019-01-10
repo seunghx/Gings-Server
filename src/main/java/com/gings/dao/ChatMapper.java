@@ -112,7 +112,7 @@ public interface ChatMapper {
     // ==============================================================================================
     
     
-    @Insert("INSERT INTO chat_room(type) VALUES(#{chatRoom.type})")
+    @Insert("INSERT INTO chat_room(type) VALUES(#{type})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     public void saveChatRoom(ChatRoom chatRoom);
     

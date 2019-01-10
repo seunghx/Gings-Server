@@ -1,7 +1,6 @@
 package com.gings.controller;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,7 +14,6 @@ import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
 import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
 import com.gings.model.chat.ChatRoomView.ChatRoomRefreshReq;
 import com.gings.model.chat.ChatRoomView.ChatRoomRefreshRes;
-import com.gings.model.chat.ChatRoomView.PriorChatRoomInfo;
 import com.gings.model.chat.IncomingMessage;
 import com.gings.service.ChatService;
 import com.gings.utils.InvalidChatRoomCapacityException;
@@ -23,12 +21,14 @@ import com.gings.utils.WebSocketSessionManager;
 
 import lombok.extern.slf4j.Slf4j;
 
+
 /**
  * 
- * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 
- * {@link User}의 {@code id}로 사용하였는데, int 타입과 String 타입 간의 변환이 많아 불편.
  * 
- * 후에 email로 변경 예정.
+ * 
+ * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 {@link User}의 {@code id}로 사용하였는데, 
+ * int 타입과 String 타입 간의 변환이 많아 불편하여 후에 email로 변경 예정.
+ * 
  * 
  * @author seunghyun
  *
@@ -80,12 +80,16 @@ public class ChatController {
     
     /**
      * 
+     * 
+     * 
      * 아래 chat room type에 따른 capacity 검사는 후에 시간 날 경우 class level bean validation constraint
      * 정의해서 변경예정.
      * 
      * <pre> 
      *     openReq.getRoomType().validateCapacityOrFail(openReq.getOpponent().size() + 1); 
      * </pre>
+     * 
+     * 
      * 
      */
     @MessageMapping("/chat/create")
@@ -173,6 +177,7 @@ public class ChatController {
      * 
      */
     @MessageMapping("/chat/refresh")
+    @SendTo(CHAT_NOTIFICATION_TOPIC)
     public ChatRoomRefreshRes chatRoomRefresh(Principal principal, ChatRoomRefreshReq refreshReq) {
         
        int userId = Integer.valueOf(principal.getName()); 

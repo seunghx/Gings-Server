@@ -8,6 +8,13 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * 세션 connected시 logging
+ * 
+ * @author seunghyun
+ *
+ */
 @Slf4j
 @Component
 public class SessionConnectedLogger implements ApplicationListener<SessionConnectedEvent>{
@@ -18,7 +25,6 @@ public class SessionConnectedLogger implements ApplicationListener<SessionConnec
         if(log.isInfoEnabled()) {
 
             log.info("New session connected : {}.", event.getMessage());
-            log.info("Newly connected user : {}", event.getUser());
         }
     }
 

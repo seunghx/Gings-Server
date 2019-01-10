@@ -15,8 +15,6 @@ import java.util.List;
 import org.apache.ibatis.mapping.FetchType;
 
 import com.gings.model.user.SignUp;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *

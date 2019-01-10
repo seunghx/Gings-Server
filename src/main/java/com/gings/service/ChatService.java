@@ -58,7 +58,9 @@ public class ChatService {
      */
     @Transactional
     public int initOneToOneChatRoom(int userId, OneToOneChatOpenReq openReq) {
-                
+        
+        validateOneToOneChatOrFail(userId, openReq);
+        
         ChatRoom chatRoom = openReq.getChatRoom();
         
         chatMapper.saveChatRoom(chatRoom);
@@ -74,6 +76,17 @@ public class ChatService {
         log.info("Creating chat room succeeded.");
         
         return chatRoom.getId();
+    }
+    
+    private void validateOneToOneChatOrFail(int userId, OneToOneChatOpenReq openReq) {
+        if(userId == openReq.getOpponentId()) {
+            log.warn("Illegal access detected while trying to create new one to one chat room");
+            log.warn("Same user id and opponent id : {}", userId);
+            
+            throw new IllegalWebsocketAccessException("User id is same with opponentId", userId);
+        }
+        
+        // 동일 유저와의 채팅 신청 예외 처리 예정.
     }
     
     @Transactional
