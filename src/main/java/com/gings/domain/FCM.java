@@ -7,8 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class BoardKeyword {
-
-    private int id;
-    private String content;
+public class FCM {
+    private String firebaseMessage;
+    private int boardId;
 }

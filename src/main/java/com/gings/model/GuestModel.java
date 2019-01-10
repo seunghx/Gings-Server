@@ -9,7 +9,7 @@ public class GuestModel {
         @Getter
         @Setter
         public static class GuestModelReq{
-            //private int id;    //마이페이지 유저 id
+            private int guestBoardId;
             private String content;
         }
 

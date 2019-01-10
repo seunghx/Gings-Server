@@ -1,4 +1,4 @@
-package com.gings.domain;
+package com.gings.domain.board;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,5 +44,12 @@ public class Board {
     @ToString
     public static class BoardBlock {
         private List<Integer> blockBoardIdList;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class Black {
+        private List<Integer> blackList;
     }
 }

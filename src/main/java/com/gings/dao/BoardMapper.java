@@ -1,7 +1,6 @@
 package com.gings.dao;
 
-import com.gings.domain.Board;
-import com.gings.domain.BoardReply;
+import com.gings.domain.board.BoardReply;
 import com.gings.model.MyPageBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.model.board.HomeBoard.HomeBoardOneRes;
@@ -9,13 +8,11 @@ import com.gings.model.board.ModifyBoard.ModifyBoardReq;
 import com.gings.model.Pagination;
 import com.gings.model.board.ReBoard.ModifyReBoardReq;
 import com.gings.model.board.ReBoard.ReBoardReq;
-import com.gings.model.board.UpBoard.UpBoardOneRes;
 import com.gings.model.board.UpBoard.UpBoardReq;
 import com.gings.utils.code.BoardCategory;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
-import java.util.Locale;
 
 @Mapper
 public interface BoardMapper {
@@ -196,9 +193,19 @@ public interface BoardMapper {
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
 
+    // 회원 고유 번호로 좋아요한 리보드 조회
+    @Select("SELECT reply_id FROM reply_recommend WHERE recommender_id = #{userId}")
+    public List<Integer> findRecommendRepliesByUserId(int userId);
+
     // 회원 고유 번호로 차단한 보드 조회
     @Select("SELECT board_id FROM board_block WHERE block_user_id = #{userId}")
     public List<Integer> findBlockBoardsByUserId(int userId);
+
+
+    // 회원 고유 번호로 블랙리스트에 추가한 회원 고유 번호 조회
+    @Select("SELECT to_id FROM blacklist WHERE from_id = #{userId}")
+    public List<Integer> findBlackListUsersByUserId(int userId);
+
 
     // 보드 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE board_id = #{boardId}")
@@ -320,6 +327,10 @@ public interface BoardMapper {
     // 업보드 차단한 사람 저장
     @Insert("INSERT INTO board_block(board_id, block_user_id) VALUES(#{boardId}, #{userId})")
     void saveBoardBlockUser(@Param("boardId") int boardId, @Param("userId") int userId);
+
+    // 업보드 차단한 사람 저장
+    @Insert("INSERT INTO blacklist(from_id, to_id) VALUES(#{boardId}, #{userId})")
+    void saveBlackListUser(@Param("fromId") int fromId, @Param("toId") int toId);
 
 
     /*

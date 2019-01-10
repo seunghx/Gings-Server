@@ -211,6 +211,7 @@ public interface UserMapper {
     Guest Board 저장
     */
     @Insert("INSERT INTO guestboard(user_id, writer_id, content) VALUES(#{myPageUserId}, #{id}, #{guestModelReq.content})")
+    @Options(useGeneratedKeys = true, keyProperty = "guestModelReq.guestBoardId", keyColumn = "guestboard_id")
     void saveGuest(@Param("guestModelReq") final GuestModel.GuestModelReq guestModelReq, @Param("myPageUserId") final int myPageUserId, @Param("id") final int id);
 
 

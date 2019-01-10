@@ -1,9 +1,7 @@
 package com.gings.model.board;
 
-import com.gings.domain.BoardKeyword;
-import com.gings.domain.BoardReply;
+import com.gings.domain.board.BoardReply;
 import com.gings.utils.code.BoardCategory;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,8 +21,9 @@ public class UpBoard {
         private String content;
         private BoardCategory category;
 
-
+        @NotBlank
         private List<MultipartFile> images;
+        @NotBlank
         private List<String> keywords;
 
         private int recommender;
