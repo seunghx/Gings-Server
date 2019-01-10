@@ -23,8 +23,9 @@ public class UpBoard {
         private String content;
         private BoardCategory category;
 
-
+        @NotBlank
         private List<MultipartFile> images;
+        @NotBlank
         private List<String> keywords;
 
         private int recommender;

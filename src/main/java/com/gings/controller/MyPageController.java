@@ -241,6 +241,7 @@ public class MyPageController {
                 System.out.println("확인하자 : " + guestModelReq.getContent());
                 myPageService.createGuest(guestModelReq, myPageUserId, id);
                 final String fireBaseResponse =  fcmService.createFcm(myPageUserId, "title", "body");
+                log.error("FCM Message : " +fireBaseResponse);
                 return new ResponseEntity<>(fireBaseResponse, HttpStatus.OK);
             }
         } catch (Exception e) {

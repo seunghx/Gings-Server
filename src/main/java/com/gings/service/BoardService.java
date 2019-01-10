@@ -207,10 +207,14 @@ public class BoardService implements ApplicationEventPublisherAware {
             boardMapper.saveBoard(upBoardReq);
             final int boardId = upBoardReq.getBoardId();
 
-            List<String> urlList = s3MultipartService.uploadMultipleFiles(upBoardReq.getImages());
-            boardMapper.saveBoardImg(boardId, urlList);
-
-            boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
+            if(upBoardReq.getImages() != null) {
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(upBoardReq.getImages());
+                boardMapper.saveBoardImg(boardId, urlList);
+            }
+            if(upBoardReq.getKeywords() != null){
+                log.error("keywordddd");
+                boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
+            }
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
