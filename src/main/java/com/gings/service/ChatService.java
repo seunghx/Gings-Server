@@ -30,7 +30,7 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final SimpMessagingTemplate messagingTemplate;
     
-    @Value("${gings.message.admin-sender-id}")
+    //@Value("${gings.message.admin-sender-id}")
     private String GINGS_ADMIN;
 
     
