@@ -239,6 +239,10 @@ public interface BoardMapper {
     })
     public List<MyPageBoard> findBoardByUserId(int userId);
 
+    // 회원 고유 번호로 보드 고유 번호 조회
+    @Select("SELECT board_id FROM board WHERE writer_id = #{userId}")
+    public List<Integer> findBoardIdByUserId(int userId);
+
     // 보드 고유 번호로 해당 리보드 조회
     @Select("SELECT * FROM board_reply WHERE board_id = #{boardId} ORDER BY write_time DESC")
     @Results(value = {
@@ -321,8 +325,8 @@ public interface BoardMapper {
     void saveBoardBlockUser(@Param("boardId") int boardId, @Param("userId") int userId);
 
     // 업보드 차단한 사람 저장
-    @Insert("INSERT INTO blacklist(from_id, to_id) VALUES(#{boardId}, #{userId})")
-    void saveBlackListUser(@Param("fromId") int fromId, @Param("toId") int toId);
+    @Insert("INSERT INTO blacklist(from_id, to_id) VALUES(#{userId}, #{blockUserId})")
+    void saveBlackListUser(@Param("userId") int userId, @Param("blockUserId") int blockUserId);
 
 
     /*

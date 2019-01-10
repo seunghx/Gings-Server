@@ -156,7 +156,7 @@ public class BoardController {
     @PostMapping("boards/{boardId}/recommend")
     public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
-            return new ResponseEntity<>(boardService.BoardLikes(boardId, principal.getUserId()), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.boardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -173,7 +173,7 @@ public class BoardController {
     @PostMapping("boards/{boardId}/block")
     public ResponseEntity blockBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
-            return new ResponseEntity<>(boardService.BoardBlocks(boardId, principal.getUserId()), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.boardBlocks(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -190,7 +190,7 @@ public class BoardController {
     @PostMapping("boards/{boardId}/blacklist")
     public ResponseEntity addBlackList(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
-            return new ResponseEntity<>(boardService.BoardBlocks(boardId, principal.getUserId()), HttpStatus.OK);
+            return new ResponseEntity<>(boardService.addBlackList(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
