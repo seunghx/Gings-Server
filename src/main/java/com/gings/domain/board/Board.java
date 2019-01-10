@@ -45,4 +45,11 @@ public class Board {
     public static class BoardBlock {
         private List<Integer> blockBoardIdList;
     }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class Black {
+        private List<Integer> blackList;
+    }
 }

@@ -201,11 +201,11 @@ public interface BoardMapper {
     @Select("SELECT board_id FROM board_block WHERE block_user_id = #{userId}")
     public List<Integer> findBlockBoardsByUserId(int userId);
 
-    /*
+
     // 회원 고유 번호로 블랙리스트에 추가한 회원 고유 번호 조회
-    @Select("SELECT blacklist FROM board_block WHERE block_user_id = #{userId}")
-    public List<Integer> findBlockBoardsByUserId(int userId);
-    */
+    @Select("SELECT to_id FROM blacklist WHERE from_id = #{userId}")
+    public List<Integer> findBlackListUsersByUserId(int userId);
+
 
     // 보드 고유 번호로 보드 조회
     @Select("SELECT * FROM board WHERE board_id = #{boardId}")
@@ -327,6 +327,10 @@ public interface BoardMapper {
     // 업보드 차단한 사람 저장
     @Insert("INSERT INTO board_block(board_id, block_user_id) VALUES(#{boardId}, #{userId})")
     void saveBoardBlockUser(@Param("boardId") int boardId, @Param("userId") int userId);
+
+    // 업보드 차단한 사람 저장
+    @Insert("INSERT INTO blacklist(from_id, to_id) VALUES(#{boardId}, #{userId})")
+    void saveBlackListUser(@Param("fromId") int fromId, @Param("toId") int toId);
 
 
     /*
