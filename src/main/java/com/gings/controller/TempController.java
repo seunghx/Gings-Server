@@ -11,7 +11,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gings.utils.UserRole;
+import com.gings.utils.code.UserRole;
 
 //import jdk.internal.line.internal.Log;
 import lombok.Getter;

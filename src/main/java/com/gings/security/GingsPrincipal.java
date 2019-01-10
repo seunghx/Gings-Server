@@ -2,7 +2,7 @@ package com.gings.security;
 
 import java.security.Principal;
 
-import com.gings.utils.UserRole;
+import com.gings.utils.code.UserRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

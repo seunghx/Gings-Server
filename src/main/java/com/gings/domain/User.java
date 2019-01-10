@@ -2,9 +2,9 @@ package com.gings.domain;
 
 import java.util.List;
 
-import com.gings.utils.UserRole;
 import com.gings.utils.code.Region;
 import com.gings.utils.code.Status;
+import com.gings.utils.code.UserRole;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -4,7 +4,7 @@ package com.gings.model.user;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import com.gings.utils.UserRole;
+import com.gings.utils.code.UserRole;
 
 import lombok.Getter;
 import lombok.Setter;

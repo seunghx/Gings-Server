@@ -396,7 +396,5 @@ public class ChatService {
         priorUsers.stream().forEach(priorUser -> existingUserMap.remove(priorUser));
         
         return new ArrayList<>(existingUserMap.values());
-        
     }
-    
 }
