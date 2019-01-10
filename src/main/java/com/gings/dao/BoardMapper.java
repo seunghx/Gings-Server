@@ -221,7 +221,7 @@ public interface BoardMapper {
     public HomeBoardOneRes findBoardByBoardId(int boardId);
 
     // 회원 고유 번호로 보드 조회
-    @Select("SELECT * FROM board WHERE writer_id = #{userId} ORDER BY write_time")
+    @Select("SELECT * FROM board WHERE writer_id = #{userId} ORDER BY write_time DESC")
     @Results(value = {
             @Result(property="boardId", column="board_id"),
             @Result(property="writerId", column="writer_id"),
