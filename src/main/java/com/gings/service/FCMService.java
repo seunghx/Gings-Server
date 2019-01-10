@@ -26,6 +26,7 @@ public class FCMService {
     public String createFcm(final int userId, final String title, final String body){
         JSONObject jsonBody = new JSONObject();
         String fcm = this.getFcm(userId);
+        log.error("fcm : " + fcm);
         jsonBody.put("to", fcm);
 
         JSONObject notification = new JSONObject();

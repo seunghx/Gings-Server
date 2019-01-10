@@ -212,7 +212,6 @@ public class BoardService implements ApplicationEventPublisherAware {
                 boardMapper.saveBoardImg(boardId, urlList);
             }
             if(upBoardReq.getKeywords() != null){
-                log.error("keywordddd");
                 boardMapper.saveBoardKeyword(boardId, upBoardReq.getKeywords());
             }
 
@@ -325,9 +324,10 @@ public class BoardService implements ApplicationEventPublisherAware {
             boardMapper.saveReBoard(reBoardReq);
             final int reReplyId = reBoardReq.getReplyId();
 
-            List<String> urlList = s3MultipartService.uploadMultipleFiles(reBoardReq.getImages());
-            boardMapper.saveReBoardImg(reReplyId, urlList);
-
+            if(reBoardReq.getImages() != null) {
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(reBoardReq.getImages());
+                boardMapper.saveReBoardImg(reReplyId, urlList);
+            }
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_REBOARD);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -448,13 +448,28 @@ public class BoardService implements ApplicationEventPublisherAware {
         for(int likedBoardId : likedBoardIdList) {
             if (board.isLikeChk()) break;
 
-            if (board.getBoardId() == likedBoardId) { board.setLikeChk(true); }
-            else { board.setLikeChk(false); }
+            if (board.getBoardId() == likedBoardId) {
+                board.setLikeChk(true);
+            } else {
+                board.setLikeChk(false);
+            }
 
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
             board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+        }
+        List<Integer> likedReBoardIdList = boardMapper.findRecommendRepliesByUserId(userId);
+        for(BoardReply reboard : board.getReplys()){
+            for(int likedReBoardId : likedReBoardIdList){
+                if(reboard.isLikeChk()) break;
+                if(reboard.getReplyId() == likedReBoardId){
+                    reboard.setLikeChk(true);
+                }
+                else{
+                    reboard.setLikeChk(false);
+                }
+            }
         }
         return board;
     }

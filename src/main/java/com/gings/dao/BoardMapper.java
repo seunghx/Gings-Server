@@ -196,6 +196,10 @@ public interface BoardMapper {
     @Select("SELECT board_id FROM board_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendBoardsByUserId(int userId);
 
+    // 회원 고유 번호로 좋아요한 리보드 조회
+    @Select("SELECT reply_id FROM reply_recommend WHERE recommender_id = #{userId}")
+    public List<Integer> findRecommendRepliesByUserId(int userId);
+
     // 회원 고유 번호로 차단한 보드 조회
     @Select("SELECT board_id FROM board_block WHERE block_user_id = #{userId}")
     public List<Integer> findBlockBoardsByUserId(int userId);
