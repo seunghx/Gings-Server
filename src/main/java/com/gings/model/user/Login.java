@@ -11,7 +11,7 @@ public class Login {
     
     private static final String MSG_EMAIL_BLANK = "이메일을 입력하세요.";
     private static final String MSG_PASSWORD_BLANK = "패스워드를 입력하세요.";
-    
+
     @Getter
     @Setter
     @AllArgsConstructor

@@ -36,6 +36,9 @@ import com.gings.security.jwt.TokenInfo;
 import com.gings.security.utils.AuthenticationNumberNotificationProvider;
 import com.gings.service.UserService;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -129,7 +132,7 @@ public class UserController {
                                         HttpStatus.OK);
         }
     }
-    
+    /*
     @GetMapping("/signup/authNumber")
     public ResponseEntity<DefaultRes<Void>> 
                         getAuthenticationNubmer(@Validated EmailReq emailReq,
@@ -143,6 +146,22 @@ public class UserController {
         String message = msgSource.getMessage("response.auth-number.succees", null, locale);
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.OK.value(), message),
+                                    HttpStatus.OK);
+    }*/
+    
+    @GetMapping("/signup/authNumber")
+    public ResponseEntity<DefaultRes<Temp>> 
+                        getAuthenticationNubmer(@Validated EmailReq emailReq,
+                                                Locale locale) {
+        
+        String authNumber = getAuthenticationNumber();
+        
+        String jwt = setAuthToken(authNumber, emailReq.getEmail());
+        notificationProvider.sendAuthenticationNumber(emailReq.getEmail(), authNumber);
+        
+        String message = msgSource.getMessage("response.auth-number.succees", null, locale);
+        
+        return new ResponseEntity<>(new DefaultRes<>(HttpStatus.OK.value(), message, new Temp(jwt)),
                                     HttpStatus.OK);
     }
     
@@ -217,9 +236,7 @@ public class UserController {
        return String.valueOf(random.nextInt(9000) + 1000);
     }
     
-    /**
-     * @param authNumber jwt token에 저장될 인증 번호.
-     */
+    /*
     private void setAuthToken(String authNumber, String email) {
         
         EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo();
@@ -235,6 +252,25 @@ public class UserController {
         requestAttr.getResponse()
                    .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
     }
+    */
+    
+    private String setAuthToken(String authNumber, String email) {
+        
+        EmailAuthTokenInfo tokenInfo = new EmailAuthTokenInfo();
+        tokenInfo.setAuthNumber(authNumber);
+        tokenInfo.setEmail(email);
+        
+        String jwt =  jwtServiceManager.resolve(USING_TOKEN_INFO)
+                                       .create(tokenInfo);
+        
+        ServletRequestAttributes requestAttr = (ServletRequestAttributes)
+                                               RequestContextHolder.getRequestAttributes();
+
+        requestAttr.getResponse()
+                   .setHeader(AUTHORIZATION, BEARER_SCHEME + jwt);
+        
+        return BEARER_SCHEME + jwt;
+    }
     
     private String getRequestedAddr() {
         HttpServletRequest request = 
@@ -248,5 +284,11 @@ public class UserController {
         }
         
         return remote;
+    }
+    
+    @Getter
+    @AllArgsConstructor
+    public static class Temp {
+        private String jwt;
     }
 }

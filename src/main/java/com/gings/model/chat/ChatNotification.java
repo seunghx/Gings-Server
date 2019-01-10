@@ -3,6 +3,7 @@ package com.gings.model.chat;
 
 import com.gings.domain.chat.ChatRoom;
 import com.gings.domain.chat.ChatRoom.ChatRoomUser;
+import com.gings.model.chat.ChatRoomView.NewChatRoom;
 import com.gings.utils.code.ChatNotificationType;
 
 import lombok.AllArgsConstructor;
@@ -16,11 +17,10 @@ import lombok.ToString;
 @ToString
 public abstract class ChatNotification {
     
-    private ChatNotificationType type;
+    private final ChatNotificationType type;
     
     @Getter
     @Setter
-    @ToString
     public static class UserEnteredNotification extends ChatNotification {
         
         private int roomId;
@@ -31,11 +31,15 @@ public abstract class ChatNotification {
             this.roomId = roomId;
             this.user = user;
         }
+        
+        @Override
+        public String toString() {
+            return super.toString() + "(roomId=" + roomId + ", user=" + user +")";
+        }
     }
     
     @Getter
     @Setter
-    @ToString
     public static class UserExitedNotification extends ChatNotification {
         
         private int roomId;
@@ -46,18 +50,27 @@ public abstract class ChatNotification {
             this.roomId = roomId;
             this.userId = userId;
         }
+        
+        @Override
+        public String toString() {
+            return super.toString() + "(roomId=" + roomId + ", userId=" + userId +")";
+        }
     }
     
     @Getter
     @Setter
-    @ToString
     public static class ChatOpenedNotification extends ChatNotification {
         
-        private ChatRoom chatRoom;
+        private NewChatRoom chatRoom;
         
-        public ChatOpenedNotification(ChatRoom chatRoom) {
+        public ChatOpenedNotification(NewChatRoom chatRoom) {
             super(ChatNotificationType.ROOM_OPENED);
             this.chatRoom = chatRoom;
+        }
+        
+        @Override
+        public String toString() {
+            return super.toString() + "(chatRoom=" + chatRoom + ")";
         }
     }
     
