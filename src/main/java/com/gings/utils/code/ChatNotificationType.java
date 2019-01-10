@@ -1,5 +1,5 @@
 package com.gings.utils.code;
 
 public enum ChatNotificationType {
-    USER_ENTER;
+    ROOM_OPENED;
 }
