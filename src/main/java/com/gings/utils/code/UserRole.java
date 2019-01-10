@@ -1,4 +1,4 @@
-package com.gings.utils;
+package com.gings.utils.code;
 
 import java.util.Collection;
 import java.util.function.Supplier;

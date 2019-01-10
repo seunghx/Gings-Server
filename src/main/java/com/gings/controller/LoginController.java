@@ -8,7 +8,7 @@ import com.gings.security.jwt.JWTService;
 import com.gings.security.jwt.JWTServiceManager;
 import com.gings.security.jwt.TokenInfo;
 import com.gings.security.jwt.UserAuthTokenInfo;
-import com.gings.utils.UserRole;
+import com.gings.utils.code.UserRole;
 
 import lombok.Getter;
 import lombok.Setter;
