@@ -220,6 +220,7 @@ public class MyPageController {
      * @param principal
      * @return
      */
+
     @PostMapping("/guestboard/{myPageUserId}")
     public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final GingsPrincipal principal) {
         try {
@@ -230,45 +231,73 @@ public class MyPageController {
             } else {
                 System.out.println("확인하자 : " + guestModelReq.getContent());
                 myPageService.createGuest(guestModelReq, myPageUserId, id);
-                final String fireBaseResponse =  fcmService.createFcm(myPageUserId, "title", "body");
-                log.error("FCM Message : " +fireBaseResponse);
-                return new ResponseEntity<>(fireBaseResponse, HttpStatus.OK);
+                int i = guestModelReq.getGuestBoardId();
+
+                String guestboardId = Integer.toString(i);
+                String firebaseResponse = fcmService.createFcm(myPageUserId, guestboardId, "깅스", "누군가 멤버가 당신의 게스트 보드에 글을 남겼어요!");
+                return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
-        } catch (Exception e) {
+
+        }catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-//    public ResponseEntity<String> sendMessageOfGuestBoard(final int id){
-//        //FCM 메시지 전송//
-//        JSONObject body = new JSONObject();
-//
-//        //DB에 저장된 여러개의 토큰(수신자)을 가져와서 설정할 수 있다.//
-//        //List<String> tokenlist = new ArrayList<String>();
-//        String fcm = myPageService.getFcm(id);
-//        body.put("to", fcm);
-//
-//        JSONObject notification = new JSONObject();
-//        notification.put("title", "FCM Test App");
-//        notification.put("body", "So so so sleepy");
-//
-//        body.put("notification", notification);
-//
-//        HttpEntity<String> request = new HttpEntity<>(body.toString());
-//
-//        CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
-//        CompletableFuture.allOf(pushNotification).join();
+
+
+
+
+
+//   @PostMapping("/guestboard/{myPageUserId}")
+//    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final GingsPrincipal principal) {
 //        try {
-//            String firebaseResponse = pushNotification.get();
-//            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
+//            final int id = principal.getUserId();
+//            if (id == myPageUserId) {
+//                DefaultRes defaultRes = myPageService.checkUser();
+//                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+//            } else {
+//                System.out.println("확인하자 : " + guestModelReq.getContent());
+//                myPageService.createGuest(guestModelReq, myPageUserId, id);
+//                int i = guestModelReq.getGuestBoardId();
+//                String guestboardId = Integer.toString(i);
+//                //sendMessageOfGuestBoard(id);
+//                //return new ResponseEntity<>(sendMessageOfGuestBoard(id), HttpStatus.OK);
+//                JSONObject body = new JSONObject();
+//                String fcm = myPageService.getFcm(myPageUserId);
+//                System.out.println("서버 토큰: "+fcm);
+//                body.put("to", fcm);
+//
+//                JSONObject notification = new JSONObject();
+//                notification.put("title", "guest board");
+//                notification.put("body", "확인하세요");
+//
+//                body.put("notification", notification);
+//
+//                JSONObject data = new JSONObject();
+//                data.put("guestboard_id", guestboardId);
+//                body.put("data",data);
+//                System.out.println(body.toString());
+//
+//                HttpEntity<String> request = new HttpEntity<>(body.toString());
+//
+//                CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
+//                CompletableFuture.allOf(pushNotification).join();
+//                try {
+//                    String firebaseResponse = pushNotification.get();
+//                    log.info(firebaseResponse);
+//                    return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
 //        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
-//
 //    }
 
     //====================================== 설정 설정 설정 설정 설정 설정 ==================================================

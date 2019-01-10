@@ -4,6 +4,8 @@ import com.gings.dao.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,32 +23,38 @@ public class FCMService {
         this.androidPushNotificationsService = androidPushNotificationsService;
     }
 
-    public String createFcm(final int userId, final String title, final String body){
-        JSONObject jsonBody = new JSONObject();
-        String fcm = this.getFcm(userId);
-        log.error("fcm : " + fcm);
-        jsonBody.put("to", fcm);
+    public String createFcm(final int receiverId, final String senderId,
+                            String notfTitle, String notfBody ){
+        JSONObject body = new JSONObject();
+        String fcm = getFcm(receiverId);
+        System.out.println("서버 토큰: "+fcm);
+        body.put("to", fcm);
 
         JSONObject notification = new JSONObject();
-        notification.put("title", title); // title
-        notification.put("body", body); // body
+        notification.put("title", notfTitle);
+        notification.put("body", notfBody);
 
-        jsonBody.put("notification", notification);
+        body.put("notification", notification);
 
-        HttpEntity<String> request = new HttpEntity<>(body);
+        JSONObject data = new JSONObject();
+        data.put("sender_id", senderId);
+        body.put("data",data);
+        System.out.println(body.toString());
+
+        HttpEntity<String> request = new HttpEntity<>(body.toString());
 
         CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
         CompletableFuture.allOf(pushNotification).join();
         try {
             String firebaseResponse = pushNotification.get();
+            log.info(body.toString());
             return firebaseResponse;
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return null;
-        } catch (
-                ExecutionException e) {
+            return "";
+        } catch (ExecutionException e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
     }
 
