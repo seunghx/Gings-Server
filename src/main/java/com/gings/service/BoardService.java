@@ -435,7 +435,14 @@ public class BoardService implements ApplicationEventPublisherAware {
 
             List<String> imgUrl = modifyReBoardReq.getPrevImagesUrl();
 
-            if(imgUrl.isEmpty() ){
+            boolean isImgUrl = false;
+            for(String url : imgUrl){
+                if(url != null && url.equals("")){
+                    isImgUrl = true;
+                }
+            }
+
+            if(isImgUrl){
                 for (String url : modifyReBoardReq.getPrevImagesUrl()) {
                     boardMapper.deleteReBoardImg(url);
                 }
@@ -486,9 +493,14 @@ public class BoardService implements ApplicationEventPublisherAware {
                 board.setLikeChk(false);
             }
 
+            MyPageProfile profile = userMapper.selectProfileImg(board.getWriterId());
+            String image = profile == null? null : profile.getImage();
+
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            board.setWriterImage(image);
+            
             String imgUrl = userMapper.selectProfileImg(board.getWriterId()).getImage();
             if(imgUrl != null && imgUrl.equals("") ) {
                 board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
