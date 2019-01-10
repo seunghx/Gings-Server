@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +21,6 @@ import com.gings.domain.chat.ChatRoom.ChatRoomUser;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
 import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
-import com.gings.model.chat.ChatRoomView.ChatRoomRefreshReq;
 import com.gings.model.chat.ChatRoomView.ChatRoomRefreshRes;
 import com.gings.model.chat.ChatRoomView.ExistingChatRoom;
 import com.gings.model.chat.ChatRoomView.NewChatRoom;
@@ -265,10 +263,10 @@ public class ChatService {
                              
                              newChatRooms.add(newRoom);
                           }else {
-                              ExistingChatRoom existingRoom = 
+                             ExistingChatRoom existingRoom = 
                                               getExistingChatRoom(userId, room, priorChatRoom);
                               
-                              existingChatRooms.add(existingRoom);
+                             existingChatRooms.add(existingRoom);
                           }
                       });
         
@@ -325,7 +323,7 @@ public class ChatService {
                                     .stream()
                                     .filter(user -> user.getId() == userId)
                                     .findFirst()
-                                    .orElseThrow(() ->{
+                                    .<IllegalStateException>orElseThrow(() ->{
                                         log.error("Illegal state. User {} does not exist in room {}", room);
                                         
                                         throw new IllegalStateException("User does not exist in chat room ");
@@ -353,7 +351,7 @@ public class ChatService {
                                     .stream()
                                     .filter(user -> user.getId() == userId)
                                     .findFirst()
-                                    .orElseThrow(() ->{
+                                    .<IllegalStateException>orElseThrow(() ->{
                                         log.error("Illegal state. User {} does not exist in room {}", room);
 
                                         throw new IllegalStateException("User does not exist in chat room ");
@@ -372,6 +370,7 @@ public class ChatService {
         existingRoom.setAddedUsers(getNewUsers(priorChatRoom.getUsers(), room.getUsers()));
         existingRoom.setLastReadMessage(sameUser.getLastReadMessage());
         existingRoom.setLatestReceivedMessage(sameUser.getLatestReceiveMessage());
+        
         return existingRoom;
     }
     
@@ -388,6 +387,7 @@ public class ChatService {
     private List<ChatRoomUser> getNewUsers(List<Integer> priorUsers, List<ChatRoomUser> existingUsers){
         
         Map<Integer, ChatRoomUser> existingUserMap = new HashMap<>();
+        
         existingUsers.stream()
                      .forEach(existingUser -> {
                          existingUserMap.put(existingUser.getId(), existingUser);
