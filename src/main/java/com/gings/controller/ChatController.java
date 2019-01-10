@@ -1,6 +1,7 @@
 package com.gings.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gings.domain.chat.ChatMessage;
 import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
 import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
+import com.gings.model.chat.ChatRoomView.ChatRoomRefreshReq;
+import com.gings.model.chat.ChatRoomView.ChatRoomRefreshRes;
+import com.gings.model.chat.ChatRoomView.PriorChatRoomInfo;
 import com.gings.model.chat.IncomingMessage;
 import com.gings.service.ChatService;
 import com.gings.utils.InvalidChatRoomCapacityException;
@@ -84,7 +88,7 @@ public class ChatController {
      * </pre>
      * 
      */
-    @MessageMapping("/normal-chat/create")
+    @MessageMapping("/chat/create")
     public void createOneToOneChat(Principal principal, @Validated OneToOneChatOpenReq openReq) {
                 
         log.info("Starting to create new chat room.");
@@ -97,9 +101,7 @@ public class ChatController {
     
     @MessageMapping("/group-chat/create")
     public void createGroupChat(Principal principal, @Validated GroupChatOpenReq openReq) {
-        
-        log.error("{}", openReq);
-        
+                
         if(openReq.getRoomType().isCapable(openReq.getUsers().size() + 1)) {
             
             log.info("Validation for chat room capacity failed.");
@@ -111,7 +113,7 @@ public class ChatController {
             throw new InvalidChatRoomCapacityException("Invalid chat room capacity.");
         }
 
-        log.info("Starting to create new chat room.");
+        log.info("Starting to create new group chat room.");
         
         int roomId = chatService.initGroupChatRoom(Integer.valueOf(principal.getName()), openReq);
         
@@ -162,5 +164,23 @@ public class ChatController {
         chatService.confirmLatestReceive(roomId, userId, latestReceive);
 
     }
+    
+    /**
+     * 
+     * @param refreshReq - bean validation을 위해 정의한 클래스이므로 아래 메서드에서 
+     *                     {@code refreshReq#getChatRoomInfos()}를 호출하여 서비스에 전달함. 
+     *                     
+     * 
+     */
+    @MessageMapping("/chat/refresh")
+    public ChatRoomRefreshRes chatRoomRefresh(Principal principal, ChatRoomRefreshReq refreshReq) {
+        
+       int userId = Integer.valueOf(principal.getName()); 
+        
+       log.info("Received message for refreshing chat room list history from user : {}.", userId);
+       
+       return chatService.refreshChatRoomHistory(userId, refreshReq.getChatRoomInfos());
+    }
+    
     
 }

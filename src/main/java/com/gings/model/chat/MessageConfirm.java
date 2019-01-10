@@ -1,5 +1,7 @@
 package com.gings.model.chat;
 
+import javax.validation.constraints.Positive;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +12,7 @@ public class MessageConfirm {
     @Setter
     @ToString
     public static class LastReadConfirm {
+        @Positive
         private int messageId;
     }
     
@@ -17,6 +20,7 @@ public class MessageConfirm {
     @Setter
     @ToString
     public static class LatestReceivedConfirm {
+        @Positive
         private int messageId;
     }
     

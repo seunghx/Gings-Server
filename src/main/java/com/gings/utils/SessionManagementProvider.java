@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class SessionManagementProvider implements ApplicationListener<SessionConnectedEvent>{
    
+    
     @Override
     public void onApplicationEvent(SessionConnectedEvent event) {
         if(log.isInfoEnabled()) {

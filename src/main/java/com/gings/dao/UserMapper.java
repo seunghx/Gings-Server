@@ -47,8 +47,7 @@ public interface UserMapper {
                     many = @Many(select = "findSignaturesByUserId", fetchType = FetchType.LAZY))
     })
     public User findByUserId(int userId);
-
-
+    
     @Select("SELECT user_id as userId, pwd, role, first_login as firstLogin"
             + " FROM user "
             + " WHERE email = #{email}")

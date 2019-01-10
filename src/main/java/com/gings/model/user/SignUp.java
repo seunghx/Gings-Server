@@ -31,8 +31,6 @@ public class SignUp {
     // 아직 일반 유저 밖에 없으니 정의만해놓음.
     private UserRole role = UserRole.USER;
 
-    @NotBlank
-
     @NotBlank(message = EMPTY_AUTH_NUMBER)
 
     @Pattern(regexp="^[0-9]{4}$", message = INVALID_AUTH_NUMBER)
