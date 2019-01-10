@@ -18,7 +18,7 @@ import java.util.List;
 public interface BoardMapper {
 
     // 보드 전체 조회 (findAllBoard)
-    @Select("SELECT * FROM board LEFT JOIN board_block ON board.board_id = board_block.board_id WHERE board_block.board_id IS NULL " +
+    @Select("SELECT * FROM board " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id", id=true),
@@ -38,7 +38,7 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findAllBoard(@Param("pagination") final Pagination pagination);
 
     // 카테고리로 보드 전체 조회
-    @Select("SELECT * FROM board LEFT JOIN board_block ON board.board_id = board_block.board_id WHERE board_block.board_id IS NULL AND board.category = #{category} " +
+    @Select("SELECT * FROM board WHERE category = #{category} " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
     @Results(value= {
             @Result(property="boardId", column="board_id", id=true),
@@ -60,9 +60,7 @@ public interface BoardMapper {
 
     // 키워드로 보드 전체 조회(최신순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
-            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
-            "WHERE board_block.board_id IS NULL "+
-            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
+            "WHERE(title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
             "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
@@ -85,9 +83,7 @@ public interface BoardMapper {
 
     // 키워드로 보드 전체 조회(추천순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
-            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
-            "WHERE board_block.board_id IS NULL "+
-            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
+            "WHERE(title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
             "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
@@ -110,10 +106,8 @@ public interface BoardMapper {
 
     // 카테고리별로 키워드로 보드 전체 조회(최신순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
-            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
-            "WHERE board_block.board_id IS NULL "+
-            "AND category = #{category}" +
-            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
+            "WHERE category = #{category} " +
+            "OR(title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
             "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")
@@ -138,10 +132,8 @@ public interface BoardMapper {
 
     // 카테고리별로 키워드로 보드 전체 조회(추천순)
     @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
-            "LEFT JOIN board_block ON board.board_id = board_block.board_id "+
-            "WHERE board_block.board_id IS NULL "+
-            "AND category = #{category}" +
-            "AND (title LIKE CONCAT('%',#{keyword},'%') "+
+            "WHERE category = #{category} " +
+            "OR(title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
             "OR board_keyword.content LIKE CONCAT('%',#{keyword},'%')) " +
             "ORDER BY write_time DESC LIMIT #{pagination.limit} OFFSET #{pagination.offset}")

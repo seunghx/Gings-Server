@@ -433,10 +433,14 @@ public class BoardService implements ApplicationEventPublisherAware {
         try {
             boardMapper.updateReBoard(replyId, modifyReBoardReq);
 
-            for (String url : modifyReBoardReq.getPrevImagesUrl()) {
-                boardMapper.deleteReBoardImg(url);
+            List<String> imgUrl = modifyReBoardReq.getPrevImagesUrl();
+
+            if(imgUrl.isEmpty() ){
+                for (String url : modifyReBoardReq.getPrevImagesUrl()) {
+                    boardMapper.deleteReBoardImg(url);
+                }
+                s3MultipartService.deleteMultipleFiles(modifyReBoardReq.getPrevImagesUrl());
             }
-            s3MultipartService.deleteMultipleFiles(modifyReBoardReq.getPrevImagesUrl());
 
             List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyReBoardReq.getPostImages());
             boardMapper.saveReBoardImg(replyId, urlList);
@@ -518,7 +522,10 @@ public class BoardService implements ApplicationEventPublisherAware {
                 else { boardReply.setLikeChk(false); }
             }
             boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
-            boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
+            String imgUrl = userMapper.selectProfileImg(boardReply.getWriterId()).getImage();
+            if(imgUrl != null && imgUrl.equals("") ) {
+                boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
+            }
         }
         return boardReplies;
     }
