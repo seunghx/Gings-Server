@@ -105,7 +105,7 @@ public interface BoardMapper {
     public List<HomeBoardAllRes> findBoardsByKeywordOrderByRecommend(@Param("keyword")String keyword, @Param("pagination")Pagination pagination);
 
     // 카테고리별로 키워드로 보드 전체 조회(최신순)
-    @Select("SELECT * FROM board LEFT JOIN board_keyword ON board.board_id = board_keyword.board_id " +
+    @Select("SELECT * FROM board JOIN board_keyword ON board.board_id = board_keyword.board_id " +
             "WHERE category = #{category} " +
             "OR(title LIKE CONCAT('%',#{keyword},'%') "+
             "OR board.content LIKE CONCAT('%',#{keyword},'%') " +
@@ -370,9 +370,6 @@ public interface BoardMapper {
     // 리보드 수정
     @Update("UPDATE board_reply SET content=#{ModifyReBoardReq.content}, write_time = now() WHERE reply_id = #{replyId}")
     void updateReBoard(@Param("replyId") final int replyId, @Param("ModifyReBoardReq") final ModifyReBoardReq modifyReBoardReq);
-
-
-
 
 
     /*

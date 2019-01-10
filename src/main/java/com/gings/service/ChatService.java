@@ -143,7 +143,7 @@ public class ChatService {
         
         log.info("Checking existence for user {} with room {}", userId, roomId);
         
-        if(chatMapper.existByUserIdAndRoomId(userId, roomId)) {
+        if(chatMapper.existByUserIdAndRoomId(roomId, userId)) {
             log.info("Requesting user {} exists in room {}", userId, roomId);
             return true;
         }else {

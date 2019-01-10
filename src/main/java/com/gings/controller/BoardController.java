@@ -25,8 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -34,7 +32,6 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 /**
  * Created by YW
  */
-
 @Slf4j
 @RestController
 @Authentication

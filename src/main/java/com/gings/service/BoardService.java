@@ -486,7 +486,7 @@ public class BoardService {
 
     public HomeBoardOneRes setUserInfoInOneRes(HomeBoardOneRes board, int userId) {
         List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
-
+        
         for(int likedBoardId : likedBoardIdList) {
             if (board.isLikeChk()) break;
 
@@ -548,14 +548,13 @@ public class BoardService {
     public List<HomeBoardAllRes> removeBlockedBoards(List<HomeBoardAllRes> boards, int userId) {
 
         List<Integer> blockBoardIdList = boardMapper.findBlockBoardsByUserId(userId);
-        for(int i = 0; i< boards.size(); i++){
-            for(int blockBoardId : blockBoardIdList){
-                if(boards.get(i).getBoardId() == blockBoardId){
-                    boards.remove(boards.get(i));
-                }
-            }
-        }
-        return boards;
+        
+        List<HomeBoardAllRes> filteredBoards = 
+                boards.stream()
+                      .filter(board -> !blockBoardIdList.contains(board.getBoardId()))
+                      .collect(Collectors.toList());
+        
+        return filteredBoards;
     }
 
     public List<HomeBoardAllRes> removeBlackListBoards(List<HomeBoardAllRes> boards, int userId) {

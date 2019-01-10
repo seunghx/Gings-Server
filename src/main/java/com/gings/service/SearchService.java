@@ -113,21 +113,33 @@ public class SearchService {
     }
 
     /**
-         * 카테고리별 보드 검색(최신순)
-         *
-         * @param
-         * @return DefaultRes
-         */
-        public DefaultRes<List<HomeBoardAllRes>> selectBoardByCategoryByKeywordByWriteTime(final String keyword, final BoardCategory boardCategory,
-                                                                                           final Pagination pagination, final int userId) {
-            List<HomeBoardAllRes> boards =
-                    boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByWriteTime(keyword, boardCategory, pagination), userId);
-            boards = deleteOverlapBoard(boards);
-            if (boards.isEmpty())
-                return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
-            boardService.removeBlockedBoards(boards, userId);
-            final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
+     * 카테고리별 보드 검색(최신순)
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<HomeBoardAllRes>> selectBoardByCategoryByKeywordByWriteTime(final String keyword, final BoardCategory boardCategory,
+            final Pagination pagination, final int userId) {
+        List<HomeBoardAllRes> boards =
+                boardService.setUserInfoInAllRes(boardMapper.findBoardsByCategoryByKeywordOrderByWriteTime(keyword, boardCategory, pagination), userId);
+
+        boards.forEach(board -> {
+            log.error("{}", board);
+        });
+
+        boards = deleteOverlapBoard(boards);
+        
+        log.error("deleted : ");
+        boards.forEach(board -> {
+            log.error("{}", board);
+        });
+        
+        if (boards.isEmpty())
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NO_SEARCH_RESULT);
+        boardService.removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = boardService.removeBlackListBoards(boards, userId);
+        
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_BOARD, filteredBoards);
     }
 
     /**

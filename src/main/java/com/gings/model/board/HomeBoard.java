@@ -4,6 +4,7 @@ import com.gings.domain.board.BoardReply;
 import com.gings.utils.code.BoardCategory;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 public class HomeBoard {
     @Getter
     @Setter
+    @ToString
     public static class HomeBoardAllRes implements Comparable<HomeBoardAllRes>{
         private int boardId;
 
@@ -48,6 +50,7 @@ public class HomeBoard {
 
     @Getter
     @Setter
+    @ToString
     public static class HomeBoardOneRes {
         private int boardId;
 

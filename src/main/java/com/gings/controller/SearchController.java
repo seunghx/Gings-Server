@@ -48,8 +48,7 @@ public class SearchController {
             DefaultRes<List<Directory>> defaultRes = searchService.selectUserByKeyword(keyword, pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -65,8 +64,7 @@ public class SearchController {
             DefaultRes<List<Directory>> defaultRes = searchService.selectUserByWriteTime(pagination);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -85,8 +83,7 @@ public class SearchController {
                     searchService.selectBoardByKeywordByWriteTime(keyword, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -104,8 +101,7 @@ public class SearchController {
                     searchService.selectBoardByKeywordByRecommend(keyword, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -116,7 +112,8 @@ public class SearchController {
      * @return ResponseEntity
      */
     @GetMapping("search/boards/category/{category}/latest")
-    public ResponseEntity SearchBoardsByCategoryByWriteTime(@RequestParam String keyword, @PathVariable BoardCategory category,
+    public ResponseEntity SearchBoardsByCategoryByWriteTime(@RequestParam String keyword, 
+                                                            @PathVariable BoardCategory category,
                                                             final Pagination pagination, GingsPrincipal principal) {
         try {
             final int userId = principal.getUserId();
@@ -125,8 +122,7 @@ public class SearchController {
                     searchService.selectBoardByCategoryByKeywordByWriteTime(keyword, category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -145,8 +141,7 @@ public class SearchController {
                     searchService.selectBoardByCategoryByKeywordByRecommend(keyword, category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
