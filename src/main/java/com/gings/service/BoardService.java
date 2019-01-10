@@ -225,7 +225,7 @@ public class BoardService implements ApplicationEventPublisherAware {
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -260,7 +260,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_BOARD, boardLike);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -293,7 +293,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             boardBlock.setBlockBoardIdList(boardMapper.findBlockBoardsByUserId(userId));
             return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, boardBlock);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -320,7 +320,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             black.setBlackList(boardMapper.findBlackListUsersByUserId(userId));
             return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, black);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -343,7 +343,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             return DefaultRes.res(StatusCode.OK, ResponseMessage.SHARE_BOARD);
 
         } catch (Exception e){
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -366,7 +366,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             }
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_REBOARD);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -391,7 +391,7 @@ public class BoardService implements ApplicationEventPublisherAware {
             boardMapper.saveReBoardRecommender(replyId, userId);
             return DefaultRes.res(StatusCode.OK, ResponseMessage.LIKE_REBOARD);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -459,7 +459,7 @@ public class BoardService implements ApplicationEventPublisherAware {
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_REBOARD);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
@@ -568,7 +568,6 @@ public class BoardService implements ApplicationEventPublisherAware {
         for(int blackListUserId : blackListUserList){
             for(int boardId : boardMapper.findBoardIdByUserId(blackListUserId)){
                 blockBoardIdList.add(boardId);
-                log.error("boardId : " + boardId);
             }
         }
 
