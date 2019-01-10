@@ -1,11 +1,9 @@
 package com.gings.model.board;
 
-import com.gings.domain.BoardReply;
+import com.gings.domain.board.BoardReply;
 import com.gings.utils.code.BoardCategory;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;

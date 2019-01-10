@@ -2,13 +2,9 @@ package com.gings.service;
 
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
-import com.gings.domain.Board;
 import com.gings.domain.Directory;
-import com.gings.domain.User;
 import com.gings.model.DefaultRes;
 import com.gings.model.Pagination;
-import com.gings.model.SearchKeyword.SearchKeywordReq;
-import com.gings.model.board.HomeBoard;
 import com.gings.model.board.HomeBoard.HomeBoardAllRes;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -16,7 +12,6 @@ import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.gings.model;
 
-import com.gings.domain.BoardReply;
+import com.gings.domain.board.BoardReply;
 import lombok.Getter;
 import lombok.Setter;
 

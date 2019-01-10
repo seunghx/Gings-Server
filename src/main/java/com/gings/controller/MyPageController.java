@@ -1,7 +1,5 @@
 package com.gings.controller;
 
-import com.gings.domain.Board;
-import com.gings.domain.FCM;
 import com.gings.model.DefaultRes;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
@@ -13,22 +11,14 @@ import com.gings.service.AndroidPushNotificationsService;
 import com.gings.service.BoardService;
 import com.gings.service.FCMService;
 import com.gings.service.MyPageService;
-import com.gings.utils.ResponseMessage;
-import com.gings.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 

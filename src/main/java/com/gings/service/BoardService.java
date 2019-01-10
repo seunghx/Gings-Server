@@ -3,8 +3,8 @@ package com.gings.service;
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
 
-import com.gings.domain.*;
-
+import com.gings.domain.board.Board;
+import com.gings.domain.board.BoardReply;
 import com.gings.model.DefaultRes;
 import com.gings.model.MyPage.MyPageProfile;
 import com.gings.model.MyPageBoard;
@@ -65,6 +65,25 @@ public class BoardService implements ApplicationEventPublisherAware {
     }
 
     /**
+     * 보드 고유 번호로 보드 조회
+     *
+     * @param boardId 보드 고유 번호
+     * @return DefaultRes
+     */
+    public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int boardId, final int userId) {
+        HomeBoardOneRes board = setUserInfoInOneRes(boardMapper.findBoardByBoardId(boardId), userId);
+
+        List<BoardReply> boardReplies = setUserInfoInReplyRes(boardMapper.findReplyByBoardId(boardId), userId);
+
+        board.setReplys(boardReplies);
+
+        if (board == null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, board);
+    }
+
+
+    /**
      * 카테고드별 보드 조회
      *
      * @param
@@ -94,24 +113,6 @@ public class BoardService implements ApplicationEventPublisherAware {
 
         Collections.sort(boards);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, boards);
-    }
-
-    /**
-     * 보드 고유 번호로 보드 조회
-     *
-     * @param boardId 보드 고유 번호
-     * @return DefaultRes
-     */
-    public DefaultRes<HomeBoardOneRes> findBoardByBoardId(final int boardId, final int userId) {
-        HomeBoardOneRes board = setUserInfoInOneRes(boardMapper.findBoardByBoardId(boardId), userId);
-
-        List<BoardReply> boardReplies = setUserInfoInReplyRes(boardMapper.findReplyByBoardId(boardId), userId);
-
-        board.setReplys(boardReplies);
-
-        if (board == null)
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, board);
     }
 
     /**
@@ -194,7 +195,6 @@ public class BoardService implements ApplicationEventPublisherAware {
         final int replyRecommend = boardMapper.findReplyRecommendNumbersByReplyId(id);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD_INFO, replyRecommend);
     }
-
 
     /**
      * 보드 저장

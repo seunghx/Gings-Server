@@ -1,4 +1,4 @@
-package com.gings.domain;
+package com.gings.domain.board;
 
 import java.time.LocalDateTime;
 import java.util.List;
