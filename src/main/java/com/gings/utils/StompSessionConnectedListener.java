@@ -17,14 +17,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class SessionConnectedLogger implements ApplicationListener<SessionConnectedEvent>{
-   
+public class StompSessionConnectedListener implements ApplicationListener<SessionConnectedEvent>{
     
     @Override
     public void onApplicationEvent(SessionConnectedEvent event) {
         if(log.isInfoEnabled()) {
 
             log.info("New session connected : {}.", event.getMessage());
+
         }
     }
 

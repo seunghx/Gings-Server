@@ -47,7 +47,6 @@ public class ChatController {
         this.sessionManager = sessionManager;
     }
     
-    
     // @SubscribeMapping
     // ==============================================================================================
     
@@ -72,11 +71,9 @@ public class ChatController {
             sessionManager.close(String.valueOf(userId));
         }
     }
-
     
     // @MessageMapping
     // ==============================================================================================
-    
     
     /**
      * 

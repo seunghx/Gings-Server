@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,14 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager  {
         log.info("WebSocketSession to be deleted soon : {}", session);
         
         try {
-            session.close();
+            
+            if(session == null) {
+                return;
+            }
+            
+            session.close(CloseStatus.SESSION_NOT_RELIABLE);
             socketSessionMap.remove(userId);
+            
         }catch(IOException e) {
             log.info("IO Exception occurred while trying to close the session ");
             

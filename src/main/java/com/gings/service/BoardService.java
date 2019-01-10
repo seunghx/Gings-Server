@@ -22,8 +22,6 @@ import com.gings.utils.code.BoardCategory;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,13 +34,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class BoardService implements ApplicationEventPublisherAware {
+public class BoardService {
 
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
-
-    private ApplicationEventPublisher eventPublisher;
 
     public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
                         final S3MultipartService s3MultipartService) {
@@ -60,8 +56,10 @@ public class BoardService implements ApplicationEventPublisherAware {
      */
     public DefaultRes<List<HomeBoardAllRes>> findAllBoard(final Pagination pagination, final int userId) {
         final List<HomeBoardAllRes> boards = setUserInfoInAllRes(boardMapper.findAllBoard(pagination), userId);
-        if (boards.isEmpty())
+        if (boards.isEmpty()) {
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+
+        }
 
         removeBlockedBoards(boards, userId);
         final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
@@ -564,25 +562,19 @@ public class BoardService implements ApplicationEventPublisherAware {
 
         List<Integer> blackListUserList = boardMapper.findBlackListUsersByUserId(userId);
         List<Integer> blockBoardIdList = new ArrayList<>();
-
+        
+        if(blackListUserList == null) {
+            log.info("Black list is null");
+        }
+        
         for(int blackListUserId : blackListUserList){
             for(int boardId : boardMapper.findBoardIdByUserId(blackListUserId)){
                 blockBoardIdList.add(boardId);
             }
         }
 
-
         return boards.stream()
                      .filter(board -> !blockBoardIdList.contains(board.getBoardId())).collect(Collectors.toList());
-
-    }
-
-
-
-
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
 
     }
 }

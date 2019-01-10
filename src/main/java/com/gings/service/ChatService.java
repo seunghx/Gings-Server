@@ -143,7 +143,14 @@ public class ChatService {
         
         log.info("Checking existence for user {} with room {}", userId, roomId);
         
-        return chatMapper.existByUserIdAndRoomId(userId, roomId);
+        if(chatMapper.existByUserIdAndRoomId(userId, roomId)) {
+            log.info("Requesting user {} exists in room {}", userId, roomId);
+            return true;
+        }else {
+            log.info("Requesting user {} does not exist in room {}", userId, roomId);
+            return false;
+        }
+        
     }
     
     public ChatMessage addMeesageToChatRoomAndGet(int userId, int roomId, IncomingMessage message) {

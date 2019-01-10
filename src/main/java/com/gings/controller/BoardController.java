@@ -62,7 +62,7 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findAllBoard(pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -81,7 +81,7 @@ public class BoardController {
             DefaultRes<HomeBoardOneRes> defaultRes = boardService.findBoardByBoardId(boardId, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -102,7 +102,7 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategoryByWriteTime(category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -123,7 +123,7 @@ public class BoardController {
             DefaultRes<List<HomeBoardAllRes>> defaultRes = boardService.findBoardsByCategoryByRecommend(category, pagination, userId);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -141,7 +141,7 @@ public class BoardController {
             upBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -208,7 +208,7 @@ public class BoardController {
         try {
             return new ResponseEntity<>(boardService.increaseBoardShare(boardId), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -227,7 +227,7 @@ public class BoardController {
             reBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -245,7 +245,7 @@ public class BoardController {
         try {
             return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -264,7 +264,7 @@ public class BoardController {
             modifyBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateBoard(boardId,modifyBoardReq), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -284,7 +284,7 @@ public class BoardController {
             modifyReBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.updateReBoard(reboardId,modifyReBoardReq), HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -302,7 +302,7 @@ public class BoardController {
             DefaultRes defaultRes = DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_BOARD);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
@@ -320,7 +320,7 @@ public class BoardController {
             DefaultRes defaultRes = DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_REBOARD);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }

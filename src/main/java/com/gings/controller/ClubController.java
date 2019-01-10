@@ -42,7 +42,7 @@ public class ClubController {
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception exception)
         {
-            log.error(exception.getMessage());
+            log.error("{}", exception);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -59,7 +59,7 @@ public class ClubController {
             return new ResponseEntity<>(defaultRes,HttpStatus.OK);
         }catch (Exception exception)
         {
-            log.error(exception.getMessage());
+            log.error("{}", exception);
             return new ResponseEntity<>(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -76,7 +76,7 @@ public class ClubController {
             return new ResponseEntity<>(defaultRes,HttpStatus.OK);
         }catch (Exception exception)
         {
-            log.error(exception.getMessage());
+            log.error("{}", exception);
             return new ResponseEntity<>(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -90,7 +90,7 @@ public class ClubController {
         try{
             return new ResponseEntity<>(clubService.joinClub(clubId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception exception){
-            log.error(exception.getMessage());
+            log.error("{}", exception);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -104,7 +104,7 @@ public class ClubController {
         try{
             return new ResponseEntity<>(clubService.joinEvent(eventId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception exception){
-            log.error(exception.getMessage());
+            log.error("{}", exception);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
