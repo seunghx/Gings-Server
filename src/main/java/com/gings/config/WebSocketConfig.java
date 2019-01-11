@@ -17,7 +17,7 @@ import com.gings.security.authentication.StompConnectionInterceptor;
  * @author seunghyun
  *
  */
-@Profile({"production", "test"})
+@Profile("production")
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
@@ -61,7 +61,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(connectInterceptor);
-     
 
     }
     

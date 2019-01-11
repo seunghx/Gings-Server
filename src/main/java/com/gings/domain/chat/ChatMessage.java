@@ -20,7 +20,7 @@ public class ChatMessage {
     private int roomId;
     private int writerId;
     private String message;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-mm-dd hh:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private LocalDateTime writeAt;
     private MessageType type;
    
