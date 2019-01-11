@@ -53,6 +53,5 @@ public class StompControllerExceptionHandler {
             log.error("Error occurred,",  e);
             throw e;
         }
-        
     }
 }

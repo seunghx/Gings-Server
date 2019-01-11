@@ -298,8 +298,8 @@ public interface UserMapper {
     @Update("UPDATE user SET fcm=#{fcm} WHERE user_id = #{id}")
     void saveFcmToken(@Param("id")final int id, @Param("fcm") final String fcm);
 
-    @Select("SELECT fcm FROM user")
-    public List<CheckFcm> getTokenOfFcmAll(@Param("id")final int id);
+    @Select("SELECT user_id, fcm FROM user")
+    public List<CheckFcm> getTokenOfFcmAll();
 
     @Update("UPDATE user SET fcm=#{none} WHERE user_id = #{id}")
     void deleteFcmOfUser(@Param("id")final int id, @Param("none") final String none);

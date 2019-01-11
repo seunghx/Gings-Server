@@ -17,6 +17,7 @@ import com.gings.security.authentication.Authentication;
 import com.gings.service.BoardService;
 
 import com.gings.service.FCMService;
+import com.gings.service.MyPageService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
@@ -39,13 +40,16 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 public class BoardController {
 
     private final BoardService boardService;
+    private final MyPageService myPageService;
     private final BoardMapper boardMapper;
     private final FCMService fcmService;
 
-    public BoardController(final BoardService boardService, final BoardMapper boardMapper, final FCMService fcmService) {
+    public BoardController(final BoardService boardService, final BoardMapper boardMapper,
+                           final FCMService fcmService, final MyPageService myPageService) {
         this.boardService = boardService;
         this.boardMapper = boardMapper;
         this.fcmService = fcmService;
+        this.myPageService = myPageService;
     }
 
     /**
@@ -156,13 +160,15 @@ public class BoardController {
     @PostMapping("boards/{boardId}/recommend")
     public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
-            boardService.boardLikes(boardId, principal.getUserId());
-
             int receiverId = boardMapper.findBoardByBoardId(boardId).getWriterId();
-            String senderId = Integer.toString(boardId);
-
-            String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", "누군가 나의 보드에 추천을 눌렀어요!");
-            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+            if(receiverId!=principal.getUserId()){
+                boardService.boardLikes(boardId, principal.getUserId());
+                String senderId = Integer.toString(boardId);
+                String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
+                String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", name+"님이 나의 보드에 추천을 눌렀어요!");
+                return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(boardService.boardLikes(boardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -231,18 +237,16 @@ public class BoardController {
     public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final GingsPrincipal principal) {
         try {
             reBoardReq.setWriterId(principal.getUserId());
-            //System.out.println("리보드 작성자:"+reBoardReq.getWriterId());
-
             boardService.saveReBoard(reBoardReq);
             int boardId = reBoardReq.getBoardId();
 
             int writer = boardMapper.findBoardByBoardId(boardId).getWriterId();
-
             int i = reBoardReq.getReplyId();
-
             String replyId = Integer.toString(i);
 
-            String firebaseResponse = fcmService.createFcm(writer, replyId, "깅스", "누군가 나의 보드에 답변을 달았어요!");
+            String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
+
+            String firebaseResponse = fcmService.createFcm(writer, replyId, "깅스", name+"님이 나의 보드에 답변을 달았어요!");
             return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
@@ -261,6 +265,15 @@ public class BoardController {
     public ResponseEntity likeReBoard(@PathVariable("reboardId") final int reboardId,
                                       final GingsPrincipal principal) {
         try {
+            int receiverId = boardMapper.findReplyByReplyId(reboardId).getWriterId();
+            if(principal.getUserId()!=receiverId){
+                boardService.ReBoardLikes(reboardId, principal.getUserId());
+                String senderId = Integer.toString(reboardId);
+                String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
+
+                String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", name+"님이 나의 리보드에 추천을 눌렀어요!");
+                return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+            }
             return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);

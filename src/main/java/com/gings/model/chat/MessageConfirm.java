@@ -19,7 +19,7 @@ public class MessageConfirm {
     @Getter
     @Setter
     @ToString
-    public static class LatestReceivedConfirm {
+    public static class LatestReceiveConfirm {
         @Positive
         private int messageId;
     }
