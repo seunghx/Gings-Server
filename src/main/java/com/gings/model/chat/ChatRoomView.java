@@ -35,7 +35,7 @@ public class ChatRoomView {
         @Positive
         private int roomId;
         @Positive
-        private int latestReceivedMessage;
+        private int latestReceiveMessage;
         @NotEmpty
         private List<Integer> users;
     }
@@ -43,7 +43,7 @@ public class ChatRoomView {
     @Getter
     @Setter
     @ToString
-    public static class ChatRoomRefreshRes {
+    public static class RefreshedChatRoomsStatus {
 
         List<Integer> deletedChatRooms;
         List<NewChatRoom> newChatRooms;
@@ -58,7 +58,7 @@ public class ChatRoomView {
         
         private int id;
         private int lastReadMessage;
-        private int latestReceivedMessage;
+        private int latestReceiveMessage;
         private List<Integer> deletedUsers;
         private List<ChatRoomUser> addedUsers;
         private List<ChatMessage> messages;

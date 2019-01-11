@@ -10,11 +10,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gings.domain.chat.ChatMessage;
+import com.gings.model.chat.ChatNotification.ChatRoomStatusRefreshNotification;
 import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
 import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
 import com.gings.model.chat.ChatRoomView.ChatRoomRefreshReq;
-import com.gings.model.chat.ChatRoomView.ChatRoomRefreshRes;
+import com.gings.model.chat.ChatRoomView.RefreshedChatRoomsStatus;
 import com.gings.model.chat.IncomingMessage;
+import com.gings.model.chat.MessageConfirm.LastReadConfirm;
+import com.gings.model.chat.MessageConfirm.LatestReceiveConfirm;
 import com.gings.service.ChatService;
 import com.gings.utils.InvalidChatRoomCapacityException;
 import com.gings.utils.WebSocketSessionManager;
@@ -23,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * 
  * 
  * 
  * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 {@link User}의 {@code id}로 사용하였는데, 
@@ -138,31 +140,31 @@ public class ChatController {
         return newMessage;
     }
     
-    @MessageMapping("/room/{roomId}/last-read")
+    @MessageMapping("/room/{roomId}/last-read-message")
     public void confirmLastRead(Principal principal, 
                                 @DestinationVariable("roomId") int roomId,
-                                int lastRead) {
+                                LastReadConfirm confirm) {
         
         int userId = Integer.valueOf(principal.getName());
         
         log.info("Received message for confirming last read message. room : {}, user :{}", 
                   roomId, userId);
         
-        chatService.confirmLastRead(roomId, userId, lastRead);
+        chatService.confirmLastRead(roomId, userId, confirm.getMessageId());
         
     }
     
-    @MessageMapping("/room/{roomId}/latest-receive")
+    @MessageMapping("/room/{roomId}/latest-receive-message")
     public void confirmLatestReceive(Principal principal,
                                      @DestinationVariable("roomId") int roomId,
-                                     int latestReceive) {
+                                     LatestReceiveConfirm confirm) {
         
         int userId = Integer.valueOf(principal.getName());
         
         log.info("Received message for confirming latest received message. room : {}, user :{}", 
                   roomId, userId);
         
-        chatService.confirmLatestReceive(roomId, userId, latestReceive);
+        chatService.confirmLatestReceive(roomId, userId, confirm.getMessageId());
 
     }
     
@@ -175,14 +177,17 @@ public class ChatController {
      */
     @MessageMapping("/chat/refresh")
     @SendTo(CHAT_NOTIFICATION_TOPIC)
-    public ChatRoomRefreshRes chatRoomRefresh(Principal principal, ChatRoomRefreshReq refreshReq) {
+    public ChatRoomStatusRefreshNotification chatRoomRefresh(Principal principal, ChatRoomRefreshReq refreshReq) {
         
        int userId = Integer.valueOf(principal.getName()); 
         
        log.info("Received message for refreshing chat room list history from user : {}.", userId);
        
-       return chatService.refreshChatRoomHistory(userId, refreshReq.getChatRoomInfos());
-    }
-    
-    
+       RefreshedChatRoomsStatus refreshed = chatService.refreshChatRoomHistory(userId, refreshReq.getChatRoomInfos());
+       
+       log.debug("Refreshed chat rooms status : {}", refreshed);
+       
+       return new ChatRoomStatusRefreshNotification(refreshed);
+    }    
+   
 }

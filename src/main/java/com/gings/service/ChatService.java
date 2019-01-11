@@ -21,7 +21,7 @@ import com.gings.domain.chat.ChatRoom.ChatRoomUser;
 import com.gings.model.chat.ChatNotification;
 import com.gings.model.chat.ChatOpenReq.GroupChatOpenReq;
 import com.gings.model.chat.ChatOpenReq.OneToOneChatOpenReq;
-import com.gings.model.chat.ChatRoomView.ChatRoomRefreshRes;
+import com.gings.model.chat.ChatRoomView.RefreshedChatRoomsStatus;
 import com.gings.model.chat.ChatRoomView.ExistingChatRoom;
 import com.gings.model.chat.ChatRoomView.NewChatRoom;
 import com.gings.model.chat.ChatRoomView.PriorChatRoomInfo;
@@ -235,7 +235,7 @@ public class ChatService {
      *           경우 null을 반환.
      * 
      */
-    public ChatRoomRefreshRes refreshChatRoomHistory(int userId, List<PriorChatRoomInfo> chatRooms) {
+    public RefreshedChatRoomsStatus refreshChatRoomHistory(int userId, List<PriorChatRoomInfo> chatRooms) {
         
         if(chatRooms == null) {
             log.error("Parameter chatRooms is null. Checking controller or more prior component required.");
@@ -266,7 +266,7 @@ public class ChatService {
      *         포함한다. (각 채팅방 별로 삭제된 유저 및 추가된 유저에 대한 정보 또한 포함)
      *         
      */
-    private ChatRoomRefreshRes refreshChatRooms(int userId, 
+    private RefreshedChatRoomsStatus refreshChatRooms(int userId, 
                                                 Map<Integer, PriorChatRoomInfo> priorChatRoomMap, 
                                                 List<Integer> currentRoomIds){
         
@@ -290,7 +290,7 @@ public class ChatService {
                           }
                       });
         
-        ChatRoomRefreshRes res = new ChatRoomRefreshRes();
+        RefreshedChatRoomsStatus res = new RefreshedChatRoomsStatus();
         res.setDeletedChatRooms(getDeletedRoomIds(priorChatRoomMap, currentRoomIds));
         res.setExistingChatRooms(existingChatRooms);
         res.setNewChatRooms(newChatRooms);
@@ -377,7 +377,7 @@ public class ChatService {
                                         throw new IllegalStateException("User does not exist in chat room ");
                                     });
         
-        int priorLatestReceiveMessage = priorChatRoom.getLatestReceivedMessage();
+        int priorLatestReceiveMessage = priorChatRoom.getLatestReceiveMessage();
         
         if(priorLatestReceiveMessage < sameUser.getLatestReceiveMessage()) {
             existingRoom.setMessages(
@@ -389,7 +389,7 @@ public class ChatService {
         existingRoom.setDeletedUsers(getDeletedUser(priorChatRoom.getUsers(), room.getUsers()));
         existingRoom.setAddedUsers(getNewUsers(priorChatRoom.getUsers(), room.getUsers()));
         existingRoom.setLastReadMessage(sameUser.getLastReadMessage());
-        existingRoom.setLatestReceivedMessage(sameUser.getLatestReceiveMessage());
+        existingRoom.setLatestReceiveMessage(sameUser.getLatestReceiveMessage());
         
         return existingRoom;
     }
