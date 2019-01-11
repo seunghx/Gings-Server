@@ -311,7 +311,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PutMapping("reboards/{reboardId}")
-    public ResponseEntity updateReBoard(@PathVariable final int reboardId, @Validated  final ModifyReBoardReq modifyReBoardReq,
+    public ResponseEntity updateReBoard(@PathVariable final int reboardId, @Validated final ModifyReBoardReq modifyReBoardReq,
                                       GingsPrincipal principal) {
         try {
             modifyReBoardReq.setWriterId(principal.getUserId());

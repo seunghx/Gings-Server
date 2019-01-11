@@ -23,6 +23,7 @@ import com.gings.utils.code.BoardCategory;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -90,7 +91,7 @@ public class BoardService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByWriteTime(final BoardCategory category, final Pagination pagination, final int userId) {
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByWriteTime(@Validated final BoardCategory category, final Pagination pagination, final int userId) {
         final List<HomeBoardAllRes> boards =
                 setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
         if (boards.isEmpty())
@@ -107,7 +108,7 @@ public class BoardService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByRecommend(final BoardCategory category, final Pagination pagination, final int userId) {
+    public DefaultRes<List<HomeBoardAllRes>> findBoardsByCategoryByRecommend(@Validated final BoardCategory category, final Pagination pagination, final int userId) {
         final List<HomeBoardAllRes> boards =
                 setUserInfoInAllRes(boardMapper.findBoardsByCategory(category, pagination), userId);
 
@@ -207,7 +208,7 @@ public class BoardService {
      * @param upBoardReq 보드 데이터
      * @return DefaultRes
      */
-    public DefaultRes saveBoard(final UpBoardReq upBoardReq) {
+    public DefaultRes saveBoard(@Validated final UpBoardReq upBoardReq) {
         try {
             boardMapper.saveBoard(upBoardReq);
             final int boardId = upBoardReq.getBoardId();
@@ -352,7 +353,7 @@ public class BoardService {
      * @return DefaultRes
      */
 
-    public DefaultRes saveReBoard(final ReBoardReq reBoardReq) {
+    public DefaultRes saveReBoard(@Validated final ReBoardReq reBoardReq) {
         try {
             boardMapper.saveReBoard(reBoardReq);
             final int reReplyId = reBoardReq.getReplyId();
@@ -401,7 +402,7 @@ public class BoardService {
      * @return DefaultRes
      */
 
-    public DefaultRes updateBoard(final int boardId, final ModifyBoardReq modifyBoardReq) {
+    public DefaultRes updateBoard(final int boardId, final @Validated ModifyBoardReq modifyBoardReq) {
         try {
             boardMapper.updateBoard(boardId, modifyBoardReq);
 
@@ -434,7 +435,7 @@ public class BoardService {
      * @return DefaultRes
      */
 
-    public DefaultRes updateReBoard(final int replyId, final ModifyReBoardReq modifyReBoardReq) {
+    public DefaultRes updateReBoard(final int replyId, @Validated final ModifyReBoardReq modifyReBoardReq) {
         try {
             boardMapper.updateReBoard(replyId, modifyReBoardReq);
 
@@ -461,7 +462,7 @@ public class BoardService {
         }
     }
 
-    public List<HomeBoardAllRes> setUserInfoInAllRes(List<HomeBoardAllRes> boards, int userId) {
+    public List<HomeBoardAllRes> setUserInfoInAllRes(@Validated List<HomeBoardAllRes> boards, int userId) {
         List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
 
         for (HomeBoardAllRes board : boards) {
@@ -483,7 +484,7 @@ public class BoardService {
         return boards;
     }
 
-    public HomeBoardOneRes setUserInfoInOneRes(HomeBoardOneRes board, int userId) {
+    public HomeBoardOneRes setUserInfoInOneRes(@Validated HomeBoardOneRes board, int userId) {
         List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
 
         for(int likedBoardId : likedBoardIdList) {
@@ -498,11 +499,17 @@ public class BoardService {
             MyPageProfile profile = userMapper.selectProfileImg(board.getWriterId());
             String image = profile == null? null : profile.getImage();
 
+            log.error("{image}" + image);
+
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
 
+
+
             String imgUrl = userMapper.selectProfileImg(board.getWriterId()).getImage();
+
+            log.error("{imageUrl}" + imgUrl);
             if(imgUrl != null && !(imgUrl.equals("")) ) {
                 board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
             }
@@ -524,7 +531,7 @@ public class BoardService {
 
 
 
-    public List<BoardReply> setUserInfoInReplyRes(List<BoardReply> boardReplies, int userId) {
+    public List<BoardReply> setUserInfoInReplyRes(@Validated List<BoardReply> boardReplies, int userId) {
 
 
         List<Integer> likedReBoardIdList = boardMapper.findRecommendReBoardsByUserId(userId);
@@ -545,7 +552,7 @@ public class BoardService {
         return boardReplies;
     }
 
-    public List<HomeBoardAllRes> removeBlockedBoards(List<HomeBoardAllRes> boards, int userId) {
+    public List<HomeBoardAllRes> removeBlockedBoards(@Validated List<HomeBoardAllRes> boards, int userId) {
 
         List<Integer> blockBoardIdList = boardMapper.findBlockBoardsByUserId(userId);
 
@@ -557,7 +564,7 @@ public class BoardService {
         return filteredBoards;
     }
 
-    public List<HomeBoardAllRes> removeBlackListBoards(List<HomeBoardAllRes> boards, int userId) {
+    public List<HomeBoardAllRes> removeBlackListBoards(@Validated List<HomeBoardAllRes> boards, int userId) {
 
         List<Integer> blackListUserList = boardMapper.findBlackListUsersByUserId(userId);
         List<Integer> blockBoardIdList = new ArrayList<>();

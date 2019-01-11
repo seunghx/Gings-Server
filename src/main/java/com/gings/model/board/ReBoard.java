@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class ReBoard {
     public static class ReBoardReq{
         private int replyId;
 
-        @NotBlank
+
         private int boardId;
 
         private int writerId;
@@ -27,7 +28,6 @@ public class ReBoard {
 
         private LocalDateTime writeTime;
 
-        @NotBlank
         private List<MultipartFile> images;
 
         private int recommender;
@@ -37,9 +37,8 @@ public class ReBoard {
     @Getter
     @Setter
     public static class ModifyReBoardReq{
-        @NotBlank
+
         private int replyId;
-        @NotBlank
         private int boardId;
 
         private int writerId;
