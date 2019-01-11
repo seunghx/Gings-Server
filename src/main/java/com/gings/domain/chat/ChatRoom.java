@@ -15,6 +15,8 @@ import lombok.ToString;
  * {@link @JsonInclude}와 같은 어노테이션은 뷰에 전달되는 DTO에 사용되나 
  * 편의를 위해 도메인 클래스 {@link ChatRoom}에 추가하였다.
  * 
+ * 후에 1:1 채팅용 db 테이블 따로 만들고(동일한 일대일 채팅방 생성 편하게 막기위해) 필요할 경우 변경가능.
+ * 
  * @author seunghyun
  *
  */
