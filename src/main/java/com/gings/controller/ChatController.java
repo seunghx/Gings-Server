@@ -27,94 +27,97 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * 
- * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 {@link User}의 {@code id}로 사용하였는데, 
+ *
+ *
+ * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 {@link User}의 {@code id}로 사용하였는데,
  * int 타입과 String 타입 간의 변환이 많아 불편하여 후에 email로 변경 예정.
- * 
- * 
+ *
+ *
  * @author seunghyun
  *
  */
 @Slf4j
 @RestController
 public class ChatController {
-        
+
     public static final String CHAT_NOTIFICATION_TOPIC = "/queue/chat-notice";
 
     private final ChatService chatService;
     private final WebSocketSessionManager sessionManager;
-    
+
     public ChatController(ChatService chatService, WebSocketSessionManager sessionManager) {
         this.chatService = chatService;
         this.sessionManager = sessionManager;
     }
-    
-    // @SubscribeMapping
-    // ==============================================================================================
-    
-    
+
+    //@SubscribeMapping
+    //==============================================================================================
+
+
     @SubscribeMapping(CHAT_NOTIFICATION_TOPIC)
     public void logChatNotificationSubscription(Principal principal) {
         int userId = Integer.valueOf(principal.getName());
-        
+
         log.info("User {} subscribe to chat notification queue.", userId);
-            
+
     }
-    
+
     @SubscribeMapping("/topic/room/{roomId}")
     public void logChatRoomSubscription(Principal principal, @DestinationVariable("roomId") int roomId) {
         int userId = Integer.valueOf(principal.getName());
-        
+
         if(chatService.isUserExistInChatRoom(userId, roomId)) {
             log.info("User {} subscribe to chat room {}", userId, roomId);
         }else {
             log.warn("Invalid access detected. User {} subscribe to chat room {}", userId, roomId);
-            
+
             sessionManager.close(String.valueOf(userId));
         }
     }
-    
-    // @MessageMapping
-    // ==============================================================================================
-    
+
+    //@MessageMapping
+    //==============================================================================================
+
     /**
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * 아래 chat room type에 따른 capacity 검사는 후에 시간 날 경우 class level bean validation constraint
      * 정의해서 변경예정.
-     * 
-     * <pre> 
-     *     openReq.getRoomType().validateCapacityOrFail(openReq.getOpponent().size() + 1); 
+     *
+     * <pre>
+     *     openReq.getRoomType().validateCapacityOrFail(openReq.getOpponent().size() + 1);
      * </pre>
-     * 
-     * 
-     * 
+     *
+     *
+     *
      */
     @MessageMapping("/chat/create")
     public void createOneToOneChat(Principal principal, @Validated OneToOneChatOpenReq openReq) {
-                
+
         log.info("Starting to create new chat room.");
-        
+
         int roomId = chatService.initOneToOneChatRoom(Integer.valueOf(principal.getName()), openReq);
-        
+
         chatService.notifyChatRoomOpening(roomId);
-      
+
     }
-    
+
     @MessageMapping("/group-chat/create")
     public void createGroupChat(Principal principal, @Validated GroupChatOpenReq openReq) {
-                
+
         if(openReq.getRoomType().isCapable(openReq.getUsers().size() + 1)) {
-            
+
             log.info("Validation for chat room capacity failed.");
             log.info("Chat room type : {}, User number in request : {}", openReq.getRoomType()
                                                                        , openReq.getUsers().size() + 1);
-            
+
             sessionManager.close(principal.getName());
-            
+
             throw new InvalidChatRoomCapacityException("Invalid chat room capacity.");
         }
+
+        
 
         log.info("Starting to create new group chat room.");
         

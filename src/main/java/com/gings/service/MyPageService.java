@@ -291,8 +291,6 @@ public class MyPageService implements ApplicationEventPublisherAware{
         }
     }
 
-
-
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;

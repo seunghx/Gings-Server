@@ -37,15 +37,14 @@ import static com.gings.controller.ChatController.CHAT_NOTIFICATION_TOPIC;
 @Slf4j
 @Service
 public class ChatService {
-    
+
     private final ChatMapper chatMapper;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper = new ModelMapper();
-    
+
     @Value("${gings.message.admin-sender-id}")
     private String GINGS_ADMIN;
 
-    
     public ChatService(ChatMapper chatMapper, SimpMessagingTemplate messagingTemplate) {
         this.chatMapper = chatMapper;
         this.messagingTemplate = messagingTemplate;

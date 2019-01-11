@@ -1,6 +1,8 @@
 package com.gings.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -8,6 +10,7 @@ import org.springframework.http.client.support.HttpRequestWrapper;
 
 import java.io.IOException;
 
+@Slf4j
 public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor{
     private final String headerName;
     private final String headerValue;
@@ -21,8 +24,11 @@ public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor{
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
         // TODO Auto-generated method stub
-        HttpRequest wrapper = new HttpRequestWrapper(request);
+
+        HttpRequestWrapper wrapper = new HttpRequestWrapper(request);
         wrapper.getHeaders().set(headerName, headerValue);
+        wrapper.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+        log.error("{}", wrapper.getHeaders().getContentType());
 
         return execution.execute(wrapper, body);
     }

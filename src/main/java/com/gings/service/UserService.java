@@ -6,6 +6,8 @@ import com.gings.domain.Signature;
 import com.gings.domain.User;
 import com.gings.domain.UserKeyword;
 import com.gings.model.DefaultRes;
+import com.gings.model.Pagination;
+import com.gings.model.board.HomeBoard;
 import com.gings.model.user.SignUp;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import org.omg.CORBA.portable.ValueOutputStream;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +47,14 @@ public class UserService {
         signUp.setPwd(passwordEncoder.encode(signUp.getPwd()));
         
         userMapper.save(signUp);
+    }
+
+    public DefaultRes<Void> deleteUser(final int userId) {
+        if(userMapper.findByUserId(userId) == null)
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_USER);
+
+        userMapper.deleteUser(userId);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_USER);
     }
 
     public boolean isEmailExist(String email) {

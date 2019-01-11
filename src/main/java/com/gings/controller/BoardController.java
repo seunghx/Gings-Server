@@ -16,6 +16,7 @@ import com.gings.security.authentication.Authentication;
 
 import com.gings.service.BoardService;
 
+import com.gings.service.FCMService;
 import com.gings.utils.ResponseMessage;
 import com.gings.utils.StatusCode;
 import com.gings.utils.code.BoardCategory;
@@ -39,10 +40,12 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardMapper boardMapper;
+    private final FCMService fcmService;
 
-    public BoardController(final BoardService boardService, final BoardMapper boardMapper) {
+    public BoardController(final BoardService boardService, final BoardMapper boardMapper, final FCMService fcmService) {
         this.boardService = boardService;
         this.boardMapper = boardMapper;
+        this.fcmService = fcmService;
     }
 
     /**
@@ -153,7 +156,13 @@ public class BoardController {
     @PostMapping("boards/{boardId}/recommend")
     public ResponseEntity likeBoard(@PathVariable("boardId") final int boardId, final GingsPrincipal principal) {
         try {
-            return new ResponseEntity<>(boardService.boardLikes(boardId, principal.getUserId()), HttpStatus.OK);
+            boardService.boardLikes(boardId, principal.getUserId());
+
+            int receiverId = boardMapper.findBoardByBoardId(boardId).getWriterId();
+            String senderId = Integer.toString(boardId);
+
+            String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", "누군가 나의 보드에 추천을 눌렀어요!");
+            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -222,7 +231,19 @@ public class BoardController {
     public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final GingsPrincipal principal) {
         try {
             reBoardReq.setWriterId(principal.getUserId());
-            return new ResponseEntity<>(boardService.saveReBoard(reBoardReq), HttpStatus.OK);
+            //System.out.println("리보드 작성자:"+reBoardReq.getWriterId());
+
+            boardService.saveReBoard(reBoardReq);
+            int boardId = reBoardReq.getBoardId();
+
+            int writer = boardMapper.findBoardByBoardId(boardId).getWriterId();
+
+            int i = reBoardReq.getReplyId();
+
+            String replyId = Integer.toString(i);
+
+            String firebaseResponse = fcmService.createFcm(writer, replyId, "깅스", "누군가 나의 보드에 답변을 달았어요!");
+            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

@@ -121,8 +121,15 @@ public class LoginController {
         if (passwordEncoder.matches(req.getPwd(), user.getPwd())) {
 
             log.info("Login succeeded for user email : {}", email);
-            
             userMapper.findByEmail(email);
+            System.out.println("이메일: " + email);
+            System.out.println("아이디: " + user.getUserId());
+
+//            List<CheckFcm> fcmList = userMapper.getTokenOfFcmAll(user.getUserId());
+//            for(int i = 0; i<fcmList.size(); i++){
+//                if(fcmList.get(i).getFcm().equals(req.getFcm()))
+//                    userMapper.deleteFcmOfUser(fcmList.get(i).getUser_id(), "");
+//            }
             
             userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
