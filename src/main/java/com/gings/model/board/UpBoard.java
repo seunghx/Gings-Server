@@ -27,7 +27,7 @@ public class UpBoard {
         @NotNull
         private BoardCategory category;
 
-        private List<@ImageExtension  MultipartFile> images;
+        private List<MultipartFile> images;
         private List<String> keywords;
 
         private int recommender;

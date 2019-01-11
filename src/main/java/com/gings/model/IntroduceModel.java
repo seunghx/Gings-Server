@@ -17,7 +17,7 @@ public class IntroduceModel {
         private int id;    //사실상 introduceId야
         //아래부터 받는 애들
         private String content;
-        private List<@ImageExtension MultipartFile> images;
+        private List<MultipartFile> images;
 
         private List<String> prevImagesUrl;
         //private List<String> postImagesUrl;

@@ -49,7 +49,7 @@ public class ReBoard {
         private LocalDateTime writeTime;
 
         private List<String> prevImagesUrl;
-        private List<@ImageExtension MultipartFile> postImages;
+        private List<MultipartFile> postImages;
 
         private int recommender;
     }
