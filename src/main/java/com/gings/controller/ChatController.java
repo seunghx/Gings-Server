@@ -32,7 +32,8 @@ import lombok.extern.slf4j.Slf4j;
  * 현재 gings 다른 클래스들과 동일하게 하려고 websocket user name을 {@link User}의 {@code id}로 사용하였는데,
  * int 타입과 String 타입 간의 변환이 많아 불편하여 후에 email로 변경 예정.
  *
- *
+ * 채팅방 퇴장 만들기.
+ * 
  * @author seunghyun
  *
  */
