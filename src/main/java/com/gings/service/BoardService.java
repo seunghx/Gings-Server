@@ -58,7 +58,6 @@ public class BoardService {
         final List<HomeBoardAllRes> boards = setUserInfoInAllRes(boardMapper.findAllBoard(pagination), userId);
         if (boards.isEmpty()) {
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
-
         }
 
         final List<HomeBoardAllRes> blockedBoards =  removeBlockedBoards(boards, userId);
@@ -486,7 +485,7 @@ public class BoardService {
 
     public HomeBoardOneRes setUserInfoInOneRes(HomeBoardOneRes board, int userId) {
         List<Integer> likedBoardIdList = boardMapper.findRecommendBoardsByUserId(userId);
-        
+
         for(int likedBoardId : likedBoardIdList) {
             if (board.isLikeChk()) break;
 
@@ -502,10 +501,9 @@ public class BoardService {
             board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
             board.setField(userMapper.findByUserId(board.getWriterId()).getField());
             board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
-            board.setWriterImage(image);
 
             String imgUrl = userMapper.selectProfileImg(board.getWriterId()).getImage();
-            if(imgUrl != null && imgUrl.equals("") ) {
+            if(imgUrl != null && !(imgUrl.equals("")) ) {
                 board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
             }
         }
@@ -524,6 +522,8 @@ public class BoardService {
         return board;
     }
 
+
+
     public List<BoardReply> setUserInfoInReplyRes(List<BoardReply> boardReplies, int userId) {
 
 
@@ -538,7 +538,7 @@ public class BoardService {
             }
             boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
             String imgUrl = userMapper.selectProfileImg(boardReply.getWriterId()).getImage();
-            if(imgUrl != null && imgUrl.equals("") ) {
+            if(imgUrl != null && !(imgUrl.equals("")) ) {
                 boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
             }
         }
