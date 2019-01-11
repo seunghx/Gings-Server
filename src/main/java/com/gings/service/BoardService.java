@@ -39,10 +39,10 @@ public class BoardService {
 
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
-    private final S3MultipartService s3MultipartService;
+    private final S3MultipartServiceProd s3MultipartService;
 
     public BoardService(final BoardMapper boardMapper, final UserMapper userMapper,
-                        final S3MultipartService s3MultipartService) {
+                        final S3MultipartServiceProd s3MultipartService) {
         this.boardMapper = boardMapper;
         this.userMapper = userMapper;
         this.s3MultipartService = s3MultipartService;

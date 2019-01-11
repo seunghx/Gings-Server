@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,11 +36,14 @@ import lombok.extern.slf4j.Slf4j;
  * @author seunghyun
  *
  */
+@Profile("test")
 @Slf4j
 @Service
-public class S3MultipartService implements MultipartService {
+public class S3MultipartServiceTest implements MultipartService {
 
-    @Value("${cloud.aws.s3.default-url}")
+    @Value("${cloud.aws.cloud-front.default-url}")
+    private String defaultCDNUrl;
+    @Value("${cloud.aws.s3.default-url}") 
     private String defaultUrl;
     @Value("${cloud.aws.s3.bucket-name}")
     private String bucketName;
@@ -51,7 +55,7 @@ public class S3MultipartService implements MultipartService {
      *  현재는 default 설정.
      * 
      */
-    public S3MultipartService(AmazonS3Client s3Client) {
+    public S3MultipartServiceTest(AmazonS3Client s3Client) {
         this.s3Client = s3Client;
         this.transferManager = TransferManagerBuilder.standard()
                                                      .withS3Client(s3Client)
@@ -213,8 +217,6 @@ public class S3MultipartService implements MultipartService {
          }
     }
     
-    
-    
     private String upload(MultipartFile file) throws InterruptedException {
         
         ObjectMetadata metaData = getObjectMetadata(file);
@@ -269,7 +271,7 @@ public class S3MultipartService implements MultipartService {
 
     private String uploadedFileUrl(String fileName) {
         
-        return new StringBuilder(defaultUrl).append(bucketName)
+        return new StringBuilder(defaultCDNUrl)
                                             .append("/")
                                             .append(fileName)
                                             .toString();
@@ -279,15 +281,16 @@ public class S3MultipartService implements MultipartService {
     private List<String> parseFileName(List<String> fileNames) {
         List<String> replaced = new ArrayList<>();
         
-        fileNames.stream().forEach(file -> {
-            replaced.add(parseFileName(file));
+        fileNames.stream().forEach(fileName -> {
+            replaced.add(parseFileName(fileName));
         });
         
         return replaced;
     }
     
     private String parseFileName(String fileName) {
-        return fileName.replace(defaultUrl + bucketName + "/", "");
+      
+        return fileName.replace(defaultCDNUrl + "/", "");
     }
     
 }

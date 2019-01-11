@@ -1,6 +1,7 @@
 package com.gings.security.authentication;
 
 import org.modelmapper.ModelMapper;
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
@@ -17,7 +18,6 @@ import org.springframework.util.StringUtils;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.gings.dao.UserMapper;
-import com.gings.security.GingsPrincipal;
 import com.gings.security.StompConnectingAuthentication;
 import com.gings.security.WebSocketPrincipal;
 import com.gings.security.jwt.JWTService;
@@ -54,7 +54,7 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = 
                 MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class); 
-        
+                
         if(accessor.getCommand() == StompCommand.CONNECT) {
             String jwt = accessor.getFirstNativeHeader(JWTService.AUTHORIZATION);
 

@@ -28,12 +28,12 @@ public class MyPageService implements ApplicationEventPublisherAware{
 
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
-    private final S3MultipartService s3MultipartService;
+    private final S3MultipartServiceProd s3MultipartService;
     private final PasswordEncoder passwordEncoder;
 
     private ApplicationEventPublisher eventPublisher;
 
-    public MyPageService(BoardMapper boardMapper, UserMapper userMapper, S3MultipartService s3MultipartService, PasswordEncoder passwordEncoder) {
+    public MyPageService(BoardMapper boardMapper, UserMapper userMapper, S3MultipartServiceProd s3MultipartService, PasswordEncoder passwordEncoder) {
         this.boardMapper = boardMapper;
         this.userMapper = userMapper;
         this.s3MultipartService = s3MultipartService;
