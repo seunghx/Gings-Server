@@ -4,6 +4,8 @@ import javax.xml.soap.SAAJResult;
 
 public class ResponseMessage {
     public static final String OKAY = "오케이";
+    public static final String SAVED_ALARM = "알람 저장";
+    public static final String GET_ALARM = "알람조회";
     public static final String LOGIN_SUCCESS = "로그인 성공";
     public static final String LOGIN_FAIL = "로그인 실패";
 

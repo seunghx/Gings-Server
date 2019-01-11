@@ -284,6 +284,9 @@ public interface BoardMapper {
     @Select("SELECT COUNT(recommender_id) AS recommender FROM reply_recommend WHERE reply_id = #{replyId}")
     public int findReplyRecommendNumbersByReplyId(int replyId);
 
+    @Select("SELECT board_id FROM board_reply WHERE reply_id = #{replyId}")
+    public int findBoardIdByReplyId(int replyId);
+
     // 회원 고유 번호로 좋아요 한 리보드 조회
     @Select("SELECT reply_id FROM reply_recommend WHERE recommender_id = #{userId}")
     public List<Integer> findRecommendReBoardsByUserId(int userId);
