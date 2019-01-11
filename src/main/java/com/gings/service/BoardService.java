@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
-import sun.plugin.util.UserProfile;
 
 import java.util.*;
 import java.util.stream.Collectors;

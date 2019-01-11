@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.ibatis.mapping.FetchType;
 
 import com.gings.model.user.SignUp;
+import org.springframework.security.access.method.P;
 
 /**
  *
@@ -303,5 +304,29 @@ public interface UserMapper {
 
     @Update("UPDATE user SET fcm=#{none} WHERE user_id = #{id}")
     void deleteFcmOfUser(@Param("id")final int id, @Param("none") final String none);
+
+    //===================== 알람을 해보자 =====================================================================
+
+    @Insert("INSERT INTO user_alarm(user_id, writer_id, sentence, location, destination_id) VALUES(#{id}, #{writerId}, #{sentence}, #{locate}, #{destinate}) ")
+    void saveAlarm(@Param("id")final int id, @Param("writerId")final int writerId, @Param("sentence")final String sentence,
+                   @Param("locate")final String locate, @Param("destinate")final int destinate);
+
+    @Select("SELECT * FROM user_alarm WHERE user_id = #{id}")
+    @Results(value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "writerId", column = "writer_id"),
+            @Result(property = "sentence", column = "sentence"),
+            @Result(property = "location", column = "location"),
+            @Result(property = "destinationId", column = "destination_id")
+    })
+    public List<Alarm> findAlarmByUserId(@Param("id")final int id);
+
+    @Select("SELECT DISTINCT location FROM user_alarm WHERE destination_id = #{dId}")
+    public String findLocationByDestinationId(@Param("dId")final int dId);
+
+
+    //=========================================================================================
+
+
 
 }

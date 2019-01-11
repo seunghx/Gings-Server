@@ -14,6 +14,7 @@ import com.gings.model.board.ReBoard.ReBoardReq;
 import com.gings.security.GingsPrincipal;
 import com.gings.security.authentication.Authentication;
 
+import com.gings.service.AlarmService;
 import com.gings.service.BoardService;
 
 import com.gings.service.FCMService;
@@ -45,13 +46,15 @@ public class BoardController {
     private final MyPageService myPageService;
     private final BoardMapper boardMapper;
     private final FCMService fcmService;
+    private final AlarmService alarmService;
 
     public BoardController(final BoardService boardService, final BoardMapper boardMapper,
-                           final FCMService fcmService, final MyPageService myPageService) {
+                           final FCMService fcmService, final MyPageService myPageService, final AlarmService alarmService) {
         this.boardService = boardService;
         this.boardMapper = boardMapper;
         this.fcmService = fcmService;
         this.myPageService = myPageService;
+        this.alarmService = alarmService;
     }
 
     /**
@@ -167,7 +170,10 @@ public class BoardController {
                 boardService.boardLikes(boardId, principal.getUserId());
                 String senderId = Integer.toString(boardId);
                 String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
-                String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", name+"님이 나의 보드에 추천을 눌렀어요!");
+                String detailboard = "detail board";
+                String firebaseResponse = fcmService.createFcm(detailboard,receiverId, senderId, "깅스", name+"님이 나의 보드에 추천을 눌렀어요!");
+
+                alarmService.insertAlarm(receiverId,principal.getUserId(), name+"님이 나의 보드에 추천을 눌렀어요!","board detail", boardId);
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
             return new ResponseEntity<>(boardService.boardLikes(boardId, principal.getUserId()), HttpStatus.OK);
@@ -247,8 +253,10 @@ public class BoardController {
             String replyId = Integer.toString(i);
 
             String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
-
-            String firebaseResponse = fcmService.createFcm(writer, replyId, "깅스", name+"님이 나의 보드에 답변을 달았어요!");
+            String detailboard = "detail board";
+            String firebaseResponse = fcmService.createFcm(detailboard, writer, replyId, "깅스", name+"님이 나의 보드에 답변을 달았어요!");
+            System.out.println("찾아아아아ㅏㅇㅅㅂ: "+writer);
+            alarmService.insertAlarm(writer, principal.getUserId(), name+"님이 나의 보드에 답변을 달았어요!","board detail", boardId);
             return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
@@ -270,10 +278,15 @@ public class BoardController {
             int receiverId = boardMapper.findReplyByReplyId(reboardId).getWriterId();
             if(principal.getUserId()!=receiverId){
                 boardService.ReBoardLikes(reboardId, principal.getUserId());
-                String senderId = Integer.toString(reboardId);
-                String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
+                int rId = boardMapper.findBoardIdByReplyId(reboardId);
 
-                String firebaseResponse = fcmService.createFcm(receiverId, senderId, "깅스", name+"님이 나의 리보드에 추천을 눌렀어요!");
+                String senderId = Integer.toString(rId);
+                String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
+                String detailboard = "detail board";
+                String firebaseResponse = fcmService.createFcm(detailboard,receiverId, senderId, "깅스", name+"님이 나의 리보드에 추천을 눌렀어요!");
+
+                alarmService.insertAlarm(receiverId,principal.getUserId(), name+"님이 나의 리보드에 추천을 눌렀어요!","board detail", rId);
+
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
             return new ResponseEntity<>(boardService.ReBoardLikes(reboardId, principal.getUserId()), HttpStatus.OK);
