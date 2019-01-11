@@ -549,13 +549,11 @@ public class BoardService {
 
         List<Integer> blockBoardIdList = boardMapper.findBlockBoardsByUserId(userId);
 
-        log.error("boards {}", boards);
-        log.error("blockboard {}", blockBoardIdList);
         List<HomeBoardAllRes> filteredBoards = 
                 boards.stream()
                       .filter(board -> !blockBoardIdList.contains(board.getBoardId()))
                       .collect(Collectors.toList());
-        log.error("filtered {}", filteredBoards);
+
         return filteredBoards;
     }
 
