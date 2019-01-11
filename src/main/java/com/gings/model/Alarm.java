@@ -23,9 +23,4 @@ public class Alarm {
         private GuestModel.GuestModelUser guestModelUser;
     }
 
-    @Getter
-    @Setter
-    public class AlarmBoard{
-
-    }
 }

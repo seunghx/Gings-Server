@@ -54,15 +54,17 @@ public class AlarmController {
         }
     }
 
-//    @PostMapping("/specific")
-//    public ResponseEntity getSpecificAlarm(@RequestBody final Alarm alarm, final GingsPrincipal principal){
-//        try{
-//            final int id = principal.getUserId();
-//            String location = userMapper.findLocationByDestinationId(alarm.getDestinationId());
-//
-//        }
-//    }
-
+    @PostMapping("/specific")
+    public ResponseEntity getSpecificAlarm(@RequestBody final Alarm alarm, final GingsPrincipal principal){
+        try{
+            final int id = principal.getUserId();
+            DefaultRes<HomeBoard.HomeBoardOneRes>defaultRes = alarmService.findLocation(alarm.getDestinationId());
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 

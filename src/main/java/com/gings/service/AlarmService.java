@@ -49,17 +49,16 @@ public class AlarmService {
         }
     }
 
-    public DefaultRes<HomeBoard.HomeBoardOneRes>findBoardByBoardId(final int destinationId){
+    public DefaultRes<HomeBoard.HomeBoardOneRes>findLocation(final int id){
         try{
-            HomeBoard.HomeBoardOneRes homeBoardOneRes = boardMapper.findBoardByBoardId(destinationId);
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BOARD, homeBoardOneRes);
-        }catch (Exception e){
+            String location = userMapper.findLocationByDestinationId(id);
+            HomeBoard.HomeBoardOneRes homeBoardOneRes = new HomeBoard.HomeBoardOneRes();
+            if(location.equals("board detail"))
+                homeBoardOneRes = boardMapper.findBoardByBoardId(id);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.GET_ALARM, homeBoardOneRes);
+        }catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.DB_ERROR);
         }
     }
-
-
-
-
 }
