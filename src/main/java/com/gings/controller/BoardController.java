@@ -25,8 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -140,7 +142,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PostMapping("boards")
-    public ResponseEntity saveBoard(final UpBoardReq upBoardReq, final GingsPrincipal principal) {
+    public ResponseEntity saveBoard(@Validated final UpBoardReq upBoardReq, final GingsPrincipal principal) {
         try {
             upBoardReq.setWriterId(principal.getUserId());
             return new ResponseEntity<>(boardService.saveBoard(upBoardReq), HttpStatus.OK);
@@ -234,7 +236,7 @@ public class BoardController {
      */
 
     @PostMapping("reboards")
-    public ResponseEntity saveReBoard(final ReBoardReq reBoardReq, final GingsPrincipal principal) {
+    public ResponseEntity saveReBoard(@Validated final ReBoardReq reBoardReq, final GingsPrincipal principal) {
         try {
             reBoardReq.setWriterId(principal.getUserId());
             boardService.saveReBoard(reBoardReq);
@@ -289,7 +291,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PutMapping("boards/{boardId}")
-    public ResponseEntity updateBoard(@PathVariable final int boardId, final ModifyBoardReq modifyBoardReq,
+    public ResponseEntity updateBoard(@PathVariable final int boardId, @Validated final ModifyBoardReq modifyBoardReq,
                                       GingsPrincipal principal) {
         try {
             modifyBoardReq.setWriterId(principal.getUserId());
@@ -309,7 +311,7 @@ public class BoardController {
      * @return ResponseEntity
      */
     @PutMapping("reboards/{reboardId}")
-    public ResponseEntity updateReBoard(@PathVariable final int reboardId, final ModifyReBoardReq modifyReBoardReq,
+    public ResponseEntity updateReBoard(@PathVariable final int reboardId, @Validated  final ModifyReBoardReq modifyReBoardReq,
                                       GingsPrincipal principal) {
         try {
             modifyReBoardReq.setWriterId(principal.getUserId());

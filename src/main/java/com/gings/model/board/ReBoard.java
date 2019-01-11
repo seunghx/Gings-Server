@@ -1,5 +1,6 @@
 package com.gings.model.board;
 
+import com.gings.utils.ImageExtension;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +50,7 @@ public class ReBoard {
         private LocalDateTime writeTime;
 
         private List<String> prevImagesUrl;
-        private List<MultipartFile> postImages;
+        private List<@ImageExtension MultipartFile> postImages;
 
         private int recommender;
     }
