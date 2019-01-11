@@ -1,5 +1,6 @@
 package com.gings.controller;
 
+import com.gings.dao.UserMapper;
 import com.gings.model.DefaultRes;
 import com.gings.model.GuestModel;
 import com.gings.model.IntroduceModel;
@@ -27,6 +28,7 @@ import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 @RequestMapping("mypage")
 @Authentication
 public class MyPageController {
+    private final UserMapper userMapper;
     private final MyPageService myPageService;
     private final BoardService boardService;
     private final PasswordEncoder passwordEncoder;
@@ -35,7 +37,8 @@ public class MyPageController {
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
 
-    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
+    public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
+        this.userMapper = userMapper;
         this.myPageService = myPageService;
         this.boardService = boardService;
         this.passwordEncoder = passwordEncoder;
@@ -223,7 +226,8 @@ public class MyPageController {
 
     @PostMapping("/guestboard/{myPageUserId}")
     //@RequestMapping(value = "/guestboard/{myPageUserId}", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId, @RequestBody final GuestModel.GuestModelReq guestModelReq, final GingsPrincipal principal) {
+    public ResponseEntity saveGuestBoard(@PathVariable("myPageUserId") final int myPageUserId,
+                                         @RequestBody final GuestModel.GuestModelReq guestModelReq, final GingsPrincipal principal) {
         try {
             final int id = principal.getUserId();
             if (id == myPageUserId) {
@@ -234,10 +238,10 @@ public class MyPageController {
                 myPageService.createGuest(guestModelReq, myPageUserId, id);
                 int i = guestModelReq.getGuestBoardId();
 
-                myPageService.findByUserId(id);
+                String name = myPageService.findByUserId(id).getData().getName();
 
                 String guestboardId = Integer.toString(i);
-                String firebaseResponse = fcmService.createFcm(myPageUserId, guestboardId, "깅스", "게스트 보드가 작성되었습니다.");
+                String firebaseResponse = fcmService.createFcm(myPageUserId, guestboardId, "깅스", name+"님이 게스트 보드를 작성했습니다.");
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
 

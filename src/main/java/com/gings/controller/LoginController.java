@@ -1,6 +1,7 @@
 package com.gings.controller;
 
 import com.gings.dao.UserMapper;
+import com.gings.model.CheckFcm;
 import com.gings.model.DefaultRes;
 import com.gings.model.user.Login.LoginReq;
 import com.gings.model.user.Login.LoginRes;
@@ -34,6 +35,7 @@ import static com.gings.security.jwt.JWTService.AUTHORIZATION;
 import static com.gings.security.jwt.JWTService.BEARER_SCHEME;
 import static com.gings.utils.ResponseMessage.LOGIN_SUCCESS;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -125,12 +127,12 @@ public class LoginController {
             System.out.println("이메일: " + email);
             System.out.println("아이디: " + user.getUserId());
 
-//            List<CheckFcm> fcmList = userMapper.getTokenOfFcmAll(user.getUserId());
-//            for(int i = 0; i<fcmList.size(); i++){
-//                if(fcmList.get(i).getFcm().equals(req.getFcm()))
-//                    userMapper.deleteFcmOfUser(fcmList.get(i).getUser_id(), "");
-//            }
-            
+            List<CheckFcm> fcmList = userMapper.getTokenOfFcmAll();
+            for(int i = 0; i<fcmList.size(); i++){
+                if(req.getFcm().equals(fcmList.get(i).getFcm())) {
+                    userMapper.deleteFcmOfUser(fcmList.get(i).getUser_id(), "");
+                }
+            }
             userMapper.saveFcmToken(user.getUserId(), req.getFcm());
 
             return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), LOGIN_SUCCESS,

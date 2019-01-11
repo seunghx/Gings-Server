@@ -33,6 +33,7 @@ public class FCMService {
         JSONObject notification = new JSONObject();
         notification.put("title", notfTitle);
         notification.put("body", notfBody);
+//        notification.put("data", senderId);
 
         body.put("notification", notification);
 
