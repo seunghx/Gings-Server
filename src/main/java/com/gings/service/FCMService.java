@@ -23,7 +23,7 @@ public class FCMService {
         this.androidPushNotificationsService = androidPushNotificationsService;
     }
 
-    public String createFcm(final int receiverId, final String senderId,
+    public String createFcm(final String action, final int receiverId, final String senderId,
                             String notfTitle, String notfBody ){
         JSONObject body = new JSONObject();
         String fcm = getFcm(receiverId);
@@ -34,12 +34,14 @@ public class FCMService {
 //        notification.put("title", notfTitle);
 //        notification.put("body", notfBody);
 //        notification.put("data", senderId);
+//        notification.put("clickAction", action);
 
-        //body.put("notification", notification);
+//        body.put("notification", notification);
 
         JSONObject data = new JSONObject();
         data.put("title", notfTitle);
         data.put("body", notfBody);
+        data.put("clickAction", action);
         data.put("sender_id", senderId);
         body.put("data",data);
         System.out.println(body.toString());

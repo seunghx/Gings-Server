@@ -7,13 +7,9 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.gings.security.authentication.StompConnectionInterceptor;
-import com.gings.security.authentication.TestInterCeptor;
-import com.gings.utils.SessionStoreProtocolHandler;
 
 
 /**
@@ -21,7 +17,7 @@ import com.gings.utils.SessionStoreProtocolHandler;
  * @author seunghyun
  *
  */
-@Profile("production")
+@Profile({"production", "test"})
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
@@ -30,8 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     
     @Autowired
     private StompConnectionInterceptor connectInterceptor;
-    @Autowired
-    private TestInterCeptor test;
+   
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -66,8 +61,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(connectInterceptor);
-        registration.interceptors(test);
+     
 
+    }
+    
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
     }
 
 }

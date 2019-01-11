@@ -8,10 +8,7 @@ import com.gings.model.MyPage;
 import com.gings.security.*;
 import com.gings.model.*;
 import com.gings.security.authentication.Authentication;
-import com.gings.service.AndroidPushNotificationsService;
-import com.gings.service.BoardService;
-import com.gings.service.FCMService;
-import com.gings.service.MyPageService;
+import com.gings.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,19 +30,20 @@ public class MyPageController {
     private final BoardService boardService;
     private final PasswordEncoder passwordEncoder;
     private final FCMService fcmService;
+    private final AlarmService alarmService;
 
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
 
 
-
-
-    public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
+    public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService,
+                            PasswordEncoder passwordEncoder, FCMService fcmService, AlarmService alarmService) {
         this.userMapper = userMapper;
         this.myPageService = myPageService;
         this.boardService = boardService;
         this.passwordEncoder = passwordEncoder;
         this.fcmService = fcmService;
+        this.alarmService = alarmService;
     }
 
 
@@ -245,7 +243,12 @@ public class MyPageController {
                 String name = myPageService.findByUserId(id).getData().getName();
 
                 String guestboardId = Integer.toString(i);
-                String firebaseResponse = fcmService.createFcm(myPageUserId, guestboardId, "깅스", name+"님이 게스트 보드를 작성했습니다.");
+                String action = "마이페이지";
+
+                String firebaseResponse = fcmService.createFcm(action, myPageUserId, guestboardId, "깅스", name+"님이 게스트 보드를 작성했습니다.");
+                alarmService.insertAlarm(myPageUserId, "mypage", i);
+
+
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
 
