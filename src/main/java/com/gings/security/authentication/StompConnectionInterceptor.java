@@ -96,6 +96,8 @@ public class StompConnectionInterceptor implements ChannelInterceptor {
                 
                 onConnectionAuthenticationFailed(message);
             }
+        }else {
+            log.error("New message : {}", accessor.getCommand());
         }
         
        return message;
