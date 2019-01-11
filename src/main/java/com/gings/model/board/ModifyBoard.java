@@ -1,5 +1,6 @@
 package com.gings.model.board;
 
+import com.gings.utils.ImageExtension;
 import com.gings.utils.code.BoardCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class ModifyBoard {
         private BoardCategory category;
 
         private List<String> prevImagesUrl;
-        private List<MultipartFile> postImages;
+        private List<@ImageExtension MultipartFile> postImages;
 
         private List<String> prevKeywords;
         private List<String> postKeywords;
