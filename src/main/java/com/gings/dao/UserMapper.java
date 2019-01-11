@@ -4,10 +4,7 @@ package com.gings.dao;
 import com.gings.controller.LoginController.LoginUser;
 
 import com.gings.domain.*;
-import com.gings.model.GuestModel;
-import com.gings.model.IntroduceModel;
-import com.gings.model.MyPage;
-import com.gings.model.Pagination;
+import com.gings.model.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -300,6 +297,12 @@ public interface UserMapper {
 
     @Update("UPDATE user SET fcm=#{fcm} WHERE user_id = #{id}")
     void saveFcmToken(@Param("id")final int id, @Param("fcm") final String fcm);
+
+    @Select("SELECT fcm FROM user")
+    public List<CheckFcm> getTokenOfFcmAll(@Param("id")final int id);
+
+    @Update("UPDATE user SET fcm=#{none} WHERE user_id = #{id}")
+    void deleteFcmOfUser(@Param("id")final int id, @Param("none") final String none);
 
 
 }
