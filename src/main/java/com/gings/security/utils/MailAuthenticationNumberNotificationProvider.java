@@ -36,6 +36,7 @@ public class MailAuthenticationNumberNotificationProvider
     private static final String AUTH_NUMBER_KEY = "authNumber";
     private static final String IMG_CID = "identifier";
     private static final String MIME_ENCODING = "UTF-8";
+    private static final String SUBJECT = "깅스 계정 확인 인증번호를 보내드립니다.";
     
     @Value("${thymeleaf.template.authNumber.location}")
     private String templateLocation;
@@ -70,6 +71,7 @@ public class MailAuthenticationNumberNotificationProvider
             helper.setFrom(senderId);
             helper.setTo(email);
             helper.setText(htmlMessage, true);
+            helper.setSubject(SUBJECT);
             helper.addInline(IMG_CID, resourceLoader.getResource(representingImgLocation));
             
             mailSender.send(message);

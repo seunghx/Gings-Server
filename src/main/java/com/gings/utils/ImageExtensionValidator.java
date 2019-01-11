@@ -41,7 +41,6 @@ public class ImageExtensionValidator implements ConstraintValidator<ImageExtensi
 
         log.debug("Delegating image file name validation to {}.", ImageOperationProvider.class);
         
- 
         try {
             ImageOperationProvider.validateImage(file.getOriginalFilename());
         } catch (UnsupportedImageFormatException ex) {

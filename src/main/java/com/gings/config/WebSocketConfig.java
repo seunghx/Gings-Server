@@ -12,6 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.gings.security.authentication.StompConnectionInterceptor;
+import com.gings.security.authentication.TestInterCeptor;
 import com.gings.utils.SessionStoreProtocolHandler;
 
 
@@ -23,12 +24,14 @@ import com.gings.utils.SessionStoreProtocolHandler;
 @Profile("production")
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer{
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     public static final String WS_CONNECT = "/connect";
     
     @Autowired
     private StompConnectionInterceptor connectInterceptor;
+    @Autowired
+    private TestInterCeptor test;
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -63,9 +66,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(connectInterceptor);
+        registration.interceptors(test);
+
     }
 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    }
 }
