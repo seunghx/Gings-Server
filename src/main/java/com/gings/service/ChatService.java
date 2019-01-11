@@ -85,7 +85,7 @@ public class ChatService {
             throw new IllegalWebsocketAccessException("User id is same with opponentId", userId);
         }
         
-        // 동일 유저와의 채팅 신청 예외 처리 예정.
+        // 동일 유저와의 일대일 채팅 신청 예외 처리 예정 -> db 테이블 따로 추가 후 변경사항 적용한 후 처리예정
     }
     
     @Transactional

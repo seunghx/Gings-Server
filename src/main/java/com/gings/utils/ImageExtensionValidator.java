@@ -39,17 +39,7 @@ public class ImageExtensionValidator implements ConstraintValidator<ImageExtensi
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
 
-        if (Objects.isNull(file) || file.isEmpty()) {
-            log.info("Empty multipart file detected in {}.", this);
-
-            context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(
-                    messageSource.getMessage("response.exception.multipart.empty", null, 
-                                             LocaleContextHolder.getLocale()))
-                   .addConstraintViolation();
-
-            return false;
-        }
+        if(file == null) return true;
 
         log.debug("Delegating image file name validation to {}.", ImageOperationProvider.class);
 

@@ -39,6 +39,7 @@ public class MyPageController {
 
 
 
+
     public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
         this.userMapper = userMapper;
         this.myPageService = myPageService;
