@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author seunghyun
  *
  */
-@Profile("production")
 @Slf4j
 @Service
 public class S3MultipartServiceProd implements MultipartService {
