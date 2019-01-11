@@ -30,14 +30,16 @@ public class FCMService {
         System.out.println("서버 토큰: "+fcm);
         body.put("to", fcm);
 
-        JSONObject notification = new JSONObject();
-        notification.put("title", notfTitle);
-        notification.put("body", notfBody);
+//        JSONObject notification = new JSONObject();
+//        notification.put("title", notfTitle);
+//        notification.put("body", notfBody);
 //        notification.put("data", senderId);
 
-        body.put("notification", notification);
+        //body.put("notification", notification);
 
         JSONObject data = new JSONObject();
+        data.put("title", notfTitle);
+        data.put("body", notfBody);
         data.put("sender_id", senderId);
         body.put("data",data);
         System.out.println(body.toString());
