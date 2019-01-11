@@ -36,42 +36,42 @@ public class MyPageController {
     AndroidPushNotificationsService androidPushNotificationsService;
 
     public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
-        this.myPageService = myPageService;
-        this.boardService = boardService;
-        this.passwordEncoder = passwordEncoder;
-        this.fcmService = fcmService;
-    }
+                this.myPageService = myPageService;
+                this.boardService = boardService;
+                this.passwordEncoder = passwordEncoder;
+                this.fcmService = fcmService;
+            }
 
-    //====================================== 마이 페이지 ====================================================
-    /**
-     * 자신의 마이페이지 회원 고유 번호로 상단 정보 출력
-     *
-     * @param principal 토큰으로 회원 아이디 가져오기
-     * @return ResponseEntity
-     */
-    @GetMapping("/mine")
-    public ResponseEntity getMyUser(final GingsPrincipal principal){
-        try{
-            final int id = principal.getUserId();
-            DefaultRes<MyPage> defaultRes = myPageService.findByUserId(id);
-            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
-        }catch (Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+            //====================================== 마이 페이지 ====================================================
+            /**
+             * 자신의 마이페이지 회원 고유 번호로 상단 정보 출력
+             *
+             * @param principal 토큰으로 회원 아이디 가져오기
+             * @return ResponseEntity
+             */
+            @GetMapping("/mine")
+            public ResponseEntity getMyUser(final GingsPrincipal principal){
+                try{
+                    final int id = principal.getUserId();
+                    DefaultRes<MyPage> defaultRes = myPageService.findByUserId(id);
+                    return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+                }catch (Exception e){
+                    log.error(e.getMessage());
+                    return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
 
-    /**
-     * 타인의 마이페이지 회원 고유 번호로 상단 정보 출력
-     *
-     * @param myPageUserId
-     * @param principal 토큰으로 회원 아이디 가져오기
-     * @return ResponseEntity
-     */
-    @GetMapping("others/{myPageUserId}")
-    public ResponseEntity getOtherUser(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
-        try{
-            final int id = principal.getUserId();
+            /**
+             * 타인의 마이페이지 회원 고유 번호로 상단 정보 출력
+             *
+             * @param myPageUserId
+             * @param principal 토큰으로 회원 아이디 가져오기
+             * @return ResponseEntity
+             */
+            @GetMapping("others/{myPageUserId}")
+            public ResponseEntity getOtherUser(@PathVariable("myPageUserId") final int myPageUserId, final GingsPrincipal principal){
+                try{
+                    final int id = principal.getUserId();
             if(id != myPageUserId){
                 DefaultRes<MyPage>defaultRes = myPageService.checkUserId(myPageUserId);
                 return new ResponseEntity<>(defaultRes, HttpStatus.OK);
@@ -137,8 +137,8 @@ public class MyPageController {
     public ResponseEntity getUserActive(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
-                DefaultRes<List<MyPageBoard>>defaultRes = boardService.findBoardByUserId(id);
-                return new ResponseEntity<>(defaultRes, HttpStatus.OK);
+            DefaultRes<List<MyPageBoard>>defaultRes = boardService.findBoardByUserId(id);
+            return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -180,7 +180,7 @@ public class MyPageController {
     public ResponseEntity findGuestBoards(final GingsPrincipal principal){
         try{
             final int id = principal.getUserId();
-            DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.checkfindGuestBoard(id);
+            DefaultRes<List<GuestModel.GuestModelRes>>defaultRes = myPageService.findGuestBoard(id);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         } catch (Exception e){
             log.error(e.getMessage());

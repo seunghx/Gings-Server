@@ -46,7 +46,7 @@ public class MyPageService implements ApplicationEventPublisherAware{
      * @param id 회원 고유 번호
      * @return DefaultRes
      */
-    public DefaultRes<MyPage>findByUserId(final int id) {
+    public DefaultRes<MyPage> findByUserId(final int id) {
         final MyPage myPage = userMapper.findByUserId2(id);
         if (myPage == null)
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_USER);

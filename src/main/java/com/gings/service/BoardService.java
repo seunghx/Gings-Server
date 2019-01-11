@@ -61,8 +61,8 @@ public class BoardService {
 
         }
 
-        removeBlockedBoards(boards, userId);
-        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        final List<HomeBoardAllRes> blockedBoards =  removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(blockedBoards, userId);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
 
@@ -97,8 +97,8 @@ public class BoardService {
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
-        removeBlockedBoards(boards, userId);
-        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        final List<HomeBoardAllRes> blockedBoards =  removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(blockedBoards, userId);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
 
@@ -115,8 +115,8 @@ public class BoardService {
         if (boards.isEmpty())
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
 
-        removeBlockedBoards(boards, userId);
-        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(boards, userId);
+        final List<HomeBoardAllRes> blockedBoards =  removeBlockedBoards(boards, userId);
+        final List<HomeBoardAllRes> filteredBoards = removeBlackListBoards(blockedBoards, userId);
         Collections.sort(filteredBoards);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, filteredBoards);
     }
@@ -548,12 +548,14 @@ public class BoardService {
     public List<HomeBoardAllRes> removeBlockedBoards(List<HomeBoardAllRes> boards, int userId) {
 
         List<Integer> blockBoardIdList = boardMapper.findBlockBoardsByUserId(userId);
-        
+
+        log.error("boards {}", boards);
+        log.error("blockboard {}", blockBoardIdList);
         List<HomeBoardAllRes> filteredBoards = 
                 boards.stream()
                       .filter(board -> !blockBoardIdList.contains(board.getBoardId()))
                       .collect(Collectors.toList());
-        
+        log.error("filtered {}", filteredBoards);
         return filteredBoards;
     }
 
