@@ -3,6 +3,7 @@ package com.gings.service;
 import com.gings.dao.BoardMapper;
 import com.gings.dao.UserMapper;
 
+import com.gings.domain.User;
 import com.gings.domain.board.Board;
 import com.gings.domain.board.BoardReply;
 import com.gings.model.DefaultRes;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
+import sun.plugin.util.UserProfile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -405,19 +407,25 @@ public class BoardService {
     public DefaultRes updateBoard(final int boardId, final @Validated ModifyBoardReq modifyBoardReq) {
         try {
             boardMapper.updateBoard(boardId, modifyBoardReq);
-
-            for (String url : modifyBoardReq.getPrevImagesUrl()) {
-                boardMapper.deleteBoardImg(url);
+            if(modifyBoardReq.getPrevImagesUrl() != null) {
+                for (String url : modifyBoardReq.getPrevImagesUrl()) {
+                    boardMapper.deleteBoardImg(url);
+                }
+                s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
             }
-            s3MultipartService.deleteMultipleFiles(modifyBoardReq.getPrevImagesUrl());
-
-            List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
-            boardMapper.saveBoardImg(boardId, urlList);
-
-            for (String keywords : modifyBoardReq.getPrevKeywords()) {
-                boardMapper.deleteBoardKeyword(keywords);
+            if(modifyBoardReq.getPostImages() != null) {
+                List<String> urlList = s3MultipartService.uploadMultipleFiles(modifyBoardReq.getPostImages());
+                boardMapper.saveBoardImg(boardId, urlList);
             }
-            boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
+
+            if(modifyBoardReq.getPrevKeywords() != null) {
+                for (String keywords : modifyBoardReq.getPrevKeywords()) {
+                    boardMapper.deleteBoardKeyword(keywords);
+                }
+            }
+            if(modifyBoardReq.getPostKeywords() != null) {
+                boardMapper.saveBoardKeyword(boardId, modifyBoardReq.getPostKeywords());
+            }
 
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BOARD);
 
@@ -496,22 +504,19 @@ public class BoardService {
                 board.setLikeChk(false);
             }
 
-            MyPageProfile profile = userMapper.selectProfileImg(board.getWriterId());
-            String image = profile == null? null : profile.getImage();
+            User user = userMapper.findByUserId(board.getWriterId());
 
-            log.error("{image}" + image);
-
-            board.setWriter(userMapper.findByUserId(board.getWriterId()).getName());
-            board.setField(userMapper.findByUserId(board.getWriterId()).getField());
-            board.setCompany(userMapper.findByUserId(board.getWriterId()).getCompany());
+            if(user.getName() != null &&!(user.equals(""))) board.setWriter(user.getName());
+            if(user.getField() != null &&!(user.equals(""))) board.setField(user.getField());
+            if(user.getCompany() != null &&!(user.equals(""))) board.setCompany(user.getCompany());
 
 
-
-            String imgUrl = userMapper.selectProfileImg(board.getWriterId()).getImage();
-
-            log.error("{imageUrl}" + imgUrl);
-            if(imgUrl != null && !(imgUrl.equals("")) ) {
-                board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+            if(userMapper.selectProfileImg(board.getWriterId()) != null) {
+                MyPageProfile profile = userMapper.selectProfileImg(board.getWriterId());
+                if (profile.getImage() != null &&
+                        !(profile.getImage().isEmpty())) {
+                    board.setWriterImage(userMapper.selectProfileImg(board.getWriterId()).getImage());
+                }
             }
         }
         List<Integer> likedReBoardIdList = boardMapper.findRecommendRepliesByUserId(userId);
@@ -543,10 +548,16 @@ public class BoardService {
                 if (boardReply.getReplyId() == likedReBoardId){ boardReply.setLikeChk(true); }
                 else { boardReply.setLikeChk(false); }
             }
-            boardReply.setWriter(userMapper.findByUserId(boardReply.getWriterId()).getName());
-            String imgUrl = userMapper.selectProfileImg(boardReply.getWriterId()).getImage();
-            if(imgUrl != null && !(imgUrl.equals("")) ) {
-                boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
+
+            User user = userMapper.findByUserId(boardReply.getWriterId());
+
+            if(user.getName() != null && !(user.getName().equals(""))) boardReply.setWriter(user.getName());
+            if(userMapper.selectProfileImg(boardReply.getWriterId()) != null) {
+                MyPageProfile profile = userMapper.selectProfileImg(boardReply.getWriterId());
+                if (profile.getImage() != null &&
+                        !(profile.getImage().isEmpty())) {
+                    boardReply.setWriterImage(userMapper.selectProfileImg(boardReply.getWriterId()).getImage());
+                }
             }
         }
         return boardReplies;
