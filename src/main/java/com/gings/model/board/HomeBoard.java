@@ -16,9 +16,9 @@ public class HomeBoard {
     @Setter
     @ToString
     public static class HomeBoardAllRes implements Comparable<HomeBoardAllRes>{
-        @NotBlank
+        @NotNull
         private int boardId;
-        @NotBlank
+        @NotNull
         private int writerId;
         @NotBlank
         private String writer;
@@ -63,9 +63,9 @@ public class HomeBoard {
     @Setter
     @ToString
     public static class HomeBoardOneRes {
-        @NotBlank
+        @NotNull
         private int boardId;
-        @NotBlank
+        @NotNull
         private int writerId;
         @NotBlank
         private String writer;
