@@ -27,7 +27,7 @@ public class ImageExtensionValidator implements ConstraintValidator<ImageExtensi
     private MessageSource msgSource;
     
     public ImageExtensionValidator(MessageSource msgSource) {
-        this.msgSource = mesgSource;
+        this.msgSource = msgSource;
     }
     
     @Override
