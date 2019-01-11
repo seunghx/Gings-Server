@@ -38,12 +38,6 @@ public class MyPageController {
     AndroidPushNotificationsService androidPushNotificationsService;
 
 
-    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
-                this.myPageService = myPageService;
-                this.boardService = boardService;
-                this.passwordEncoder = passwordEncoder;
-                this.fcmService = fcmService;
-            }
 
     public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
         this.userMapper = userMapper;
