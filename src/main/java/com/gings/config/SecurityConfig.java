@@ -49,7 +49,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
     
-
     @Bean
     public JWTServiceManager jwtServiceManager() {
         List<JWTService> jwtServices = new ArrayList<>();
