@@ -1,5 +1,6 @@
 package com.gings.controller;
 
+import static com.gings.model.DefaultRes.FAIL_DEFAULT_RES;
 import static com.gings.security.jwt.JWTService.AUTHORIZATION;
 import static com.gings.security.jwt.JWTService.BEARER_SCHEME;
 
@@ -7,8 +8,12 @@ import java.util.Locale;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import com.gings.dao.BoardMapper;
+import com.gings.dao.UserMapper;
+import com.gings.security.GingsPrincipal;
+import com.gings.security.authentication.Authentication;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -16,11 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
@@ -49,15 +50,18 @@ public class UserController {
     private static final Class<? extends TokenInfo> USING_TOKEN_INFO = EmailAuthTokenInfo.class;
     
     private final UserService userService;
+    private final BoardMapper boardMapper;
     private final MessageSource msgSource;
     private final JWTServiceManager jwtServiceManager;
     private final AuthenticationNumberNotificationProvider notificationProvider;
     
-    public UserController(UserService userService, MessageSource msgSource, 
-                          JWTServiceManager jwtServiceManager, 
+    public UserController(UserService userService, BoardMapper boardMapper,
+                          MessageSource msgSource,
+                          JWTServiceManager jwtServiceManager,
                           AuthenticationNumberNotificationProvider notificationProvider) {
         
         this.userService = userService;
+        this.boardMapper = boardMapper;
         this.msgSource = msgSource;
         this.jwtServiceManager = jwtServiceManager;
         this.notificationProvider = notificationProvider;
@@ -192,6 +196,17 @@ public class UserController {
         
         return new ResponseEntity<>(new DefaultRes<>(HttpStatus.CREATED.value(), message), 
                                     HttpStatus.OK);
+    }
+    @Authentication
+    @DeleteMapping("/deleteAccount")
+    public ResponseEntity<DefaultRes<Void>> deleteAccount(final GingsPrincipal principal) {
+        try {
+            final int userId = principal.getUserId();
+            return new ResponseEntity<>(userService.deleteUser(userId),  HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
     }
     
     private String resolveJWTToken(HttpServletRequest request) {

@@ -304,5 +304,4 @@ public interface UserMapper {
     @Update("UPDATE user SET fcm=#{none} WHERE user_id = #{id}")
     void deleteFcmOfUser(@Param("id")final int id, @Param("none") final String none);
 
-
 }

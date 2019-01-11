@@ -379,9 +379,19 @@ public interface BoardMapper {
     @Delete("DELETE FROM board WHERE board_id = #{boardId}")
     void deleteBoard(@Param("boardId") final int boardId);
 
-    //보드 고유번호로 보드 삭제하기
+    //회원 고유번호로 보드 삭제하기
+    @Delete("DELETE FROM board WHERE user_id = #{userId}")
+    void deleteBoardByUserId(@Param("userId") final int userId);
+
+    //리보드 고유번호로 리보드 삭제하기
     @Delete("DELETE FROM board_reply WHERE reply_id = #{reboardId}")
     void deleteReBoard(@Param("reboardId") final int reboardId);
+
+    //회원 고유번호로 리보드 삭제하기
+    @Delete("DELETE FROM board_reply WHERE user_id = #{userId}")
+    void deleteReBoardByUserId(@Param("userId") final int userId);
+
+
 
     //보드 이미지 고유 번호로 보드 이미지 삭제하기
     @Delete("DELETE FROM board_img WHERE url = #{imageUrl}")
