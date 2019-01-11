@@ -14,7 +14,6 @@ import java.util.List;
 public class ModifyBoard {
     @Getter
     @Setter
-    @NotBlank
     public static class ModifyBoardReq {
         private int boardId;
 
