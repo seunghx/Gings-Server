@@ -37,14 +37,6 @@ public class MyPageController {
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
 
-<<<<<<< HEAD
-    public MyPageController(MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
-                this.myPageService = myPageService;
-                this.boardService = boardService;
-                this.passwordEncoder = passwordEncoder;
-                this.fcmService = fcmService;
-            }
-=======
     public MyPageController(UserMapper userMapper, MyPageService myPageService, BoardService boardService, PasswordEncoder passwordEncoder, FCMService fcmService) {
         this.userMapper = userMapper;
         this.myPageService = myPageService;
@@ -52,7 +44,6 @@ public class MyPageController {
         this.passwordEncoder = passwordEncoder;
         this.fcmService = fcmService;
     }
->>>>>>> 622ebe9c83eeb889ee0720dc265c5df4357f084b
 
             //====================================== 마이 페이지 ====================================================
             /**
