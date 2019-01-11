@@ -29,8 +29,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     
     @Autowired
     private StompConnectionInterceptor connectInterceptor;
-    @Autowired
-    private SessionStoreProtocolHandler sessionStoreProtocolHandler;
     
     /*
      * 우선 rabbitmq 사용 안함.
@@ -69,7 +67,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(sessionStoreProtocolHandler, WS_CONNECT);
     }
-    
 }

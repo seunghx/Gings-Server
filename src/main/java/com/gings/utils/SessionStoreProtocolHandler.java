@@ -9,14 +9,13 @@ import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
 public class SessionStoreProtocolHandler extends SubProtocolWebSocketHandler {
 
     private final WebSocketSessionManager sessionManager;
     
     public SessionStoreProtocolHandler(MessageChannel clientInboundChannel, 
-                                SubscribableChannel clientOutboundChannel,
-                                WebSocketSessionManager sessionManager) {
+                                       SubscribableChannel clientOutboundChannel,
+                                       WebSocketSessionManager sessionManager) {
         super(clientInboundChannel, clientOutboundChannel);
         this.sessionManager = sessionManager;
     }
