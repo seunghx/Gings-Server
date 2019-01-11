@@ -29,7 +29,7 @@ public class ModifyBoard {
         private BoardCategory category;
 
         private List<String> prevImagesUrl;
-        private List<@ImageExtension MultipartFile> postImages;
+        private List<MultipartFile> postImages;
 
         private List<String> prevKeywords;
         private List<String> postKeywords;
