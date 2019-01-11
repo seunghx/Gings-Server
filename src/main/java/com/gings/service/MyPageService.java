@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class MyPageService implements ApplicationEventPublisherAware{
-   
+
     private final BoardMapper boardMapper;
     private final UserMapper userMapper;
     private final S3MultipartService s3MultipartService;
@@ -52,7 +52,7 @@ public class MyPageService implements ApplicationEventPublisherAware{
             return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_USER);
         return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_USER, myPage);
     }
-    
+
     public DefaultRes<MyPage> checkUserId(final int id){
         final MyPage myPage = userMapper.findByUserId2(id);
         if (myPage == null)
@@ -294,7 +294,7 @@ public class MyPageService implements ApplicationEventPublisherAware{
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
-        
+
     }
 
     public String getFcm(final int id){

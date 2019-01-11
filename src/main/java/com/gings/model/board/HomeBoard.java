@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,19 +16,28 @@ public class HomeBoard {
     @Setter
     @ToString
     public static class HomeBoardAllRes implements Comparable<HomeBoardAllRes>{
+        @NotBlank
         private int boardId;
-
+        @NotBlank
         private int writerId;
+        @NotBlank
         private String writer;
+
         private String writerImage;
 
+        @NotBlank
         private String field;
+        @NotBlank
         private String company;
 
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+
         private int share;
         private LocalDateTime time;
+        @NotNull
         private BoardCategory category;
 
         private List<String> images;
@@ -52,17 +63,24 @@ public class HomeBoard {
     @Setter
     @ToString
     public static class HomeBoardOneRes {
+        @NotBlank
         private int boardId;
-
+        @NotBlank
         private int writerId;
+        @NotBlank
         private String writer;
         private String writerImage;
 
+        @NotBlank
         private String field;
+        @NotBlank
         private String company;
 
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+
         private int share;
         private LocalDateTime time;
         private BoardCategory category;
@@ -75,9 +93,5 @@ public class HomeBoard {
         private int recommender;
 
         private boolean likeChk;
-
     }
-
-
-
 }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class ModifyBoard {
@@ -20,8 +21,11 @@ public class ModifyBoard {
         private String writer;
         private String writerImage;
 
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+        @NotNull
         private BoardCategory category;
 
         private List<String> prevImagesUrl;
@@ -30,11 +34,5 @@ public class ModifyBoard {
         private List<String> prevKeywords;
         private List<String> postKeywords;
 
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class UpBoardRes {
     }
 }
