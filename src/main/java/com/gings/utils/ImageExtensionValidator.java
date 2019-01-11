@@ -1,13 +1,10 @@
 package com.gings.utils;
 
-import java.util.Objects;
+
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,12 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ImageExtensionValidator implements ConstraintValidator<ImageExtension, MultipartFile> {
 
-    @Autowired
-    private final MessageSource messageSource;
-    
-    public ImageExtensionValidator(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
 
     @Override
     public void initialize(ImageExtension contactNumber) {
@@ -46,13 +37,13 @@ public class ImageExtensionValidator implements ConstraintValidator<ImageExtensi
         try {
             ImageOperationProvider.validateImage(file.getOriginalFilename());
         } catch (UnsupportedImageFormatException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Validating image file name failed due to {}.", ex.toString());
-                log.debug("Invalid file name : {}", ex.getFileName());
+            if (log.isInfoEnabled()) {
+                log.info("Validating image file name failed due to {}.", ex.toString());
+                log.info("Invalid file name : {}", ex.getFileName());
             }
             return false;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            log.error("{}", throwable);
         }
 
         log.debug("Validating image file name succeeded.");
