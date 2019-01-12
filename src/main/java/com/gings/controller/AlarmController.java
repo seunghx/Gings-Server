@@ -46,6 +46,7 @@ public class AlarmController {
         try{
             final int id = principal.getUserId();
             System.out.println("아이디 출력: "+id);
+            
             DefaultRes<List<Alarm>> defaultRes = alarmService.findByUserId(id);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
         }catch (Exception e){

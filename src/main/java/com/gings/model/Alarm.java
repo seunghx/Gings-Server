@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 public class Alarm {
+
     private int userId;
+    private int writerId;
+    private String sentence;
     private String location;
     private int destinationId;
 

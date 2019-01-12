@@ -29,9 +29,9 @@ public class AlarmService {
         this.boardMapper = boardMapper;
     }
 
-    public DefaultRes insertAlarm(final int id, final String location, final int destination) {
+    public DefaultRes insertAlarm(final int id, final int writerId, final String sentence, final String location, final int destination) {
         try {
-            userMapper.saveAlarm(id, location, destination);
+            userMapper.saveAlarm(id, writerId, sentence, location, destination);
             return DefaultRes.res(StatusCode.OK, ResponseMessage.SAVED_ALARM);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

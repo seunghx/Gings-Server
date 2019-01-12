@@ -172,7 +172,8 @@ public class BoardController {
                 String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
                 String detailboard = "detail board";
                 String firebaseResponse = fcmService.createFcm(detailboard,receiverId, senderId, "깅스", name+"님이 나의 보드에 추천을 눌렀어요!");
-                alarmService.insertAlarm(receiverId, "board detail", boardId);
+
+                alarmService.insertAlarm(receiverId,principal.getUserId(), name+"님이 나의 보드에 추천을 눌렀어요!","board detail", boardId);
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }
             return new ResponseEntity<>(boardService.boardLikes(boardId, principal.getUserId()), HttpStatus.OK);
@@ -253,8 +254,9 @@ public class BoardController {
 
             String name = myPageService.findByUserId(principal.getUserId()).getData().getName();
             String detailboard = "detail board";
-            String firebaseResponse = fcmService.createFcm(detailboard,writer, replyId, "깅스", name+"님이 나의 보드에 답변을 달았어요!");
-            alarmService.insertAlarm(writer, "board detail", boardId);
+            String firebaseResponse = fcmService.createFcm(detailboard, writer, replyId, "깅스", name+"님이 나의 보드에 답변을 달았어요!");
+            System.out.println("찾아아아아ㅏㅇㅅㅂ: "+writer);
+            alarmService.insertAlarm(writer, principal.getUserId(), name+"님이 나의 보드에 답변을 달았어요!","board detail", boardId);
             return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
@@ -283,7 +285,7 @@ public class BoardController {
                 String detailboard = "detail board";
                 String firebaseResponse = fcmService.createFcm(detailboard,receiverId, senderId, "깅스", name+"님이 나의 리보드에 추천을 눌렀어요!");
 
-                alarmService.insertAlarm(receiverId, "board detail", rId);
+                alarmService.insertAlarm(receiverId,principal.getUserId(), name+"님이 나의 리보드에 추천을 눌렀어요!","board detail", rId);
 
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
             }

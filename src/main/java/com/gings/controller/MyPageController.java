@@ -246,7 +246,8 @@ public class MyPageController {
                 String action = "마이페이지";
 
                 String firebaseResponse = fcmService.createFcm(action, myPageUserId, guestboardId, "깅스", name+"님이 게스트 보드를 작성했습니다.");
-                alarmService.insertAlarm(myPageUserId, "mypage", i);
+                //alarmService.insertAlarm(myPageUserId, "mypage", i);
+                alarmService.insertAlarm(myPageUserId, id, name+"님이 게스트 보드를 작성했습니다","mypage",i );
 
 
                 return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
