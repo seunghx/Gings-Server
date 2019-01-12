@@ -317,7 +317,7 @@ public class BoardService {
             boardMapper.saveBlackListUser(userId, blockUserId);
 
             black.setBlackList(boardMapper.findBlackListUsersByUserId(userId));
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.BLOCK_BOARD, black);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.ADD_BLACKLIST, black);
         } catch (Exception e) {
             log.error("{}",e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
