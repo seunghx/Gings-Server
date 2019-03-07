@@ -178,7 +178,7 @@ public class ChatService {
     
     public void confirmLastRead(int roomId, int userId, int lastReadMessage) {
         
-        validateLastReadOrFail(userId, roomId, lastReadMessage);
+        validateLastReadOrFail(roomId, userId, lastReadMessage);
         
         log.info("Starting to confirm last read message for message : {}", lastReadMessage);
         
